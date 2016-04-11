@@ -19,29 +19,32 @@ var {
 class SelectSecret extends React.Component {
   constructor(props){
     super(props);
-    this.ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    this.secrets = [{
-      'text': 'Create Your Own Create Your Own Create Your Own Create Your Own Create Your Own Create Your Own Create Your Own Create Your Own Create Your Own Create Your Own Create Your Own Create Your Own'
-    }, {
-      'text': 'Love'
-    }, {
-      'text': 'Sex'
-    }, {
-      'text': 'Social'
-    }, {
-      'text': 'Funny'
-    }, {
-      'text': 'Embarassing'
-    }, {
-      'text': 'From Your Past'
-    }]
+    this.state = {
+      source: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
+    }
+    this.secrets = []
+  }
+  componentDidMount() {
+    this.props.db.child('publicSecrets').orderByChild('category').equalTo(this.props.route.category).on("child_added", (snapshot) => {
+      this.secrets.push(snapshot.val())
+      this.setState({
+        source: this.state.source.cloneWithRows(this.secrets)
+      })
+    }, function (errorObject) {
+      console.log("The read failed: " + errorObject.code);
+    })
+    /*this.props.db.child('publicSecrets').orderByChild('category').equalTo(this.props.route.category).on("child_added", (snapshot) => {
+      secrets.push(snapshot.val())
+    }, function (errorObject) {
+      console.log("The read failed: " + errorObject.code);
+    })*/ 
   }
   render(){
     return (
       <View style={StylingGlobals.container}>
         <ListView
-          dataSource={
-            this.ds.cloneWithRows(this.secrets)
+          dataSource= {
+            this.state.source
           }
           renderRow={(rowData) => {
             return (

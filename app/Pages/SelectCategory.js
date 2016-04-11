@@ -33,11 +33,12 @@ class SelectCategory extends React.Component {
       'title': 'Embarassing'
     }, {
       'title': 'From Your Past'
-    }]
+    }];
   }
   selectThisCategory (categoryName, viewName) {
     this.props.navigator.push({
-      name: 'SelectSecret'
+      name: 'SelectSecret',
+      category: categoryName
     })
     /*this.props.navigator.push({
       component: viewName,
@@ -51,7 +52,7 @@ class SelectCategory extends React.Component {
           <Category 
             categoryName={this.categories[0].title} 
             imgSource={require("../../img/emails9.png")} 
-            elsewhere={this.selectThisCategory.bind(this, this.categories[0].title, CreateYourOwn)} />
+            elsewhere={() => {this.props.navigator.push({name: 'CreateSecret'})}} />
           <Category 
             categoryName={this.categories[1].title} 
             imgSource={require("../../img/heart296.png")} 

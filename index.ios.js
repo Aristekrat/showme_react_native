@@ -28,8 +28,8 @@ var {
   ListView,
 } = React;
 
-//const Firebase = require('firebase');
-//const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
+const Firebase = require('firebase');
+const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 
 var NavigationBarRouteMapper = {
   LeftButton: function(route, navigator, index, navState) {
@@ -60,11 +60,6 @@ var NavigationBarRouteMapper = {
       default:
         return (
           <Text></Text>
-          /*<TouchableHighlight style={styles.navBarRightButton} underlayColor={'transparent'}>
-            <Image 
-              source={require("./img/show8.png")}
-              style={styles.navBarRightImage} />
-          </TouchableHighlight>*/
         );
     }
   },
@@ -114,11 +109,11 @@ var NavigationBarRouteMapper = {
 class ShowMe extends React.Component {
   constructor(props) {
     super(props)
-    //this.DB = this.getRef()
-    //this.itemsRef = this.getRef().child('items') - will nest everything in a parent tree called 'items'
+    this.DB = this.getRef()
+    //this.itemsRef = this.getRef().child('items') //- will nest everything in a parent tree called 'items'
   }
   getRef() {
-    //return new Firebase(FirebaseURL)
+    return new Firebase(FirebaseURL)
   }
   renderScene (route, navigator) {
     switch (route.name) {
@@ -132,7 +127,7 @@ class ShowMe extends React.Component {
         );
       case 'SelectSecret':
         return (
-          <SelectSecret navigator={navigator} route={route} />
+          <SelectSecret navigator={navigator} route={route} db={this.db} />
         );
       case 'ShareSecret':
         return (
@@ -168,7 +163,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'SignIn'
+          name: 'SelectCategory'
         }} />
     );
   }
