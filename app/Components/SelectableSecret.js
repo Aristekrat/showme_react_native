@@ -13,7 +13,7 @@ var {
 class Secret extends React.Component {
   render() {
     return (
-      <TouchableHighlight underlayColor={StylingGlobals.colors.accentPressDown} onPress={() => this.toggleActivityIndicator()}>
+      <TouchableHighlight underlayColor={StylingGlobals.colors.accentPressDown} onPress={this.props.selectSecret}>
         <View style={styles.secretContainer}>
           <Text style={styles.secretText}>{this.props.secretText}</Text> 
           <Image 

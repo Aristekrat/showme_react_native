@@ -14,8 +14,6 @@ var {
   ListView,
 } = React;
 
-// https://www.firebase.com/blog/2016-01-20-tutorial-firebase-react-native.html - Scroll down to 'Firebase listener'
-
 class SelectSecret extends React.Component {
   constructor(props){
     super(props);
@@ -33,11 +31,9 @@ class SelectSecret extends React.Component {
     }, function (errorObject) {
       console.log("The read failed: " + errorObject.code);
     })
-    /*this.props.db.child('publicSecrets').orderByChild('category').equalTo(this.props.route.category).on("child_added", (snapshot) => {
-      secrets.push(snapshot.val())
-    }, function (errorObject) {
-      console.log("The read failed: " + errorObject.code);
-    })*/ 
+  }
+  selectThisSecret () {
+    console.log("Buh?")
   }
   render(){
     return (
@@ -49,7 +45,7 @@ class SelectSecret extends React.Component {
           renderRow={(rowData) => {
             return (
               <Secret 
-                secretText={rowData.text} />
+                secretText={rowData.text} selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', userID: rowData.text})}} />
             )
           }} />
         <TabBar navigator={this.props.navigator} route={this.props.route} />
