@@ -32,9 +32,6 @@ class SelectSecret extends React.Component {
       console.log("The read failed: " + errorObject.code);
     })
   }
-  selectThisSecret () {
-    console.log("Buh?")
-  }
   render(){
     return (
       <View style={StylingGlobals.container}>

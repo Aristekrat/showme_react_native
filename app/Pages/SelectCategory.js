@@ -85,7 +85,9 @@ class SelectCategory extends React.Component {
 }
 
 var styles = StyleSheet.create({
-
+  content: {
+    
+  }
 });
 
 module.exports = SelectCategory;

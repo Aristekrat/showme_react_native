@@ -24,12 +24,13 @@ class Category extends React.Component {
 	        </Text>
           <Image 
             source={require("../../img/right-arrow.png")}
-            style={StylingGlobals.rightArrow} />
+            style={[StylingGlobals.rightArrow, styles.catArrow]} />
         </View>
       </TouchableHighlight>
     )
   }
 }
+// [styles.button, StylingGlobals.horizontalCenter]
 
 var styles = StyleSheet.create({
   category: {
@@ -44,14 +45,17 @@ var styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
-    marginLeft: 10,
     textAlign: 'center',
-    width: 240,
+    flex: 1,
   },
   icon: {
     marginLeft: 10,
     width: 45,
     height: 45,
+  },
+  catArrow: {
+    position: 'relative',
+    right: 10,
   }
 });
 

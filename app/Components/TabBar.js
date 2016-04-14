@@ -65,8 +65,8 @@ class TabBar extends React.Component {
   }
   render(){
     return (
-      <View>
-        <TabBarIOS style={styles.tabContainer} 
+      <View style={styles.tabContainer}>
+        <TabBarIOS  
           tintColor="#fff"
           barTintColor={StylingGlobals.colors.mainColor}>
             <TabBarIOS.Item
