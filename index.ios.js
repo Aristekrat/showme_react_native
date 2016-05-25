@@ -75,7 +75,7 @@ var NavigationBarRouteMapper = {
         return (
           <TouchableHighlight onPress={() => navigator.pop()} underlayColor={'transparent'}>
             <Image 
-              source={require("./img/left207.png")}
+              source={require("./app/img/left207.png")}
               style={styles.navBarRightImage} />
           </TouchableHighlight>
         );

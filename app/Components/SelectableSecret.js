@@ -30,7 +30,7 @@ class Secret extends React.Component {
         <View style={styles.secretContainer}>
           <Text style={styles.secretText}>{this.props.secretText}</Text> 
           <Image 
-            source={require("../../img/right-arrow.png")}
+            source={require("../img/right-arrow.png")}
             style={StylingGlobals.rightArrow} />      
         </View>
       </TouchableHighlight>

@@ -85,7 +85,7 @@ class Gateway extends React.Component {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
-          <Image style={styles.heroImage} source={require("../../img/chat21.png")} />
+          <Image style={styles.heroImage} source={require("../img/chat21.png")} />
 
           <View style={styles.fbContainer}>
             <Text style={styles.fbText}>Continue with Facebook</Text>
@@ -108,7 +108,7 @@ class Gateway extends React.Component {
                   style={styles.emailButton} 
                   underlayColor={StylingGlobals.colors.pressDown} 
                   onPress={() => this.checkEmail()} >
-                <Image style={styles.emailRightArrow} source={require("../../img/right-arrow.png")} />
+                <Image style={styles.emailRightArrow} source={require("../img/right-arrow.png")} />
               </TouchableHighlight>
             </View>
           </View>
@@ -119,7 +119,7 @@ class Gateway extends React.Component {
               onPress={() => this.props.navigator.push({name: 'SelectCategory'})} >
             <View style={styles.skipContainer}>
               <Text style={styles.skipText}>Skip for Now</Text>
-              <Image style={styles.skipRightArrow} source={require("../../img/right-arrow.png")} />
+              <Image style={styles.skipRightArrow} source={require("../img/right-arrow.png")} />
             </View>
           </TouchableHighlight>
         </ScrollView>

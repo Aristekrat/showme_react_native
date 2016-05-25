@@ -148,7 +148,7 @@ class CreateYourOwn extends React.Component {
                   onPress={() => console.log("Need non-dummy")}>
                   <View style={StylingGlobals.horizontalCenter}>
                     <Image 
-                      source={require("../../img/game67.png")} style={styles.icon} />
+                      source={require("../img/game67.png")} style={styles.icon} />
                     <Text style={styles.buttonText}>Send Secret</Text>
                   </View>
               </TouchableHighlight>

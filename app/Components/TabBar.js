@@ -83,7 +83,7 @@ class TabBar extends React.Component {
               selected={this.state.selectedTab === 'tabOne'}
               onPress={() => this.setTab('tabOne', this.props.tabOne)}
               title={"My Secrets"}
-              icon={require('../../img/envelope76.png')}
+              icon={require('../img/envelope76.png')}
               style={styles.tabItem}
               badge='3' >
                 <View></View>
@@ -93,17 +93,16 @@ class TabBar extends React.Component {
               selected={this.state.selectedTab === 'tabTwo'}
               onPress={() => this.setTab('tabTwo', this.props.tabTwo)}
               title={"New"}
-              icon={require('../../img/romantic41.png')}
+              icon={require('../img/romantic41.png')}
               style={styles.tabItem}>
                 <View></View>
             </TabBarIOS.Item>
 
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabThree'}
-              unselectedTintColor={"#fff"}
               onPress={() => this.setTab('tabThree', this.props.tabThree)}
               title={true ? "Sign In" : "My Account"}
-              icon={require('../../img/business64.png')}
+              icon={require('../img/business64.png')}
               style={styles.tabItem}>
                 <View></View>
             </TabBarIOS.Item>

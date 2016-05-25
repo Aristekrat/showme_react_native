@@ -35,9 +35,9 @@ class ShareSecret extends React.Component {
       <View style={StylingGlobals.container}>
         <ScrollView style={styles.content}>
           <Text style={styles.prompt}>How would you like to ask?</Text>
-          <ShareButton imgSource={require("../../img/game67.png")} shareType={"Text"} />
-          <ShareButton imgSource={require("../../img/chat21.png")} shareType={"Facebook"} />
-          <ShareButton imgSource={require("../../img/envelope156.png")} shareType={"Email"} />
+          <ShareButton imgSource={require("../img/game67.png")} shareType={"Text"} />
+          <ShareButton imgSource={require("../img/chat21.png")} shareType={"Facebook"} />
+          <ShareButton imgSource={require("../img/envelope156.png")} shareType={"Email"} />
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
