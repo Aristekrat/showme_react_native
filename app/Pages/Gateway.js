@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
+import SkipButton from '../Components/SkipButton.js';
 import {
   StyleSheet,
   Text,
@@ -13,35 +14,18 @@ import {
   TouchableHighlight
 } from 'react-native';
 
-/*
-var StylingGlobals = require('../StylingGlobals.js');
-var React = require('react-native');
-var TabBar = require('../Components/TabBar.js');
-
-var {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Image,
-  TextInput,
-  TouchableHighlight,
-} = React;
-*/
-
-/*
 const FBSDK = require('react-native-fbsdk');
 const {
   LoginButton
 } = FBSDK;
-*/
 
 class Gateway extends React.Component {
   constructor(props) {
     super(props);
-    state: {
-      emailAddress: ''
-    }
+    this.state = {
+      emailAddress: '',
+      validEmail: true
+    },
     this.userIndex = this.props.db.child('users');
   }
 
@@ -64,7 +48,6 @@ class Gateway extends React.Component {
     var self = this;
     if (self.validateEmail(self.state.emailAddress)) {
       self.userIndex.once('value', function (snapshot) {
-        var t = self.state.emailAddress
         if (snapshot.hasChild(self.escapeEmail(self.state.emailAddress))) {
           // Go to login
           console.log("This is a registered email");
@@ -76,11 +59,9 @@ class Gateway extends React.Component {
         }
       });
     } else {
-      console.log("Boo!");
-      // Add error handling
+      self.setState({validEmail: false});
     }
   }
-  // <LoginButton style={styles.fbutton} />
   render() {
     return (
       <View style={StylingGlobals.container}>
@@ -89,9 +70,7 @@ class Gateway extends React.Component {
 
           <View style={styles.fbContainer}>
             <Text style={styles.fbText}>Continue with Facebook</Text>
-            <TouchableHighlight>
-              <Text>Placeholder</Text>
-            </TouchableHighlight>
+            <LoginButton style={styles.fbutton} />
           </View>
 
           <View style={styles.emailContainer}>
@@ -111,17 +90,13 @@ class Gateway extends React.Component {
                 <Image style={styles.emailRightArrow} source={require("../img/right-arrow.png")} />
               </TouchableHighlight>
             </View>
+            { this.state.validEmail ?
+                null
+                : 
+                <Text style={styles.errorText}>Please use a valid email</Text>
+            }
           </View>
-
-          <TouchableHighlight 
-              style={styles.skipButton} 
-              underlayColor={StylingGlobals.colors.accentPressDown} 
-              onPress={() => this.props.navigator.push({name: 'SelectCategory'})} >
-            <View style={styles.skipContainer}>
-              <Text style={styles.skipText}>Skip for Now</Text>
-              <Image style={styles.skipRightArrow} source={require("../img/right-arrow.png")} />
-            </View>
-          </TouchableHighlight>
+          <SkipButton skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
@@ -130,9 +105,6 @@ class Gateway extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  contentContainer: {
-
-  },
   heroImage: {
     width: 125,
     height: 125,
@@ -190,24 +162,10 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     tintColor: '#fff',
   },
-  skipButton: {
-    alignSelf: 'center',
-    marginTop: 10,
-    padding: 15,
-  },
-  skipContainer: {
-    flexDirection: 'row',
-  },
-  skipText: {
-    color: StylingGlobals.colors.mainColor,
-  },
-  skipRightArrow: {
-    tintColor: StylingGlobals.colors.mainColor,
-    width: 11,
-    height: 11,
-    marginTop: 3,
-    marginLeft: 2,
-  },
+  errorText: {
+    marginTop: 5,
+    color: StylingGlobals.colors.mainColor
+  }
 });
 
 module.exports = Gateway;

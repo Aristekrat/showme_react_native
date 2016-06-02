@@ -77,8 +77,8 @@ class TabBar extends React.Component {
     return (
       <View style={styles.tabContainer}>
         <TabBarIOS  
-          tintColor="#fff"
-          barTintColor={StylingGlobals.colors.mainColor}>
+          tintColor={StylingGlobals.colors.mainColor}
+          barTintColor={StylingGlobals.colors.accentPressDown}>
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabOne'}
               onPress={() => this.setTab('tabOne', this.props.tabOne)}
@@ -117,6 +117,7 @@ var styles = StyleSheet.create({
   tabContainer: {
     height: 70, // Not possible to click on the nav bar items without this. 
     marginTop: 20,
+    borderTopColor: StylingGlobals.colors.navColor,
   },
   tabItem: {
     height: 70,

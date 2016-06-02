@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
+import SkipButton from '../Components/SkipButton.js';
 import SelectSecret from './SelectSecret.js';
 import ShareSecret from './ShareSecret.js';
 import MySecrets from './MySecrets.js';
@@ -17,40 +18,14 @@ import {
   ActivityIndicatorIOS
 } from 'react-native';
 
-/*
-var React = require('react-native');
-var TabBar = require('../Components/TabBar.js');
-var SelectSecret = require('./SelectSecret.js');
-var ShareSecret = require('./ShareSecret.js');
-var MySecrets = require('./MySecrets.js');
-var MyAccount = require('./MyAccount.js');
-var StylingGlobals = require('../StylingGlobals.js');
-
-var {
-  StyleSheet,
-  Text,
-  View,
-  TouchableHighlight,
-  ScrollView,
-  TextInput,
-  ActivityIndicatorIOS,
-} = React;
-*/
-
-/*
-const FBSDK = require('react-native-fbsdk');
-const {
-  LoginManager,
-} = FBSDK;
-*/
-
 class SignIn extends React.Component {
   constructor(props){
     super(props);
     this.state = {
       animating: false,
       username: this.props.route.cookieData,
-      password: ''
+      password: '',
+      error: ''
     }
     this.usersIndex = this.props.db.child('users');
   }
@@ -65,7 +40,8 @@ class SignIn extends React.Component {
 
   registerUser() {
     var self = this;
-    this.toggleActivityIndicator()
+    this.toggleActivityIndicator();
+    self.setState({error: ''});
     
     if (self.state.username !== '' || self.state.password !== '') {
       self.props.db.createUser({
@@ -74,21 +50,55 @@ class SignIn extends React.Component {
       }, function (error, userData) {
         if (error) {
           self.toggleActivityIndicator();
-          console.log("Error creating user:", error);
-          // Add error Handling
+          switch (error.code) {
+            case 'INVALID_EMAIL':
+              self.setState({error: 'Invalid email, please check that you entered your email correctly.'});
+              break;
+            default:
+              self.setState({error: 'Registration failed. This is probably due to a connection error.'}); 
+              break;
+          }
         } else {
           self.toggleActivityIndicator();
-          var userEmail = {}
-          userEmail["registeredEmail"] = self.escapeEmail(self.state.username);
-          self.usersIndex.push(userEmail);
-          // Success notification before moving?
+          var t = self.escapeEmail(self.state.username)
+          self.usersIndex.child(t).set(true)
+          // Add success notification before moving
           self.props.navigator.push({name: 'SelectCategory'})
         }
       }) // End parent function
     }
   }
 
-  submitUser () {
+  loginUser() {
+    var self = this; 
+    self.setState({error: ''});
+    self.usersIndex.authWithPassword({
+      email: self.state.username, 
+      password: self.state.password
+    }, function (error, authData) {
+      if (error) {
+        switch (error.code) {
+          case 'INVALID_EMAIL':
+            self.setState({error: 'Invalid email, please check that you entered your email correctly.'});
+            break;
+          case 'INVALID_USER':
+            self.setState({error: 'The system did not recognize that email.'});
+            break;
+          case 'INVALID_PASSWORD':
+            self.setState({error: 'The system rejected your credentials.'});
+            break;
+          default:
+            self.setState({error: 'Login failed. This is probably due to a connection error.'}); 
+            break;
+        }
+      } else {
+        // Add success notification before moving
+        self.props.navigator.push({name: 'SelectCategory'})
+      }
+    })
+  }
+
+  submitUser() {
     if (this.props.route.name === 'Register') {
       this.registerUser()
     } else if (this.props.route.name === 'SignIn') {
@@ -96,11 +106,11 @@ class SignIn extends React.Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
 
   }
 
-  render(){
+  render() {
     return (
       <View style={styles.container}>
         <ActivityIndicatorIOS
@@ -136,6 +146,19 @@ class SignIn extends React.Component {
               onPress={() => this.submitUser()}>
             <Text style={styles.buttonText}>{this.props.route.name === 'Register' ? 'Sign Up' : 'Sign In'}</Text>
           </TouchableHighlight>
+          { this.state.error ?
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{this.state.error}</Text>
+                <SkipButton skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
+              </View>
+                : 
+              null
+          }
+          { this.state.validEmail ?
+              <Text style={styles.errorText}>Please use a valid email</Text>
+                : 
+              null
+          }
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
@@ -188,6 +211,14 @@ var styles = StyleSheet.create({
     right: 0,
     top: -7,
   },
+  errorContainer: {
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  errorText: {
+    flex: 1,
+    marginTop: 15,
+  }
 });
 
 module.exports = SignIn;

@@ -201,7 +201,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'Gateway'
+          name: 'SignIn'
         }} />
     );
   }
