@@ -25,7 +25,7 @@ class SignIn extends React.Component {
       animating: false,
       username: this.props.route.cookieData,
       password: '',
-      error: ''
+      response: 'Invalid user.'
     }
     this.usersIndex = this.props.db.child('users');
   }
@@ -41,37 +41,36 @@ class SignIn extends React.Component {
   registerUser() {
     var self = this;
     this.toggleActivityIndicator();
-    self.setState({error: ''});
-    
-    if (self.state.username !== '' || self.state.password !== '') {
-      self.props.db.createUser({
-        email: self.state.username,
-        password: self.state.password
-      }, function (error, userData) {
-        if (error) {
-          self.toggleActivityIndicator();
-          switch (error.code) {
-            case 'INVALID_EMAIL':
-              self.setState({error: 'Invalid email, please check that you entered your email correctly.'});
-              break;
-            default:
-              self.setState({error: 'Registration failed. This is probably due to a connection error.'}); 
-              break;
-          }
-        } else {
-          self.toggleActivityIndicator();
-          var t = self.escapeEmail(self.state.username)
-          self.usersIndex.child(t).set(true)
-          // Add success notification before moving
-          self.props.navigator.push({name: 'SelectCategory'})
+    self.setState({response: ''});
+
+    self.props.db.createUser({
+      email: self.state.username,
+      password: self.state.password
+    }, function (error, userData) {
+      if (error) {
+        self.toggleActivityIndicator();
+        switch (error.code) {
+          case 'INVALID_EMAIL':
+            self.setState({response: 'Invalid email.'});
+            break;
+          default:
+            self.setState({response: 'Unknown error.'});
+            break;
         }
-      }) // End parent function
-    }
+      } else {
+        self.toggleActivityIndicator();
+        self.setState({response: 'Success.'});
+        var t = self.escapeEmail(self.state.username)
+        self.usersIndex.child(t).set(true);
+        self.props.navigator.push({name: 'SelectCategory'})
+      }
+    }) // End parent function
   }
 
   loginUser() {
     var self = this; 
-    self.setState({error: ''});
+    self.toggleActivityIndicator();
+    self.setState({response: ''});
     self.usersIndex.authWithPassword({
       email: self.state.username, 
       password: self.state.password
@@ -79,31 +78,55 @@ class SignIn extends React.Component {
       if (error) {
         switch (error.code) {
           case 'INVALID_EMAIL':
-            self.setState({error: 'Invalid email, please check that you entered your email correctly.'});
+            self.setState({response: 'Invalid email.'}); // Enter correct email
             break;
           case 'INVALID_USER':
-            self.setState({error: 'The system did not recognize that email.'});
+            self.setState({response: 'Invalid user.'}); // Display forgot
             break;
           case 'INVALID_PASSWORD':
-            self.setState({error: 'The system rejected your credentials.'});
+            self.setState({response: 'Invalid password.'}); // Display forgot
             break;
           default:
-            self.setState({error: 'Login failed. This is probably due to a connection error.'}); 
+            self.setState({response: 'Unknown error.'}); // Display skip 
             break;
         }
       } else {
-        // Add success notification before moving
+        self.setState({response: 'Success.'});
         self.props.navigator.push({name: 'SelectCategory'})
       }
     })
   }
 
   submitUser() {
-    if (this.props.route.name === 'Register') {
-      this.registerUser()
-    } else if (this.props.route.name === 'SignIn') {
-      this.loginUser()
+    if (this.state.username !== '' && this.state.password !== '') {
+      if (this.props.route.name === 'Register') {
+        this.registerUser()
+      } else if (this.props.route.name === 'SignIn') {
+        this.loginUser()
+      }
+    } else {
+      this.setState({response: 'Empty email or password'}); // Enter all fields
     }
+  }
+
+  forgotPassword() {
+    var self = this;
+    this.props.db.resetPassword({
+      email: this.state.username
+    }, function (error) {
+          if (error) {
+            switch (error.code) {
+              case "INVALID_USER":
+                self.setState({response: 'User not found.'}); // Probably want to display registration query
+                break;
+              default:
+                self.setState({response: 'Unknown error.'}); // Display skip 
+            }
+          } else {
+            self.setState({response: 'Forgot password success.'})
+            console.log("Password reset email sent successfully!"); // Display success notification
+          }
+    });
   }
 
   componentDidMount() {
@@ -111,6 +134,43 @@ class SignIn extends React.Component {
   }
 
   render() {
+    let responseBlock;
+    switch (this.state.response) { // TODO - make this consistent and add unit tests
+      case "":
+        responseBlock = null;
+        break;
+      case "Invalid email.":
+        responseBlock = <InvalidEmail />;
+        break;
+      case "Invalid user.":
+      case "Invalid password.":
+        responseBlock = <ForgotPassword />;
+        break;
+      case "Unknown error.":
+        responseBlock = <View style={styles.errorContainer}>
+                          <Text style={styles.errorText}>We encountered an error, probably due to a bad connection. Either retry or skip for now.</Text>
+                          <SkipButton skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
+                        </View>
+        break;
+      case "Empty email or password.":
+        responseBlock = <EnterAllFields />;
+        break;
+      case "Success":
+        responseBlock = <SuccessNotification />;
+        break;
+      case "Forgot password success.":
+        responseBlock = <FPSuccessNotification />;
+        break;
+      case "User not found.":
+        responseBlock = <View style={styles.errorContainer}>
+                          <Text style={styles.errorText}>We did not find your email address. Do you need to register?</Text>
+                          <TouchableHighlight onPress={()=> this.props.navigator.push({name: 'Register'})}>
+                            <Text>Register</Text>
+                          </TouchableHighlight>
+                          <SkipButton skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
+                        </View>;
+        break; 
+    }
     return (
       <View style={styles.container}>
         <ActivityIndicatorIOS
@@ -132,7 +192,7 @@ class SignIn extends React.Component {
                 selectionColor={StylingGlobals.colors.mainColor} />
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Password </Text>
+            <Text style={styles.label}>Password</Text>
             <TextInput 
               style={styles.textInput}
               ref="password"
@@ -146,25 +206,83 @@ class SignIn extends React.Component {
               onPress={() => this.submitUser()}>
             <Text style={styles.buttonText}>{this.props.route.name === 'Register' ? 'Sign Up' : 'Sign In'}</Text>
           </TouchableHighlight>
-          { this.state.error ?
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorText}>{this.state.error}</Text>
-                <SkipButton skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
-              </View>
-                : 
-              null
-          }
-          { this.state.validEmail ?
-              <Text style={styles.errorText}>Please use a valid email</Text>
-                : 
-              null
-          }
+          {responseBlock}
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
     );
   }
 }
+
+class InvalidEmail extends React.Component {
+  render() {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Please enter a valid email address.</Text>
+      </View>
+    );
+  }
+}
+
+class ForgotPassword extends React.Component {
+  render() {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Incorrect email or password.</Text>
+        <TouchableHighlight
+          onPress={() => this.forgotPassword()}
+          underlayColor={StylingGlobals.colors.accentPressDown}>
+          <Text style={styles.forgotPassword}>Forgot Password?</Text>
+        </TouchableHighlight>
+      </View>
+    )
+  }
+}
+
+class SkipBlock extends React.Component {
+  constructor(props){
+    super(props);
+  }
+  render() {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>We encountered an error, probably due to a bad connection. Either retry or skip for now.</Text>
+        <SkipButton skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
+      </View>
+    );
+  }
+}
+
+class EnterAllFields extends React.Component {
+  render() {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Please enter an email and password.</Text>
+      </View>
+    )
+  }
+}
+
+class SuccessNotification extends React.Component {
+  render() {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.successText}>Success!</Text>
+      </View>
+    );
+  }
+}
+
+class FPSuccessNotification extends React.Component {
+  render() {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.successText}>Password reset successfully. Please check your email.</Text>
+      </View>
+    );
+  }
+}
+
 
 var styles = StyleSheet.create({
   container: StylingGlobals.container,
@@ -203,6 +321,11 @@ var styles = StyleSheet.create({
     textAlign: 'center',
     color: StylingGlobals.colors.textColorOne,
   },
+  forgotPassword: {
+    color: StylingGlobals.colors.mainColor,
+    marginTop: 15,
+    textAlign: 'center'
+  },
   centering: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -212,12 +335,18 @@ var styles = StyleSheet.create({
     top: -7,
   },
   errorContainer: {
-    marginLeft: 20,
+    marginLeft: 60,
     marginRight: 20,
   },
   errorText: {
     flex: 1,
     marginTop: 15,
+  },
+  successText: {
+    color: StylingGlobals.colors.pressDown,
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 10,
   }
 });
 

@@ -27,7 +27,6 @@ class SkipButton extends React.Component {
 const styles = StyleSheet.create({
   skipButton: {
     alignSelf: 'center',
-    marginTop: 10,
     padding: 15,
   },
   skipContainer: {
