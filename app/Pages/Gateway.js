@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
-import SkipButton from '../Components/SkipButton.js';
+import ArrowLink from '../Components/ArrowLink.js';
 import {
   StyleSheet,
   Text,
@@ -26,7 +26,7 @@ class Gateway extends React.Component {
       emailAddress: '',
       validEmail: true
     },
-    this.userIndex = this.props.db.child('users');
+    this.userIndex = this.props.db.child('userIndex');
   }
 
   validateEmail(email) {
@@ -96,7 +96,7 @@ class Gateway extends React.Component {
                 <Text style={styles.errorText}>Please use a valid email</Text>
             }
           </View>
-          <SkipButton skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
+          <ArrowLink skipTo={() => this.props.navigator.push({name: 'SelectCategory'})}>Skip for Now</ArrowLink>
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>

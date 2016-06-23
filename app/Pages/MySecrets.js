@@ -10,7 +10,8 @@ import {
   View,
   ScrollView,
   Image,
-  TouchableHighlight
+  TouchableHighlight,
+  AsyncStorage
 } from 'react-native';
 /*
 var React = require('react-native');
@@ -32,8 +33,15 @@ class MySecrets extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      displaying: "Answered"
+      displaying: "Answered",
+      uid: ""
     } 
+    this.mySecrets = []
+    this.users = this.props.db.child('users');
+    this.privateSecrets = this.props.db.child('privateSecrets');
+  }
+
+  /*
     this.mySecrets = [{
       author: 'Foo',
       question: 'Where?',
@@ -55,21 +63,57 @@ class MySecrets extends React.Component {
       answer: 'You haven\'t answered yet. Tap to answer now',
       state: 'Requested',
     }]
-  }
-  listSecrets() {
-    let currentState = this.state.displaying;
-    return this.mySecrets.map(function (item) {
-      if (item.state === currentState) {
-        return (
-          <Secret author={item.author} question={item.question} answer={item.answer} />
-        );
-      }
+  */
+
+  componentWillMount(){
+    let self = this;
+    // What to do if the system can't find any user data?
+    AsyncStorage.getItem('userData').then((user_data_json) => {
+      let user_data = JSON.parse(user_data_json); 
+      self.setState({uid: user_data.uid});
+      // Lookup keys associated with user
+      self.users.child(user_data.uid).once('value', (snapshot) => {
+        for (var result in snapshot.val()) {
+          if (result !== 'email') {
+            // Get result by key
+            this.privateSecrets.child(result).on('value', (secret) => {
+              this.mySecrets.push(secret.val())
+            })
+          }
+        }
+      })
     });
   }
+
+  /*this.privateSecrets.child(result).once('value').then((secret) => {
+    this.mySecrets.push(secret.val());
+  }).then(() => {
+    this.listSecrets();
+  })*/
+
+  componentDidUpdate() {
+    this.listSecrets()
+  }
+
+  listSecrets() {
+    let currentState = this.state.displaying;
+    //console.log("LIST SECRETS RAN");
+    //console.log(this.mySecrets);
+    return this.mySecrets.map(function (item) {
+      //if (item.state === currentState) {
+        //console.log(item);
+        return (
+          <Secret author={item.askerName} question={item.text} answer={item.responderAnswer} />
+        );
+      //}
+    });
+  }
+  
   setTab(state) {
     this.setState({displaying: state});
     this.listSecrets();
   }
+
   render(){
     return (
       <View style={StylingGlobals.container}>

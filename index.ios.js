@@ -155,7 +155,7 @@ class ShowMe extends React.Component {
         );
       case 'MySecrets':
         return (
-          <MySecrets navigator={navigator} route={route} />
+          <MySecrets navigator={navigator} route={route} db={this.db} />
         );
       case 'SelectSecret':
         return (
@@ -201,7 +201,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'SignIn'
+          name: 'MySecrets'
         }} />
     );
   }

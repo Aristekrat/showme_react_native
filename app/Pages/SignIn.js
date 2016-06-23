@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
-import SkipButton from '../Components/SkipButton.js';
+import ArrowLink from '../Components/ArrowLink.js';
 import SelectSecret from './SelectSecret.js';
 import ShareSecret from './ShareSecret.js';
 import MySecrets from './MySecrets.js';
@@ -13,9 +13,11 @@ import {
   Text,
   View,
   TouchableHighlight,
+  Image,
   ScrollView,
   TextInput,
-  ActivityIndicatorIOS
+  ActivityIndicatorIOS,
+  AsyncStorage
 } from 'react-native';
 
 class SignIn extends React.Component {
@@ -25,9 +27,10 @@ class SignIn extends React.Component {
       animating: false,
       username: this.props.route.cookieData,
       password: '',
-      response: 'Invalid user.'
+      response: ''
     }
-    this.usersIndex = this.props.db.child('users');
+    this.usersIndex = this.props.db.child('userIndex');
+    this.users = this.props.db.child('users');
   }
 
   toggleActivityIndicator() {
@@ -61,8 +64,10 @@ class SignIn extends React.Component {
         self.toggleActivityIndicator();
         self.setState({response: 'Success.'});
         var t = self.escapeEmail(self.state.username)
+        self.users.child(userData.uid).set({email: self.state.username});
         self.usersIndex.child(t).set(true);
-        self.props.navigator.push({name: 'SelectCategory'})
+        AsyncStorage.setItem('userData', JSON.stringify(userData));
+        self.props.navigator.push({name: 'SelectCategory'});
       }
     }) // End parent function
   }
@@ -74,8 +79,9 @@ class SignIn extends React.Component {
     self.usersIndex.authWithPassword({
       email: self.state.username, 
       password: self.state.password
-    }, function (error, authData) {
+    }, function (error, userData) {
       if (error) {
+        self.toggleActivityIndicator();
         switch (error.code) {
           case 'INVALID_EMAIL':
             self.setState({response: 'Invalid email.'}); // Enter correct email
@@ -92,7 +98,9 @@ class SignIn extends React.Component {
         }
       } else {
         self.setState({response: 'Success.'});
-        self.props.navigator.push({name: 'SelectCategory'})
+        self.toggleActivityIndicator();
+        AsyncStorage.setItem('userData', JSON.stringify(userData));
+        self.props.navigator.push({name: 'SelectCategory'});
       }
     })
   }
@@ -105,7 +113,7 @@ class SignIn extends React.Component {
         this.loginUser()
       }
     } else {
-      this.setState({response: 'Empty email or password'}); // Enter all fields
+      this.setState({response: 'Empty email or password.'}); // Enter all fields
     }
   }
 
@@ -129,8 +137,30 @@ class SignIn extends React.Component {
     });
   }
 
-  componentDidMount() {
+  switchToRegister() {
+    this.setState({response: ''});
+    this.props.navigator.push({name: 'Register'})
+    this.initialLink();
+  }
 
+  switchToLogin() {
+    this.setState({response: ''});
+    this.props.navigator.push({name: 'SignIn'})
+    this.initialLink();
+  }
+
+  initialLink() {
+    console.log("Reached the outside");
+    if (this.props.route.name === "Register" && !this.props.route.cookieData) {
+      this.setState({response: 'Empty register.'})
+    } else if (this.props.route.name === "SignIn" && !this.props.route.cookieData) {
+      console.log("Reached the inside");
+      this.setState({response: 'Empty sign in.'})
+    }
+  }
+
+  componentWillMount() {
+    this.initialLink();
   }
 
   render() {
@@ -149,13 +179,13 @@ class SignIn extends React.Component {
       case "Unknown error.":
         responseBlock = <View style={styles.errorContainer}>
                           <Text style={styles.errorText}>We encountered an error, probably due to a bad connection. Either retry or skip for now.</Text>
-                          <SkipButton skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
+                          <ArrowLink skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
                         </View>
         break;
       case "Empty email or password.":
         responseBlock = <EnterAllFields />;
         break;
-      case "Success":
+      case "Success.":
         responseBlock = <SuccessNotification />;
         break;
       case "Forgot password success.":
@@ -164,12 +194,21 @@ class SignIn extends React.Component {
       case "User not found.":
         responseBlock = <View style={styles.errorContainer}>
                           <Text style={styles.errorText}>We did not find your email address. Do you need to register?</Text>
-                          <TouchableHighlight onPress={()=> this.props.navigator.push({name: 'Register'})}>
-                            <Text>Register</Text>
-                          </TouchableHighlight>
-                          <SkipButton skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
+                          <ArrowLink skipTo={()=> this.switchToRegister()}>Register</ArrowLink>
                         </View>;
         break; 
+      case "Empty register.":
+        responseBlock = <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Already registered? Sign in</Text>
+          <ArrowLink skipTo={()=> this.switchToLogin()}>Sign In</ArrowLink>
+        </View>;
+        break;
+      case "Empty sign in.":
+        responseBlock = <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Don't have an account yet? Register</Text>
+          <ArrowLink skipTo={()=> this.switchToRegister()}>Register</ArrowLink>
+        </View>;
+        break;
     }
     return (
       <View style={styles.container}>
@@ -239,20 +278,6 @@ class ForgotPassword extends React.Component {
   }
 }
 
-class SkipBlock extends React.Component {
-  constructor(props){
-    super(props);
-  }
-  render() {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>We encountered an error, probably due to a bad connection. Either retry or skip for now.</Text>
-        <SkipButton skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} />
-      </View>
-    );
-  }
-}
-
 class EnterAllFields extends React.Component {
   render() {
     return (
@@ -277,7 +302,7 @@ class FPSuccessNotification extends React.Component {
   render() {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.successText}>Password reset successfully. Please check your email.</Text>
+        <Text style={styles.errorText}>Password reset successfully. Please check your email.</Text>
       </View>
     );
   }
@@ -346,6 +371,7 @@ var styles = StyleSheet.create({
     color: StylingGlobals.colors.pressDown,
     fontSize: 18,
     textAlign: 'center',
+    marginRight: 20,
     marginTop: 10,
   }
 });

@@ -13,7 +13,8 @@ import {
   Image,
   TextInput,
   TouchableHighlight,
-  PickerIOS
+  PickerIOS,
+  AsyncStorage
 } from 'react-native';
 
 /*
@@ -45,8 +46,10 @@ class CategoryPicker extends React.Component {
     this.state = {
       category: 'Social',
       index: 3,
+      loaded: false
     } 
   }
+
   render () {
     return (
       <View style={styles.categoryPicker}>
@@ -73,28 +76,40 @@ class CreateYourOwn extends React.Component {
       animating: false,
       text: '',
       submitSuccess: false,
+      uid: ''
     }
     this.publicSecrets = this.props.db.child('publicSecrets');
-    this.askedSecrets = this.props.db.child('askedSecrets');
+    this.privateSecrets = this.props.db.child('privateSecrets');
+    this.users = this.props.db.child('users');
   }
+
+  componentWillMount(){
+    let self = this;
+    AsyncStorage.getItem('userData').then((user_data_json) => {
+      let user_data = JSON.parse(user_data_json); 
+      self.setState({uid: user_data.uid});
+    });
+  }
+
   submitSecret() {
     var self = this;
     if (this.state.text !== '') {
       self.setState({animating: !self.state.animating});
       if (!this.state.public) {
-        this.askedSecrets.push({text: this.state.text}, function (err) {
+        var privateSecret = this.privateSecrets.push({text: self.state.text, state: 'CR', askerID: self.state.uid, askerName: '', askerAnswer: '', responderID: '', responderName: '', responderAnswer: ''}, function (err, snapshot) {
           if (err) {
-            console.log(err);
-            // Output appropriate error
+            console.log(err)
+            // Add Error handling
           } else {
-            self.setState({animating: !self.state.animating, submitSuccess: true, text: ''});
+              self.users.child(self.state.uid).child(privateSecret.key()).set('CR');
+              self.setState({animating: !self.state.animating, submitSuccess: true, text: ''});
           }
         })
       } else {
         // add to publicSecrets
         this.publicSecrets.push({text: this.state.text, category: this.refs.catPicker.state.category}, function (err) {
           if (err) {
-            // Output appropriate error
+            // Add Error handling
           } else {
             self.setState({animating: !self.state.animating, submitSuccess: true, text: ''});
           }

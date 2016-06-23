@@ -8,7 +8,7 @@ import {
   TouchableHighlight
 } from 'react-native';
 
-class SkipButton extends React.Component {
+class ArrowLink extends React.Component {
   render() {
     return (
       <TouchableHighlight 
@@ -16,7 +16,7 @@ class SkipButton extends React.Component {
           underlayColor={StylingGlobals.colors.accentPressDown} 
           onPress={this.props.skipTo} >
         <View style={styles.skipContainer}>
-          <Text style={styles.skipText}>Skip for Now</Text>
+          <Text style={styles.skipText}>{this.props.children}</Text>
           <Image style={styles.skipRightArrow} source={require("../img/right-arrow.png")} />
         </View>
       </TouchableHighlight>
@@ -44,4 +44,4 @@ const styles = StyleSheet.create({
   },
 });
 
-module.exports = SkipButton;
+module.exports = ArrowLink;
