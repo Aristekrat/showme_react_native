@@ -4,6 +4,9 @@ import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import Secret from '../Components/MySecret.js';
+import ActivityIndicator from '../Components/ActivityIndicator.js';
+import ReactMixin from 'react-mixin';
+import ReactTimer from 'react-timer-mixin';
 import {
   StyleSheet,
   Text,
@@ -33,37 +36,14 @@ class MySecrets extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      displaying: "Answered",
-      uid: ""
+      displaying: "BR",
+      uid: "",
+      animating: true
     } 
     this.mySecrets = []
     this.users = this.props.db.child('users');
     this.privateSecrets = this.props.db.child('privateSecrets');
   }
-
-  /*
-    this.mySecrets = [{
-      author: 'Foo',
-      question: 'Where?',
-      answer: 'The place',
-      state: 'Answered',
-    }, {
-      author: 'Boo',
-      question: 'Who?',
-      answer: 'The thing',
-      state: 'Answered',
-    }, {
-      author: 'You',
-      question: 'Do?',
-      answer: '(none yet)',
-      state: 'Asked',
-    }, {
-      author: 'Sue',
-      question: 'Why?',
-      answer: 'You haven\'t answered yet. Tap to answer now',
-      state: 'Requested',
-    }]
-  */
 
   componentWillMount(){
     let self = this;
@@ -72,40 +52,41 @@ class MySecrets extends React.Component {
       let user_data = JSON.parse(user_data_json); 
       self.setState({uid: user_data.uid});
       // Lookup keys associated with user
-      self.users.child(user_data.uid).once('value', (snapshot) => {
+      self.users.child(user_data.uid).child('secrets').once('value', (snapshot) => {
         for (var result in snapshot.val()) {
-          if (result !== 'email') {
             // Get result by key
             this.privateSecrets.child(result).on('value', (secret) => {
               this.mySecrets.push(secret.val())
             })
-          }
         }
       })
     });
   }
 
-  /*this.privateSecrets.child(result).once('value').then((secret) => {
-    this.mySecrets.push(secret.val());
-  }).then(() => {
-    this.listSecrets();
-  })*/
+  componentDidMount () {
+    this.setTimeout (
+      () => { 
+        this.forceUpdate();
+        this.listSecrets();
+        this.toggleActivityIndicator();
+      }, 
+      1000
+    );
+  }
 
-  componentDidUpdate() {
-    this.listSecrets()
+  // Needs to be moved to common utils
+  toggleActivityIndicator() {
+    this.setState({animating: !this.state.animating});
   }
 
   listSecrets() {
     let currentState = this.state.displaying;
-    //console.log("LIST SECRETS RAN");
-    //console.log(this.mySecrets);
     return this.mySecrets.map(function (item) {
-      //if (item.state === currentState) {
-        //console.log(item);
+      if (item.state === currentState) {
         return (
-          <Secret author={item.askerName} question={item.text} answer={item.responderAnswer} />
+          <Secret author={item.askerName} question={item.question} answer={item.responderAnswer} />
         );
-      //}
+      }
     });
   }
   
@@ -120,9 +101,9 @@ class MySecrets extends React.Component {
         <ScrollView>
           <View style={styles.header}>
             <TouchableHighlight 
-                style={[styles.headerButton, styles.firstHeaderButton, this.state.displaying === "Answered" ? styles.active : null]} 
+                style={[styles.headerButton, styles.firstHeaderButton, this.state.displaying === "BR" ? styles.active : null]} 
                 underlayColor={StylingGlobals.colors.accentColor} 
-                onPress={() => this.setTab('Answered')} >
+                onPress={() => this.setTab('BR')} >
               <Text style={styles.headerButtonText}>Answered</Text>
             </TouchableHighlight>
             <TouchableHighlight 
@@ -137,8 +118,15 @@ class MySecrets extends React.Component {
                 onPress={() => this.setTab('Requested')}>
               <Text style={styles.headerButtonText}>Requested</Text>
             </TouchableHighlight>
+            <TouchableHighlight 
+                style={[styles.headerButton, this.state.displaying === "Requested" ? styles.active : null]} 
+                underlayColor={StylingGlobals.colors.accentColor}
+                onPress={() => this.setTab('Requested')}>
+              <Text style={styles.headerButtonText}>Not Sent</Text>
+            </TouchableHighlight>
           </View>
           <View style={styles.contentContainer}>
+            <ActivityIndicator animationControl={this.state.animating}/>
             {this.listSecrets()}
           </View>
         </ScrollView>
@@ -148,19 +136,23 @@ class MySecrets extends React.Component {
   }
 }
 
+ReactMixin(MySecrets.prototype, ReactTimer);
+
 var styles = StyleSheet.create({
   header: {
     borderBottomWidth: 1, 
     borderBottomColor: StylingGlobals.colors.accentPressDown,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    //marginRight: 15,
   },
   active: {
     backgroundColor: StylingGlobals.colors.accentPressDown,
   },
   headerButton: {
-    padding: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingLeft: 10,
+    paddingRight: 10,
     flex: 1,
     borderLeftWidth: 1,
     borderLeftColor: StylingGlobals.colors.navColor,

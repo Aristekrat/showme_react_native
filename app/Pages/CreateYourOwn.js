@@ -17,25 +17,6 @@ import {
   AsyncStorage
 } from 'react-native';
 
-/*
-var React = require('react-native');
-var ActivityIndicator = require('../Components/ActivityIndicator.js');
-var TabBar = require('../Components/TabBar.js');
-var StylingGlobals = require('../StylingGlobals.js');
-
-var {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Switch,
-  Image,
-  TextInput,
-  TouchableHighlight,
-  PickerIOS
-} = React;
-*/
-
 var PickerItemIOS = PickerIOS.Item;
 
 var CATEGORIES = ["Love", "Sex", "Social", "Funny", "Embarassing", "Past"]
@@ -96,12 +77,12 @@ class CreateYourOwn extends React.Component {
     if (this.state.text !== '') {
       self.setState({animating: !self.state.animating});
       if (!this.state.public) {
-        var privateSecret = this.privateSecrets.push({text: self.state.text, state: 'CR', askerID: self.state.uid, askerName: '', askerAnswer: '', responderID: '', responderName: '', responderAnswer: ''}, function (err, snapshot) {
+        var privateSecret = this.privateSecrets.push({question: self.state.text, state: 'CR', askerID: self.state.uid, askerName: '', askerAnswer: '', responderID: '', responderName: '', responderAnswer: ''}, function (err, snapshot) {
           if (err) {
             console.log(err)
             // Add Error handling
           } else {
-              self.users.child(self.state.uid).child(privateSecret.key()).set('CR');
+              self.users.child(self.state.uid).child('secrets').child(privateSecret.key()).set('CR');
               self.setState({animating: !self.state.animating, submitSuccess: true, text: ''});
           }
         })
@@ -182,8 +163,7 @@ class CreateYourOwn extends React.Component {
              <Text style={styles.buttonText}>Create Your Secret</Text>
           </TouchableHighlight>
           }
-
-          <ActivityIndicator animationControl={this.state.animating} />
+          <ActivityIndicator animationControl={this.state.animating} extraStyling={{height:0}}/>
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>

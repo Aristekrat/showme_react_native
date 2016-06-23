@@ -8,22 +8,11 @@ import {
 } from 'react-native';
 
 class ActivityIndicator extends React.Component {
-  /*constructor(props){
-    super(props);
-    this.state = {
-      animating: true,
-    }
-  }
-
-  toggleActivityIndicator() {
-    this.setState({animating: !this.state.animating});
-  }*/
-
   render(){
     return (
         <ActivityIndicatorIOS
             animating={this.props.animationControl}
-            style={[styles.centering]}
+            style={this.props.animationControl ? [styles.centering, styles.withHeight] : [styles.centering, styles.withoutHeight]}
             size="large"
             color="#000"
         />
@@ -39,9 +28,14 @@ var styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    height: 50,
     backgroundColor: 'transparent',
   },
+  withHeight: {
+    height: 50,
+  },
+  withoutHeight: {
+    height: 0,
+  }
 });
 
 module.exports = ActivityIndicator;

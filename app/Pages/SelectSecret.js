@@ -13,22 +13,6 @@ import {
   ListView
 } from 'react-native';
 
-/*
-var React = require('react-native');
-var TabBar = require('../Components/TabBar.js');
-var Secret = require('../Components/SelectableSecret.js');
-var StylingGlobals = require('../StylingGlobals.js');
-
-var {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableHighlight,
-  ListView,
-} = React;
-*/
-
 class SelectSecret extends React.Component {
   constructor(props){
     super(props);

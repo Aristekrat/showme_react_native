@@ -15,24 +15,6 @@ import {
   TouchableHighlight
 } from 'react-native';
 
-/*
-var React = require('react-native');
-var Category = require('../Components/Category.js');
-var CreateYourOwn = require('./CreateYourOwn.js');
-var SelectSecret = require('./SelectSecret.js');
-var TabBar = require('../Components/TabBar.js');
-var StylingGlobals = require('../StylingGlobals.js');
-
-var {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Image,
-  TouchableHighlight
-} = React;
-*/
-
 class SelectCategory extends React.Component {
   constructor(props){
     super(props);
@@ -57,10 +39,6 @@ class SelectCategory extends React.Component {
       name: 'SelectSecret',
       category: categoryName
     })
-    /*this.props.navigator.push({
-      component: viewName,
-      title: categoryName
-    })*/
   }
   render(){
     return (
