@@ -5,18 +5,9 @@ import StylingGlobals from '../StylingGlobals.js';
 import {
   StyleSheet,
   Text,
-  View
-} from 'react-native';
-
-/*
-var React = require('react-native');
-
-var {
-  StyleSheet,
-  Text,
   View,
-} = React;
-*/
+  TouchableHighlight
+} from 'react-native';
 
 class MySecret extends React.Component {
   constructor(props){
@@ -24,11 +15,15 @@ class MySecret extends React.Component {
   }
   render(){
     return (
-      <View style={styles.secretContainer}>
-        <Text style={styles.author}>from {this.props.author}</Text>
-        <Text style={styles.question}>Q: {this.props.question}</Text>
-        <Text style={styles.answer}>A: {this.props.answer}</Text>
-      </View>
+      <TouchableHighlight 
+          underlayColor={StylingGlobals.colors.accentPressDown} 
+          onPress={this.props.updateSecret}>
+          <View style={styles.secretContainer}>
+            <Text style={styles.author}>from {this.props.author}</Text>
+            <Text style={styles.question}>Q: {this.props.question}</Text>
+            <Text style={styles.answer}>A: {this.props.answer}</Text>
+          </View>
+      </TouchableHighlight>
     )
   }
 }
@@ -39,7 +34,6 @@ var styles = StyleSheet.create({
     borderBottomColor: '#eee',
     marginLeft: 10,
     marginRight: 10,
-    marginBottom: 5,
     padding: 5,
     flex: 1,
   },

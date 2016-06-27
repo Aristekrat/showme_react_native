@@ -9,6 +9,7 @@ import SelectCategory from './app/Pages/SelectCategory.js';
 import SelectSecret from './app/Pages/SelectSecret.js';
 import ShareSecret from './app/Pages/ShareSecret.js';
 import MySecrets from './app/Pages/MySecrets.js';
+import YourAnswer from './app/Pages/YourAnswer.js';
 import MyAccount from './app/Pages/MyAccount.js';
 import CreateYourOwn from './app/Pages/CreateYourOwn.js';
 import SignIn from './app/Pages/SignIn.js';
@@ -30,35 +31,6 @@ import {
 import Firebase from 'firebase';
 const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 
-/*
-var React = require('react-native');
-var SelectCategory = require('./app/Pages/SelectCategory.js');
-var SelectSecret = require('./app/Pages/SelectSecret.js');
-var ShareSecret = require('./app/Pages/ShareSecret.js');
-var MySecrets = require('./app/Pages/MySecrets.js');
-var MyAccount = require('./app/Pages/MyAccount.js');
-var CreateYourOwn = require('./app/Pages/CreateYourOwn.js');
-var SignIn = require('./app/Pages/SignIn.js');
-var StylingGlobals = require('./app/StylingGlobals');
-var Gateway = require('./app/Pages/Gateway.js');
-
-var {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TabBarIOS,
-  Image,
-  Navigator,
-  TouchableHighlight,
-  ListView,
-} = React;
-
-const Firebase = require('firebase');
-const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
-*/
-
 var NavigationBarRouteMapper = {
   LeftButton: function(route, navigator, index, navState) {
     switch (route.name) {
@@ -71,6 +43,7 @@ var NavigationBarRouteMapper = {
       case 'MyAccount':
       case 'SignIn':
       case 'Register':
+      case 'YourAnswer':
       case 'Facebook':
         return (
           <TouchableHighlight onPress={() => navigator.pop()} underlayColor={'transparent'}>
@@ -98,6 +71,10 @@ var NavigationBarRouteMapper = {
       case 'MySecrets':
         return (
           <Text style={styles.navBarTitleText}>My Secrets</Text>
+        );
+      case 'YourAnswer':
+        return (
+          <Text style={styles.navBarTitleText}>Your Answer</Text>
         );
       case 'SelectCategory':
         return (
@@ -152,6 +129,10 @@ class ShowMe extends React.Component {
       case 'SelectCategory':
         return (
           <SelectCategory navigator={navigator} route={route} />
+        );
+      case 'YourAnswer':
+        return (
+          <YourAnswer navigator={navigator} route={route} db={this.db} />
         );
       case 'MySecrets':
         return (
