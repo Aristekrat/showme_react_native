@@ -16,6 +16,7 @@ import {
 
 const FBSDK = require('react-native-fbsdk');
 const {
+  LoginManager,
   LoginButton
 } = FBSDK;
 
