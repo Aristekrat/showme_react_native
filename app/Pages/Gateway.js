@@ -11,13 +11,15 @@ import {
   ScrollView,
   Image,
   TextInput,
+  AsyncStorage,
   TouchableHighlight
 } from 'react-native';
 
 const FBSDK = require('react-native-fbsdk');
 const {
   LoginManager,
-  LoginButton
+  LoginButton,
+  AccessToken
 } = FBSDK;
 
 class Gateway extends React.Component {
@@ -63,6 +65,7 @@ class Gateway extends React.Component {
       self.setState({validEmail: false});
     }
   }
+
   render() {
     return (
       <View style={StylingGlobals.container}>
@@ -71,7 +74,35 @@ class Gateway extends React.Component {
 
           <View style={styles.fbContainer}>
             <Text style={styles.fbText}>Continue with Facebook</Text>
-            <LoginButton style={styles.fbutton} />
+            <LoginButton 
+                style={styles.fbutton}
+                readPermissions={["public_profile", "email"]}
+                onLoginFinished={
+                  (error, result) => {
+                    if (error) {
+                      // Error handling
+                      alert("login has error: " + result.error);
+                    } else if (result.isCancelled) {
+                      //alert("login is cancelled.");
+                    } else {
+                      AccessToken.getCurrentAccessToken().then(
+                        (data) => {
+                          this.props.db.authWithOAuthToken('facebook', data.accessToken.toString(), (error, authData) => {
+                            if (error) {
+                              // Error handling
+                              console.log('Firebase login failed!', error);
+                            } else {
+                              AsyncStorage.setItem('userData', JSON.stringify(authData));
+                              this.props.navigator.push({name: 'SelectCategory'})
+                            }
+                          })
+                        }
+                      )
+                    }
+                  }
+                }
+                onLogoutFinished={() => console.log("logout.")}
+            />
           </View>
 
           <View style={styles.emailContainer}>
