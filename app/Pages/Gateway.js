@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import ArrowLink from '../Components/ArrowLink.js';
+import Utility from '../Globals/UtilityFunctions.js';
 import {
   StyleSheet,
   Text,
@@ -93,6 +94,7 @@ class Gateway extends React.Component {
                               console.log('Firebase login failed!', error);
                             } else {
                               AsyncStorage.setItem('userData', JSON.stringify(authData));
+                              Utility.setLocalAuth();
                               this.props.navigator.push({name: 'SelectCategory'})
                             }
                           })

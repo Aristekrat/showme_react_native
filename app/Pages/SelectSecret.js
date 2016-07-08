@@ -41,7 +41,7 @@ class SelectSecret extends React.Component {
           renderRow={(rowData) => {
             return (
               <Secret 
-                secretText={rowData.text} selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', userID: rowData.text})}} />
+                secretText={rowData.text} selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData})}} />
             )
           }} />
         <TabBar navigator={this.props.navigator} route={this.props.route} />

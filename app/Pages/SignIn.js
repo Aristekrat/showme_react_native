@@ -8,6 +8,7 @@ import SelectSecret from './SelectSecret.js';
 import ShareSecret from './ShareSecret.js';
 import MySecrets from './MySecrets.js';
 import MyAccount from './MyAccount.js';
+import Utility from '../Globals/UtilityFunctions.js';
 import {
   StyleSheet,
   Text,
@@ -67,6 +68,7 @@ class SignIn extends React.Component {
         self.users.child(userData.uid).set({email: self.state.username});
         self.usersIndex.child(t).set(true);
         AsyncStorage.setItem('userData', JSON.stringify(userData));
+        Utility.setLocalAuth();
         self.props.navigator.push({name: 'SelectCategory'});
       }
     }) // End parent function
@@ -100,6 +102,7 @@ class SignIn extends React.Component {
         self.setState({response: 'Success.'});
         self.toggleActivityIndicator();
         AsyncStorage.setItem('userData', JSON.stringify(userData));
+        Utility.setLocalAuth(true);
         self.props.navigator.push({name: 'SelectCategory'});
       }
     })
@@ -150,11 +153,9 @@ class SignIn extends React.Component {
   }
 
   initialLink() {
-    console.log("Reached the outside");
     if (this.props.route.name === "Register" && !this.props.route.cookieData) {
       this.setState({response: 'Empty register.'})
     } else if (this.props.route.name === "SignIn" && !this.props.route.cookieData) {
-      console.log("Reached the inside");
       this.setState({response: 'Empty sign in.'})
     }
   }

@@ -1,7 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- **/
 'use strict';
 
 import React, { Component } from 'react';
@@ -15,6 +11,7 @@ import CreateYourOwn from './app/Pages/CreateYourOwn.js';
 import SignIn from './app/Pages/SignIn.js';
 import StylingGlobals from './app/StylingGlobals.js';
 import Gateway from './app/Pages/Gateway.js';
+import Utility from './app/Globals/UtilityFunctions.js';
 import {
   AppRegistry,
   StyleSheet,
@@ -24,46 +21,60 @@ import {
   TabBarIOS,
   Image,
   Navigator,
-  TouchableHighlight,
+  TouchableHighlight,  
   ListView,
 } from 'react-native';
 
 import Firebase from 'firebase';
 const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 
+// Refactoring to ES6 will throw an application error, not easily refactored
 var NavigationBarRouteMapper = {
   LeftButton: function(route, navigator, index, navState) {
-    switch (route.name) {
-      case 'MySecrets':
-      case 'SelectCategory':
-      case 'SelectSecret':
-      case 'ShareSecret':
-      case 'CreateSecret':
-      case 'MySecrets':
-      case 'MyAccount':
-      case 'SignIn':
-      case 'Register':
-      case 'YourAnswer':
-      case 'Facebook':
-        return (
-          <TouchableHighlight onPress={() => navigator.pop()} underlayColor={'transparent'}>
-            <Image 
-              source={require("./app/img/left207.png")}
-              style={styles.navBarRightImage} />
-          </TouchableHighlight>
-        );
-      default:
-        return null;
+    if (index !== 0) {
+      switch (route.name) {
+        case 'MySecrets':
+        case 'SelectCategory':
+        case 'SelectSecret':
+        case 'ShareSecret':
+        case 'CreateSecret':
+        case 'MySecrets':
+        case 'MyAccount':
+        case 'SignIn':
+        case 'Register':
+        case 'YourAnswer':
+        case 'Facebook':
+          return (
+            <TouchableHighlight 
+              onPress={() => navigator.pop()} 
+              underlayColor={'transparent'}>
+              <Image 
+                source={require("./app/img/left207.png")}
+                style={styles.navBarLeftImage} />
+            </TouchableHighlight>
+          );
+        default:
+          return null;
+      }
+    } else {
+      return null;
     }
   },
 
   RightButton: function(route, navigator, index, navState) {
-    switch (route.name) {
-      default:
-        return (
-          <Text></Text>
-        );
-    }
+    return (
+      <View>
+      { Utility.authStatus ?
+        <TouchableHighlight 
+          style={styles.navBarRightButton}
+          onPress={() => { Utility.logout(); navigator.replace({name: route.name}); } } >
+          <Text style={styles.navBarButtonText}>Logout</Text>
+        </TouchableHighlight>
+        :
+        null
+      }
+      </View>
+    );
   },
 
   Title: function(route, navigator, index, navState) {
@@ -119,10 +130,12 @@ var NavigationBarRouteMapper = {
 class ShowMe extends React.Component {
   constructor(props) {
     super(props)
-    this.DB = this.getRef()
+    this.DB = Utility.getRef()
   }
-  getRef() {
-    return new Firebase(FirebaseURL)
+  componentWillMount() {
+    if (Utility.getAuthStatus()) {
+      Utility.setLocalAuth(true);
+    }
   }
   renderScene (route, navigator) {
     switch (route.name) {
@@ -144,7 +157,7 @@ class ShowMe extends React.Component {
         );
       case 'ShareSecret':
         return (
-          <ShareSecret navigator={navigator} route={route} />
+          <ShareSecret navigator={navigator} route={route} db={this.db} />
         );
       case 'CreateSecret':
         return (
@@ -182,7 +195,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'Gateway'
+          name: 'SelectCategory'
         }} />
     );
   }
@@ -194,19 +207,7 @@ var styles = StyleSheet.create({
       borderBottomColor: StylingGlobals.colors.pressDown,
       borderBottomWidth: 1,
     },
-    navBarTitleText: {
-      color: 'white',
-      fontSize: 16,
-      fontWeight: '500',
-      marginVertical: 9,
-    },
-    navBarLeftButton: {
-      paddingLeft: 10
-    },
-    navBarRightButton: {
-      paddingRight: 15,
-    },
-    navBarRightImage: {
+    navBarLeftImage: {
       tintColor: '#fff',
       width: 22,
       height: 22,
@@ -214,9 +215,21 @@ var styles = StyleSheet.create({
       marginRight: 5,
       marginLeft: 5,
     },
+    navBarLeftButton: {
+      paddingLeft: 10
+    },
+    navBarTitleText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: '500',
+      marginVertical: 9,
+    },
+    navBarRightButton: {
+      paddingRight: 10,
+    },
     navBarButtonText: {
       color: '#EEE',
-      fontSize: 16,
+      fontSize: 14,
       marginVertical: 10
     },
     test: {

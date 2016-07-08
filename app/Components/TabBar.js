@@ -1,23 +1,14 @@
 'use strict';
 
-/*
-var React = require('react-native');
-var StylingGlobals = require('../StylingGlobals');
-
-var {
-  StyleSheet,
-  Text,
-  View,
-  TabBarIOS
-} = React; */
-
 import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
+import Utility from '../Globals/UtilityFunctions.js';
 import {
   StyleSheet,
   Text,
   View,
-  TabBarIOS
+  TabBarIOS,
+  AsyncStorage
 } from 'react-native';
 
 class TabBar extends React.Component {
@@ -73,6 +64,9 @@ class TabBar extends React.Component {
       </View>
     );
   }
+  componentDidMount() {
+    console.log(Utility.authStatus);
+  }
   render(){
     return (
       <View style={styles.tabContainer}>
@@ -101,7 +95,7 @@ class TabBar extends React.Component {
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabThree'}
               onPress={() => this.setTab('tabThree', this.props.tabThree)}
-              title={true ? "Sign In" : "My Account"}
+              title={Utility.authStatus ? "My Account" : "Sign In" }
               icon={require('../img/business64.png')}
               style={styles.tabItem}>
                 <View></View>

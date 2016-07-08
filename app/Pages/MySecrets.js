@@ -38,25 +38,31 @@ class MySecrets extends React.Component {
       // Lookup keys associated with user
       this.users.child(user_data.uid).child('secrets').once('value', (snapshot) => {
         var userSecrets = snapshot.val();
-        var userKeys = Object.keys(userSecrets);
-        var resultsCount = userKeys.length - 1;
-        
-        // Find all the secret entries
-        userKeys.forEach((result, count) => {
-          this.privateSecrets.child(result).on('value', (secret) => {
-            var sv = secret.val()
-            sv.state = userSecrets[result]; // Show state from the users table, not the secrets table
-            sv.key = result;
-            this.mySecrets.push(sv)
-            // At the end of iteration, display results
-            if (count === resultsCount) {
-              this.initalDisplay()
-              this.listSecrets()
-              this.toggleActivityIndicator()
-              AsyncStorage.setItem('secrets', JSON.stringify(this.mySecrets));
-            }
+        if (userSecrets) {
+          var userKeys = Object.keys(userSecrets);
+          var resultsCount = userKeys.length - 1;
+          
+          // Find all the secret entries
+          userKeys.forEach((result, count) => {
+            this.privateSecrets.child(result).on('value', (secret) => {
+              var sv = secret.val()
+              sv.state = userSecrets[result]; // Show state from the users table, not the secrets table
+              sv.key = result;
+              this.mySecrets.push(sv)
+              // At the end of iteration, display results
+              if (count === resultsCount) {
+                this.initalDisplay()
+                this.listSecrets()
+                this.toggleActivityIndicator()
+                AsyncStorage.setItem('secrets', JSON.stringify(this.mySecrets));
+              }
+            })
           })
-        })
+        } else {
+          this.toggleActivityIndicator()
+          // the user has no secrets, display some handler suggesting the user create some
+        }
+
       })
     });
   }

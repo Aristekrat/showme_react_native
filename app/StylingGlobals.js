@@ -10,7 +10,8 @@ var globalStyling = {
 		'accentPressDown': '#FFEDED',
 		'navColor': '#E67A7A',
 		'textColorOne': '#ffffff',
-		'textColorTwo': '#555555',		
+		'textColorTwo': '#555555',	
+		'border': '#ccc'	
 	},
 	container: {    
     	flex: 1,
@@ -28,7 +29,7 @@ var globalStyling = {
 	    flexDirection: 'row', 
 	    justifyContent: 'center', 
 	    alignItems: 'center'		
-	}
+	},
 }
 
 module.exports = globalStyling;
