@@ -85,8 +85,7 @@ class ShareSecret extends React.Component {
           // Err
           console.log("ERR - NO DATA");
         } else {
-          let user_data = JSON.parse(user_data_json); 
-          console.log("Success")
+          let user_data = JSON.parse(user_data_json);
           this.setState({uid: user_data.uid});
         }
     });

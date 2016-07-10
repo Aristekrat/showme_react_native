@@ -23,6 +23,7 @@ import {
   Navigator,
   TouchableHighlight,  
   ListView,
+  AsyncStorage,
 } from 'react-native';
 
 import Firebase from 'firebase';
@@ -130,12 +131,72 @@ var NavigationBarRouteMapper = {
 class ShowMe extends React.Component {
   constructor(props) {
     super(props)
-    this.DB = Utility.getRef()
+    this.DB = Utility.getRef();
+    this.state = {
+      remoteSecrets: [],
+      localSecrets: []
+    }
+  }
+  getLocalSecrets() {
+    AsyncStorage.getItem('secrets').then((secret_data_json) => {
+      let secret_data = JSON.parse(secret_data_json);
+      if (secret_data) {
+        this.setState({localSecrets: secret_data})
+      } 
+    })
+  }
+  getRemoteSecrets() {
+    AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
+      let user_data = JSON.parse(user_data_json);
+      // Lookup keys associated with user
+
+      this.DB.child('users').child(user_data.uid).child('secrets').once('value', (snapshot) => { 
+        var userSecrets = snapshot.val();
+        var userKeys = Object.keys(userSecrets);
+        var resultsCount = userKeys.length - 1;
+  
+        // Find all the secret entries
+        userKeys.forEach((result, count) => {
+          this.DB.child('privateSecrets').child(result).on('value', (secret) => {
+            var sv = secret.val()
+            sv.state = userSecrets[result]; // Show state from the users table, not the secrets table
+            sv.key = result;
+            this.state.remoteSecrets.push(sv)
+
+            // At the end of iteration, display results
+            if (count === resultsCount) {
+              // this.setNotifcationCount()
+            }
+          })
+        })
+      })
+    });
+  }
+  setNotificationCount() {
+
+  }
+  listenForUpdatesToSecrets() {
+    AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
+      if (user_data_json) {
+        let user_data = JSON.parse(user_data_json);
+        this.DB.child('users').child(user_data.uid).child('secrets').on('child_changed', (childSnapshot) => {
+          var change = childSnapshot.val();
+          if (change !== 'CR' || change !== 'QS') {
+            // update notifications
+          }
+        })
+      }
+    });
   }
   componentWillMount() {
     if (Utility.getAuthStatus()) {
       Utility.setLocalAuth(true);
     }
+    this.getLocalSecrets();
+    this.getRemoteSecrets();
+  }
+  componentDidMount() {
+    this.listenForUpdatesToSecrets();
   }
   renderScene (route, navigator) {
     switch (route.name) {

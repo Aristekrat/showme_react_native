@@ -57,7 +57,9 @@ class CreateYourOwn extends React.Component {
       animating: false,
       text: '',
       submitSuccess: false,
-      uid: ''
+      uid: '',
+      submittedSecret: '',
+      errorMessage: ''
     }
     this.publicSecrets = this.props.db.child('publicSecrets');
     this.privateSecrets = this.props.db.child('privateSecrets');
@@ -77,31 +79,54 @@ class CreateYourOwn extends React.Component {
     if (this.state.text !== '') {
       self.setState({animating: !self.state.animating});
       if (!this.state.public) {
-        var privateSecret = this.privateSecrets.push({question: self.state.text, state: 'CR', askerID: self.state.uid, askerName: '', askerAnswer: '', responderID: '', responderName: '', responderAnswer: ''}, function (err, snapshot) {
+        // add to privateSecrets TODO Public and Private should be split into the same, seperate function
+        var secretData = {question: self.state.text, state: 'CR', askerID: self.state.uid, askerName: '', askerAnswer: '', responderID: '', responderName: '', responderAnswer: ''};
+        var privateSecret = this.privateSecrets.push(secretData, function (err, snapshot) {
           if (err) {
-            console.log(err)
-            // Add Error handling
+            this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
           } else {
+              secretData.key = privateSecret.key();
+              secretData.public = false;
               self.users.child(self.state.uid).child('secrets').child(privateSecret.key()).set('CR');
-              self.setState({animating: !self.state.animating, submitSuccess: true, text: ''});
+              self.setState({
+                animating: !self.state.animating, 
+                submitSuccess: true, 
+                text: '', 
+                submittedSecret: secretData,
+                errorMessage: '',
+              });
           }
         })
       } else {
         // add to publicSecrets
-        this.publicSecrets.push({text: this.state.text, category: this.refs.catPicker.state.category}, function (err) {
+        var secretData = {text: this.state.text, category: this.refs.catPicker.state.category};
+        var publicSecret = this.publicSecrets.push(secretData, function (err) {
           if (err) {
-            // Add Error handling
+            this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
           } else {
-            self.setState({animating: !self.state.animating, submitSuccess: true, text: ''});
+            secretData.public = true;
+            secretData.key = publicSecret.key();
+            self.setState({
+              animating: !self.state.animating, 
+              submitSuccess: true, 
+              text: '', 
+              submittedSecret: secretData, 
+              errorMessage: '',
+            });
           }
         })
       }
-
     } else {
-      console.log("Reached the error block");
-      // Pop error message
+      this.setState({errorMessage: 'Please enter your question'})
     }
   }
+
+  clearErrorMessage() {
+    if (this.state.errorMessage) {
+      this.setState({errorMessage: ''})
+    }
+  }
+
   render(){
     return (
       <View style={StylingGlobals.container}>
@@ -114,9 +139,7 @@ class CreateYourOwn extends React.Component {
                 onChangeText={(text) => this.setState({text})}
                 value={this.state.text}
               />
-              {/* The beginnings of error handling.
-                !this.state.text && this.state.error ? <Text>Please enter your secret</Text> : null
-              */}
+              { this.state.errorMessage ? <Text style={styles.errorText}>{this.state.errorMessage}</Text> : null }
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Make Public</Text>
@@ -141,7 +164,7 @@ class CreateYourOwn extends React.Component {
               <TouchableHighlight 
                   style={styles.button} 
                   underlayColor={StylingGlobals.colors.pressDown} 
-                  onPress={() => console.log("Need non-dummy")}>
+                  onPress={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: this.state.submittedSecret})}}>
                   <View style={StylingGlobals.horizontalCenter}>
                     <Image 
                       source={require("../img/game67.png")} style={styles.icon} />
@@ -203,6 +226,9 @@ var styles = StyleSheet.create({
     width: 22,
     height: 22,
     marginRight: 8,
+  },
+  errorText: {
+    color: StylingGlobals.colors.mainColor,
   },
   positiveNotification: {
     textAlign: 'center',

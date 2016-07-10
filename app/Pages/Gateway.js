@@ -54,11 +54,9 @@ class Gateway extends React.Component {
       self.userIndex.once('value', function (snapshot) {
         if (snapshot.hasChild(self.escapeEmail(self.state.emailAddress))) {
           // Go to login
-          console.log("This is a registered email");
           self.props.navigator.push({name: 'SignIn', cookieData: self.state.emailAddress})
         } else {
           // Go to registration
-          console.log("This is an unregistered email");
           self.props.navigator.push({name: 'Register', cookieData: self.state.emailAddress})
         }
       });

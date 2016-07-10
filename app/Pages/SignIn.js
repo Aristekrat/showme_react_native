@@ -65,7 +65,7 @@ class SignIn extends React.Component {
         self.toggleActivityIndicator();
         self.setState({response: 'Success.'});
         var t = self.escapeEmail(self.state.username)
-        self.users.child(userData.uid).set({email: self.state.username});
+        self.users.child(userData.uid).set({email: self.state.username, secrets: {} });
         self.usersIndex.child(t).set(true);
         AsyncStorage.setItem('userData', JSON.stringify(userData));
         Utility.setLocalAuth();
@@ -125,18 +125,18 @@ class SignIn extends React.Component {
     this.props.db.resetPassword({
       email: this.state.username
     }, function (error) {
-          if (error) {
-            switch (error.code) {
-              case "INVALID_USER":
-                self.setState({response: 'User not found.'}); // Probably want to display registration query
-                break;
-              default:
-                self.setState({response: 'Unknown error.'}); // Display skip 
-            }
-          } else {
-            self.setState({response: 'Forgot password success.'})
-            console.log("Password reset email sent successfully!"); // Display success notification
+        if (error) {
+          switch (error.code) {
+            case "INVALID_USER":
+              self.setState({response: 'User not found.'}); // Probably want to display registration query
+              break;
+            default:
+              self.setState({response: 'Unknown error.'}); // Display skip
+              break; 
           }
+        } else {
+          self.setState({response: 'Forgot password success.'}); // Display success notification
+        }
     });
   }
 
@@ -175,7 +175,7 @@ class SignIn extends React.Component {
         break;
       case "Invalid user.":
       case "Invalid password.":
-        responseBlock = <ForgotPassword />;
+        responseBlock = <ForgotPassword forgotPassword={() => this.forgotPassword()} />;
         break;
       case "Unknown error.":
         responseBlock = <View style={styles.errorContainer}>
@@ -270,7 +270,7 @@ class ForgotPassword extends React.Component {
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>Incorrect email or password.</Text>
         <TouchableHighlight
-          onPress={() => this.forgotPassword()}
+          onPress={this.props.forgotPassword}
           underlayColor={StylingGlobals.colors.accentPressDown}>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableHighlight>

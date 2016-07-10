@@ -30,14 +30,15 @@ class MySecrets extends React.Component {
     this.privateSecrets = this.props.db.child('privateSecrets');
   }
 
-  componentWillMount(){
+  componentWillMount() {
+    // TODO refactor to a gen use utility function, used in index.ios.js as well
     AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
       let user_data = JSON.parse(user_data_json);
-      user_data.secrets = {};
       
       // Lookup keys associated with user
       this.users.child(user_data.uid).child('secrets').once('value', (snapshot) => {
         var userSecrets = snapshot.val();
+        //user_data.secrets = {};
         if (userSecrets) {
           var userKeys = Object.keys(userSecrets);
           var resultsCount = userKeys.length - 1;
@@ -93,7 +94,7 @@ class MySecrets extends React.Component {
 
   listSecrets (arrayOfSecrets) {
     let currentState = this.state.displaying;
-    if (!arrayOfSecrets) {
+    if (!arrayOfSecrets) { // refactor to use default arg
       var arrayOfSecrets = this.mySecrets;
     }
     return arrayOfSecrets.map((item) => {

@@ -14,34 +14,33 @@ import {
 class TabBar extends React.Component {
   constructor(props){
     super(props);
+    this.state = {
+      notification: 0,
+    }
+    this.setActiveTab();
+  }
+
+  setActiveTab() {
     switch(this.props.route.name) {
       case "MySecrets":
-        this.state = {
-          selectedTab: 'tabOne'
-        }
+        this.state.selectedTab = 'tabOne';
         break;
       case "SelectCategory":
       case "CreateSecret":
       case "SelectSecret":
       case "ShareSecret":
-        this.state = {
-          selectedTab: 'tabTwo'
-        }
+        this.state.selectedTab = 'tabTwo';
         break;
       case "MyAccount":
       case "SignIn":
       case "Registration":
-        this.state = {
-          selectedTab: 'tabThree'
-        }
+        this.state.selectedTab = 'tabThree';
         break; 
-      default: 
-        this.state = {};
-        break;
     }
   }
-  setTab(tabId, navigate){
-    this.setState({selectedTab: tabId});
+
+  setTab(tabId, navigate) {
+    //this.setState({selectedTab: tabId});
     if (tabId === "tabOne" && this.props.route.name !== 'MySecrets') {
       this.props.navigator.push({
         name: 'MySecrets'
@@ -56,17 +55,11 @@ class TabBar extends React.Component {
       })
     }
   }
-  _renderContent(color: string, pageText: string, num?: number) {
-    return (
-      <View style={[styles.tabContent, {backgroundColor: color}]}>
-        <Text style={styles.tabText}>{pageText}</Text>
-        <Text style={styles.tabText}>{num} re-renders of the {pageText}</Text>
-      </View>
-    );
+
+  componentWillMount() {
+    this.setActiveTab()
   }
-  componentDidMount() {
-    console.log(Utility.authStatus);
-  }
+
   render(){
     return (
       <View style={styles.tabContainer}>
@@ -79,7 +72,7 @@ class TabBar extends React.Component {
               title={"My Secrets"}
               icon={require('../img/envelope76.png')}
               style={styles.tabItem}
-              badge='3' >
+              badge={this.state.notification ? this.state.notification : null} >
                 <View></View>
             </TabBarIOS.Item>
             
