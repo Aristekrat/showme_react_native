@@ -19,16 +19,29 @@ class SelectSecret extends React.Component {
     this.state = {
       source: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2})
     }
-    this.secrets = []
+    this.secrets = [];
+    this.publicSecrets = this.props.db.child('publicSecrets');
   }
-  componentDidMount() {
-    this.props.db.child('publicSecrets').orderByChild('category').equalTo(this.props.route.category).on("child_added", (snapshot) => {
-      this.secrets.push(snapshot.val())
+  upvote(key) {
+    this.publicSecrets.child(this.props.route.category).child(key).child('score').transaction(function(currentRank) {
+      return currentRank + 1;
+    });
+  }
+  downvote(key) {
+    this.publicSecrets.child(this.props.route.category).child(key).child('score').transaction(function(currentRank) {
+      return currentRank - 1;
+    });
+  }
+  componentWillMount() {
+    this.props.db.child('publicSecrets').child(this.props.route.category).orderByChild('score').startAt(-5).on("child_added", (snapshot) => {
+      var secret = snapshot.val();
+      secret.key = snapshot.key();
+      this.secrets.push(secret);
       this.setState({
         source: this.state.source.cloneWithRows(this.secrets)
       })
     }, function (errorObject) {
-      console.log("The read failed: " + errorObject.code);
+      console.log("The read failed: " + errorObject.code); // TODO real error handling
     })
   }
   render(){
@@ -41,7 +54,12 @@ class SelectSecret extends React.Component {
           renderRow={(rowData) => {
             return (
               <Secret 
-                secretText={rowData.text} selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData})}} />
+                secretText={rowData.text}
+                count={rowData.score} 
+                selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData})}} 
+                upvote={() => this.upvote(rowData.key)}
+                downvote={() => this.downvote(rowData.key)}
+              />
             )
           }} />
         <TabBar navigator={this.props.navigator} route={this.props.route} />

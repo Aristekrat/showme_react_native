@@ -152,23 +152,25 @@ class ShowMe extends React.Component {
 
       this.DB.child('users').child(user_data.uid).child('secrets').once('value', (snapshot) => { 
         var userSecrets = snapshot.val();
-        var userKeys = Object.keys(userSecrets);
-        var resultsCount = userKeys.length - 1;
-  
-        // Find all the secret entries
-        userKeys.forEach((result, count) => {
-          this.DB.child('privateSecrets').child(result).on('value', (secret) => {
-            var sv = secret.val()
-            sv.state = userSecrets[result]; // Show state from the users table, not the secrets table
-            sv.key = result;
-            this.state.remoteSecrets.push(sv)
+        if (userSecrets) {
+          var userKeys = Object.keys(userSecrets);
+          var resultsCount = userKeys.length - 1;
 
-            // At the end of iteration, display results
-            if (count === resultsCount) {
-              // this.setNotifcationCount()
-            }
+          // Find all the secret entries
+          userKeys.forEach((result, count) => {
+            this.DB.child('privateSecrets').child(result).on('value', (secret) => {
+              var sv = secret.val()
+              sv.state = userSecrets[result]; // Show state from the users table, not the secrets table
+              sv.key = result;
+              this.state.remoteSecrets.push(sv)
+
+              // At the end of iteration, display results
+              if (count === resultsCount) {
+                // this.setNotifcationCount()
+              }
+            })
           })
-        })
+        }
       })
     });
   }
@@ -256,7 +258,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'SelectCategory'
+          name: 'MySecrets'
         }} />
     );
   }

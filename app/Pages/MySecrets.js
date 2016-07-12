@@ -5,6 +5,7 @@ import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import Secret from '../Components/MySecret.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
+import ArrowLink from '../Components/ArrowLink.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 import {
@@ -38,11 +39,9 @@ class MySecrets extends React.Component {
       // Lookup keys associated with user
       this.users.child(user_data.uid).child('secrets').once('value', (snapshot) => {
         var userSecrets = snapshot.val();
-        //user_data.secrets = {};
         if (userSecrets) {
           var userKeys = Object.keys(userSecrets);
           var resultsCount = userKeys.length - 1;
-          
           // Find all the secret entries
           userKeys.forEach((result, count) => {
             this.privateSecrets.child(result).on('value', (secret) => {
@@ -60,7 +59,8 @@ class MySecrets extends React.Component {
             })
           })
         } else {
-          this.toggleActivityIndicator()
+          this.toggleActivityIndicator();
+          this.initalDisplay();
           // the user has no secrets, display some handler suggesting the user create some
         }
 
@@ -85,7 +85,7 @@ class MySecrets extends React.Component {
   initalDisplay() {
     if (this.mySecrets.length === 0) {
       // Pop a link over to secret select
-      console.log("Improperly reached here");
+      this.setState({displaying: "NL"})
     } else {
       // Probably want to refine this function to load the last / most updated, OK for now,
       this.setState({displaying: this.mySecrets[0].state})
@@ -127,6 +127,12 @@ class MySecrets extends React.Component {
         break;
       case "CR":
         helperText = <Text style={styles.helperText}>Tap to send</Text>
+        break;
+      case "NL":
+        helperText = <View>
+                      <Text style={styles.helperText}>You don't have any secrets yet, would you like to make one?</Text>
+                      <ArrowLink skipTo={() => this.props.navigator.push({name: 'SelectCategory'})}>Select Secret</ArrowLink>
+                    </View>
     }
     return (
       <View style={StylingGlobals.container}>

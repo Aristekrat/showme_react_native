@@ -105,7 +105,7 @@ class ShareSecret extends React.Component {
             selectionColor={StylingGlobals.colors.navColor}
           />
           <BigButton do={() => this.sendText()}>
-            Send Text
+            Continue
           </BigButton>
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
@@ -129,7 +129,7 @@ var styles = StyleSheet.create({
     height: 45,
     borderColor: StylingGlobals.colors.border,
     borderWidth: 1  
-  }
+  },
 });
 
 module.exports = ShareSecret;

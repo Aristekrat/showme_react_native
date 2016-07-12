@@ -99,8 +99,8 @@ class CreateYourOwn extends React.Component {
         })
       } else {
         // add to publicSecrets
-        var secretData = {text: this.state.text, category: this.refs.catPicker.state.category};
-        var publicSecret = this.publicSecrets.push(secretData, function (err) {
+        var secretData = {text: this.state.text, category: this.refs.catPicker.state.category, score: 1};
+        var publicSecret = this.publicSecrets.child(this.refs.catPicker.state.category).push(secretData, function (err) {
           if (err) {
             this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
           } else {
