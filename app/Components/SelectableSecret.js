@@ -27,12 +27,12 @@ class Secret extends React.Component {
           <TouchableHighlight style={styles.upVote} onPress={this.props.upvote} underlayColor={StylingGlobals.colors.accentPressDown}>
             <Image 
               source={require("../img/up.png")}
-              style={[styles.voteImg, styles.upvoteImg]} />   
+              style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'upvote' ? styles.active : null]} />   
           </TouchableHighlight>
           <TouchableHighlight style={styles.downVote} onPress={this.props.downvote} underlayColor={StylingGlobals.colors.accentPressDown}>
             <Image 
               source={require("../img/down.png")}
-              style={[styles.voteImg, styles.upvoteImg]} />   
+              style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'downvote' ? styles.active : null]} />   
           </TouchableHighlight>
           <Text style={styles.count}>{this.props.count}</Text>
         </View>
@@ -69,19 +69,19 @@ var styles = StyleSheet.create({
       width: 20,
       height: 20,
       tintColor: StylingGlobals.colors.navColor,
-      opacity: 0.7,
+      opacity: 0.5,
     },
     upVote: {
-      //flex: 1,
       width: 70,
-      //paddingLeft: 10,
     },
     upvoteImg: {
       alignSelf: 'center'
     },
     downVote: {
-      //flex: 1,
       width: 70,
+    },
+    active: {
+      opacity: 1.0,
     },
     downvoteImg: {
       alignSelf: 'center'

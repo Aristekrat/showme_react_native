@@ -134,8 +134,8 @@ class ShowMe extends React.Component {
     this.DB = Utility.getRef();
     this.state = {
       remoteSecrets: [],
-      localSecrets: []
-    }
+      localSecrets: [],
+    };
   }
   getLocalSecrets() {
     AsyncStorage.getItem('secrets').then((secret_data_json) => {
@@ -148,8 +148,7 @@ class ShowMe extends React.Component {
   getRemoteSecrets() {
     AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
       let user_data = JSON.parse(user_data_json);
-      // Lookup keys associated with user
-
+      
       this.DB.child('users').child(user_data.uid).child('secrets').once('value', (snapshot) => { 
         var userSecrets = snapshot.val();
         if (userSecrets) {
@@ -163,10 +162,9 @@ class ShowMe extends React.Component {
               sv.state = userSecrets[result]; // Show state from the users table, not the secrets table
               sv.key = result;
               this.state.remoteSecrets.push(sv)
-
               // At the end of iteration, display results
               if (count === resultsCount) {
-                // this.setNotifcationCount()
+                this.setNotificationCount();
               }
             })
           })
@@ -175,7 +173,12 @@ class ShowMe extends React.Component {
     });
   }
   setNotificationCount() {
-
+    let count = String(this.state.remoteSecrets.length - this.state.localSecrets.length);
+    AsyncStorage.setItem('notificationCount', count);
+    /*if (remoteSecrets.length > localSecrets.length) {
+      
+      this.props.route.cookieData.notificationCount = remoteSecrets.length - localSecrets.length;
+    }*/
   }
   listenForUpdatesToSecrets() {
     AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
@@ -258,7 +261,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'MySecrets'
+          name: 'SelectCategory'
         }} />
     );
   }

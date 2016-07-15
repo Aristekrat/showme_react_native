@@ -15,7 +15,7 @@ class TabBar extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      notification: 0,
+      notifications: 0,
     }
     this.setActiveTab();
   }
@@ -40,7 +40,6 @@ class TabBar extends React.Component {
   }
 
   setTab(tabId, navigate) {
-    //this.setState({selectedTab: tabId});
     if (tabId === "tabOne" && this.props.route.name !== 'MySecrets') {
       this.props.navigator.push({
         name: 'MySecrets'
@@ -57,7 +56,13 @@ class TabBar extends React.Component {
   }
 
   componentWillMount() {
-    this.setActiveTab()
+    this.setActiveTab();
+  }
+
+  componentDidMount() {
+    AsyncStorage.getItem('notificationCount').then((notificationCount) => {
+      this.setState({notifications: notificationCount});
+    });
   }
 
   render(){
@@ -72,7 +77,7 @@ class TabBar extends React.Component {
               title={"My Secrets"}
               icon={require('../img/envelope76.png')}
               style={styles.tabItem}
-              badge={this.state.notification ? this.state.notification : null} >
+              badge={this.state.notifications !== '0' ? this.state.notifications : null} >
                 <View></View>
             </TabBarIOS.Item>
             
