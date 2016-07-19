@@ -85,7 +85,7 @@ class MySecrets extends React.Component {
   initalDisplay() {
     if (this.mySecrets.length === 0) {
       // Pop a link over to secret select
-      this.setState({displaying: "NL"})
+      this.setState({displaying: "NR"})
     } else {
       // Probably want to refine this function to load the last / most updated, OK for now,
       this.setState({displaying: this.mySecrets[0].state})
@@ -97,7 +97,7 @@ class MySecrets extends React.Component {
     if (!arrayOfSecrets) { // refactor to use default arg
       var arrayOfSecrets = this.mySecrets;
     }
-    return arrayOfSecrets.map((item) => {
+    return arrayOfSecrets.map((item, index) => {
       if (item.state === currentState) {
         return (
           <Secret 
@@ -117,6 +117,7 @@ class MySecrets extends React.Component {
 
   render() {
     let helperText;
+    let secretsList = this.listSecrets();
     switch(this.state.displaying) {
       case "BR":
         helperText = null;
@@ -128,7 +129,7 @@ class MySecrets extends React.Component {
       case "CR":
         helperText = <Text style={styles.helperText}>Tap to send</Text>
         break;
-      case "NL":
+      case "NR":
         helperText = <View>
                       <Text style={styles.helperText}>You don't have any secrets yet, would you like to make one?</Text>
                       <ArrowLink skipTo={() => this.props.navigator.push({name: 'SelectCategory'})}>Select Secret</ArrowLink>
@@ -165,8 +166,8 @@ class MySecrets extends React.Component {
           </View>
           <View style={styles.contentContainer}>
             <ActivityIndicator animationControl={this.state.animating}/>
-            {helperText}
-            {this.listSecrets()}
+            {secretsList[0] || this.state.animating ? helperText : <Text style={styles.helperText}>No secrets of this type yet</Text> }
+            {secretsList}
           </View>
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
@@ -174,6 +175,8 @@ class MySecrets extends React.Component {
     );
   }
 }
+
+//{ this.state.errorMessage ? <Text style={styles.errorText}>{this.state.errorMessage}</Text> : null }
 
 ReactMixin(MySecrets.prototype, ReactTimer);
 
