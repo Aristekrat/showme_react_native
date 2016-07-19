@@ -24,26 +24,51 @@ class SelectSecret extends React.Component {
     this.secrets = [];
     this.publicSecrets = this.props.db.child('publicSecrets').child(this.props.route.category);
   }
-  upvote(key) { 
-    if (this.state.uid) {
-      this.publicSecrets.child(key).child('score').transaction(function(currentRank) {
-        return currentRank + 1;
-      });
-      var updateData = {};
-      updateData[this.state.uid] = 'upvote';
-      this.publicSecrets.child(key).child('votes').update(updateData)
-    } else {
-      // TODO handling for user unknown
-    }
+  postUsersVote(theVote, key) {
+    var updateData = {};
+    updateData[this.state.uid] = theVote;
+    this.publicSecrets.child(key).child('votes').update(updateData)
   }
-  downvote(key) {
-    if (this.state.uid) {
-      this.publicSecrets.child(key).child('score').transaction(function(currentRank) {
-        return currentRank - 1;
-      });
-      var updateData = {};
-      updateData[this.state.uid] = 'downvote';
-      this.publicSecrets.child(key).child('votes').update(updateData)
+  postVoteAmt(voteAmt, key) {
+    this.publicSecrets.child(key).child('score').transaction((currentRank) => {
+      return currentRank + voteAmt;
+    }, (error, committed, snapshot) => {
+      var foo = snapshot.val();
+      this.publicSecrets.child(key).setPriority(-foo);
+    });
+  }
+  vote(action, currentState, key) {
+    if (this.state.uid) { // Known user
+      /*
+      if (!currentState) { // First vote
+        if (action === 'upvote') {
+          this.postUsersVote('upvote', key);
+          this.postVoteAmt(1, key);
+        } else if (action === 'downvote') {
+          this.postUsersVote('downvote', key);
+          this.postVoteAmt(-1, key);
+        }
+      } else if (currentState === 'upvote' && action === 'downvote') { // Reverse vote
+        this.postUsersVote('downvote', key);
+        this.postVoteAmt(-2, key);
+      } else if (currentState === 'downvote' && action === 'upvote') {
+        this.postUsersVote('upvote', key);
+        this.postVoteAmt(2, key);
+      } 
+      */
+      var foo = this.secrets[0]
+      foo.score = 1;
+      this.setState(foo); // This does update state on this 
+
+      /*var foo; // Allows unlimited voting for dev purposes.
+      if (action === 'upvote') {
+        foo = 1;
+      } else if (action === 'downvote') {
+        foo = -1;
+      }
+      this.postUsersVote(action, key);
+      this.postVoteAmt(foo, key);
+      */
     } else {
       // TODO handling for user unknown
     }
@@ -53,11 +78,11 @@ class SelectSecret extends React.Component {
       var user_data = JSON.parse(user_data_json);
       if (user_data.uid) {
         this.setState({uid: user_data.uid});
-      }
-      this.publicSecrets.orderByChild('score').startAt(-5).on("child_added", (snapshot) => {
+      } 
+      this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
         var secret = snapshot.val();
         secret.key = snapshot.key();
-        secret.vote = secret.votes[user_data.uid];
+        secret.vote = secret.votes[this.state.uid];
         delete secret.votes;
         this.secrets.push(secret);
         this.setState({
@@ -68,7 +93,7 @@ class SelectSecret extends React.Component {
       })
     });
   }
-  render(){
+  render() {
     return (
       <View style={StylingGlobals.container}>
         <ListView
@@ -82,8 +107,8 @@ class SelectSecret extends React.Component {
                 count={rowData.score} 
                 selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData})}} 
                 vote={rowData.vote}
-                upvote={() => this.upvote(rowData.key)}
-                downvote={() => this.downvote(rowData.key)}
+                upvote={() => this.vote('upvote', rowData.vote, rowData.key)}
+                downvote={() => this.vote('downvote', rowData.vote, rowData.key)}
               />
             )
           }} />

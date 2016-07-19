@@ -80,7 +80,7 @@ class CreateYourOwn extends React.Component {
       self.setState({animating: !self.state.animating});
       if (!this.state.public) {
         // add to privateSecrets TODO Public and Private should be split into the same, seperate function
-        var secretData = {question: self.state.text, state: 'CR', askerID: self.state.uid, askerName: '', askerAnswer: '', responderID: '', responderName: '', responderAnswer: ''};
+        var secretData = {question: self.state.text, state: 'CR', askerID: self.state.uid, askerName: '', askerAnswer: '', responderID: '', responderName: '', responderAnswer: '',};
         var privateSecret = this.privateSecrets.push(secretData, function (err, snapshot) {
           if (err) {
             this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
@@ -99,7 +99,9 @@ class CreateYourOwn extends React.Component {
         })
       } else {
         // add to publicSecrets
-        var secretData = {text: this.state.text, category: this.refs.catPicker.state.category, score: 1};
+        var voteData = {}
+        voteData[this.state.uid] = 'upvote';
+        var secretData = {text: this.state.text, category: this.refs.catPicker.state.category, score: 1, votes: voteData, '.priority': -1};
         var publicSecret = this.publicSecrets.child(this.refs.catPicker.state.category).push(secretData, function (err) {
           if (err) {
             this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
