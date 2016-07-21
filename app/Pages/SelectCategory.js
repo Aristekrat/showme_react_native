@@ -46,34 +46,34 @@ class SelectCategory extends React.Component {
         <ScrollView style={styles.content}>
           <Category 
             categoryName={this.categories[0].title} 
-            imgSource={require("../img/emails9.png")} 
+            imgSource={require("../img/caticon-create-your-own.png")} // 'emails9'
             elsewhere={() => {this.props.navigator.push({name: 'CreateSecret'})}} />
           <Category 
             categoryName={this.categories[1].title} 
-            imgSource={require("../img/heart296.png")} 
+            imgSource={require("../img/caticon-love.png")} // 'heart296'
             elsewhere={this.selectThisCategory.bind(this, this.categories[1].title, SelectSecret, this.props.navigator)} />
           <Category 
             categoryName={this.categories[2].title} 
-            imgSource={require("../img/femenine1.png")}
+            imgSource={require("../img/caticon-sex.png")} // 'femenine1'
             elsewhere={this.selectThisCategory.bind(this, this.categories[2].title, SelectSecret)} />
           <Category 
             categoryName={this.categories[3].title} 
-            imgSource={require("../img/group12.png")} 
+            imgSource={require("../img/caticon-social.png")} // group12
             elsewhere={this.selectThisCategory.bind(this, this.categories[3].title, SelectSecret)} />
           <Category 
             categoryName={this.categories[4].title} 
-            imgSource={require("../img/laughing.png")}
+            imgSource={require("../img/caticon-funny.png")} // laughing
             elsewhere={this.selectThisCategory.bind(this, this.categories[4].title, SelectSecret)} />
           <Category 
             categoryName={this.categories[5].title} 
-            imgSource={require("../img/wound4.png")}
+            imgSource={require("../img/caticon-embarassing.png")} // wound4
             elsewhere={this.selectThisCategory.bind(this, this.categories[5].title, SelectSecret)} />
           <Category 
             categoryName={this.categories[6].title} 
-            imgSource={require("../img/music-player17.png")}
+            imgSource={require("../img/caticon-past.png")} // music-player17
             elsewhere={this.selectThisCategory.bind(this, this.categories[6].title, SelectSecret)} />
         </ScrollView>
-        <TabBar navigator={this.props.navigator} route={this.props.route} />
+        <TabBar navigator={this.props.navigator} route={this.props.route} db={this.props.db} />
       </View>
     );
   }

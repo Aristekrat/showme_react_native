@@ -3,6 +3,8 @@
 import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import Utility from '../Globals/UtilityFunctions.js';
+import ReactMixin from 'react-mixin';
+import ReactTimer from 'react-timer-mixin';
 import {
   StyleSheet,
   Text,
@@ -15,7 +17,7 @@ class TabBar extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      notifications: 0,
+      notifications: '0',
     }
     this.setActiveTab();
   }
@@ -55,14 +57,24 @@ class TabBar extends React.Component {
     }
   }
 
+  setBadge() {
+    AsyncStorage.getItem('notificationCount').then((notificationCount) => {
+      if (notificationCount !== this.state.notifications) {
+        this.setState({notifications: notificationCount});
+      }
+    });
+  }
+
   componentWillMount() {
     this.setActiveTab();
   }
 
   componentDidMount() {
-    AsyncStorage.getItem('notificationCount').then((notificationCount) => {
-      this.setState({notifications: notificationCount});
-    });
+    this.setBadge()
+    this.setTimeout (
+      () => { this.setBadge() }, 
+      3000    
+    );
   }
 
   render(){
@@ -75,7 +87,7 @@ class TabBar extends React.Component {
               selected={this.state.selectedTab === 'tabOne'}
               onPress={() => this.setTab('tabOne', this.props.tabOne)}
               title={"My Secrets"}
-              icon={require('../img/envelope76.png')}
+              icon={require('../img/tabicon-mysecret.png')} // envelope76
               style={styles.tabItem}
               badge={this.state.notifications !== '0' ? this.state.notifications : null} >
                 <View></View>
@@ -85,7 +97,7 @@ class TabBar extends React.Component {
               selected={this.state.selectedTab === 'tabTwo'}
               onPress={() => this.setTab('tabTwo', this.props.tabTwo)}
               title={"New"}
-              icon={require('../img/romantic41.png')}
+              icon={require('../img/tabicon-new.png')} // romantic41
               style={styles.tabItem}>
                 <View></View>
             </TabBarIOS.Item>
@@ -94,7 +106,7 @@ class TabBar extends React.Component {
               selected={this.state.selectedTab === 'tabThree'}
               onPress={() => this.setTab('tabThree', this.props.tabThree)}
               title={Utility.authStatus ? "My Account" : "Sign In" }
-              icon={require('../img/business64.png')}
+              icon={require('../img/tabicon-signin.png')} // business64
               style={styles.tabItem}>
                 <View></View>
             </TabBarIOS.Item>
@@ -104,6 +116,7 @@ class TabBar extends React.Component {
   }
 }
 
+ReactMixin(TabBar.prototype, ReactTimer);
 
 var styles = StyleSheet.create({
   tabContainer: {

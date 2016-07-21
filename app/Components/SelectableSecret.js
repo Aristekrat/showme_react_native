@@ -19,19 +19,19 @@ class Secret extends React.Component {
           <View style={styles.contentContainer}> 
             <Text style={styles.secretText}>{this.props.secretText}</Text> 
             <Image 
-              source={require("../img/right-arrow.png")}
+              source={require("../img/arrow-right.png")}
               style={[StylingGlobals.rightArrow, styles.secretArrow]} />      
           </View>
         </TouchableHighlight>
         <View style={styles.voteContainer}>
           <TouchableHighlight style={styles.upVote} onPress={this.props.upvote} underlayColor={StylingGlobals.colors.accentPressDown}>
             <Image 
-              source={require("../img/up.png")}
+              source={require("../img/arrow-up.png")}
               style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'upvote' ? styles.active : null]} />   
           </TouchableHighlight>
           <TouchableHighlight style={styles.downVote} onPress={this.props.downvote} underlayColor={StylingGlobals.colors.accentPressDown}>
             <Image 
-              source={require("../img/down.png")}
+              source={require("../img/arrow-down.png")}
               style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'downvote' ? styles.active : null]} />   
           </TouchableHighlight>
           <Text style={styles.count}>{this.props.count}</Text>

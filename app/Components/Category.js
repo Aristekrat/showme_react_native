@@ -22,7 +22,7 @@ class Category extends React.Component {
 	          {this.props.categoryName}
 	        </Text>
           <Image 
-            source={require("../img/right-arrow.png")}
+            source={require("../img/arrow-right.png")}
             style={[StylingGlobals.rightArrow, styles.catArrow]} />
         </View>
       </TouchableHighlight>

@@ -17,7 +17,7 @@ class ArrowLink extends React.Component {
           onPress={this.props.skipTo} >
         <View style={styles.skipContainer}>
           <Text style={styles.skipText}>{this.props.children}</Text>
-          <Image style={styles.skipRightArrow} source={require("../img/right-arrow.png")} />
+          <Image style={styles.skipRightArrow} source={require("../img/arrow-right.png")} />
         </View>
       </TouchableHighlight>
     );

@@ -19,23 +19,24 @@ import {
 } from 'react-native';
 
 class MySecrets extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       displaying: "",
       uid: "",
       animating: true,
-    } 
-    this.mySecrets = []
+    };
+    this.mySecrets = [];
     this.users = this.props.db.child('users');
     this.privateSecrets = this.props.db.child('privateSecrets');
   }
 
   componentWillMount() {
     // TODO refactor to a gen use utility function, used in index.ios.js as well
-    AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
+    AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data? Needs protection
       let user_data = JSON.parse(user_data_json);
-      
+      this.setState({uid: user_data.uid});
+
       // Lookup keys associated with user
       this.users.child(user_data.uid).child('secrets').once('value', (snapshot) => {
         var userSecrets = snapshot.val();
@@ -61,7 +62,6 @@ class MySecrets extends React.Component {
         } else {
           this.toggleActivityIndicator();
           this.initalDisplay();
-          // the user has no secrets, display some handler suggesting the user create some
         }
 
       })
@@ -83,12 +83,12 @@ class MySecrets extends React.Component {
   }
 
   initalDisplay() {
-    if (this.mySecrets.length === 0) {
-      // Pop a link over to secret select
+    if (this.mySecrets.length === 0) { // User has no secrets
       this.setState({displaying: "NR"})
     } else {
       // Probably want to refine this function to load the last / most updated, OK for now,
       this.setState({displaying: this.mySecrets[0].state})
+      AsyncStorage.setItem('notificationCount', String(0));
     }
   }
 
@@ -97,14 +97,25 @@ class MySecrets extends React.Component {
     if (!arrayOfSecrets) { // refactor to use default arg
       var arrayOfSecrets = this.mySecrets;
     }
+    if (this.state.displaying === 'CR') {
+      var route = 'ShareSecret'; 
+    } else if (this.state.displaying === 'QS' || this.state.displaying === 'RR') {
+      var route = 'YourAnswer';
+    }
     return arrayOfSecrets.map((item, index) => {
       if (item.state === currentState) {
+        // Beginnings of robust 'from' functionality, look to split it from this function
+        if (this.state.uid === item.askerID) {
+          item.askerName = "You";
+        } else if (!item.askerName) {
+          item.askerName = "Anonymous";
+        }
         return (
           <Secret 
             author={item.askerName} 
             question={item.question} 
             answer={item.responderAnswer} 
-            updateSecret={() => this.props.navigator.push({ name: 'YourAnswer', cookieData: item }) } />
+            updateSecret={() => this.props.navigator.push({ name: route, cookieData: item }) } />
         );
       }
     });
@@ -175,8 +186,6 @@ class MySecrets extends React.Component {
     );
   }
 }
-
-//{ this.state.errorMessage ? <Text style={styles.errorText}>{this.state.errorMessage}</Text> : null }
 
 ReactMixin(MySecrets.prototype, ReactTimer);
 

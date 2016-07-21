@@ -50,7 +50,7 @@ var NavigationBarRouteMapper = {
               onPress={() => navigator.pop()} 
               underlayColor={'transparent'}>
               <Image 
-                source={require("./app/img/left207.png")}
+                source={require("./app/img/arrow-left.png")}
                 style={styles.navBarLeftImage} />
             </TouchableHighlight>
           );
@@ -137,6 +137,7 @@ class ShowMe extends React.Component {
       localSecrets: [],
     };
   }
+
   getLocalSecrets() {
     AsyncStorage.getItem('secrets').then((secret_data_json) => {
       let secret_data = JSON.parse(secret_data_json);
@@ -145,16 +146,15 @@ class ShowMe extends React.Component {
       } 
     })
   }
+
   getRemoteSecrets() {
     AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
       let user_data = JSON.parse(user_data_json);
-      
       this.DB.child('users').child(user_data.uid).child('secrets').once('value', (snapshot) => { 
         var userSecrets = snapshot.val();
         if (userSecrets) {
           var userKeys = Object.keys(userSecrets);
           var resultsCount = userKeys.length - 1;
-
           // Find all the secret entries
           userKeys.forEach((result, count) => {
             this.DB.child('privateSecrets').child(result).on('value', (secret) => {
@@ -165,6 +165,7 @@ class ShowMe extends React.Component {
               // At the end of iteration, display results
               if (count === resultsCount) {
                 this.setNotificationCount();
+                AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets));
               }
             })
           })
@@ -172,14 +173,23 @@ class ShowMe extends React.Component {
       })
     });
   }
+
   setNotificationCount() {
-    let count = String(this.state.remoteSecrets.length - this.state.localSecrets.length);
-    AsyncStorage.setItem('notificationCount', count);
-    /*if (remoteSecrets.length > localSecrets.length) {
+    AsyncStorage.getItem('notificationCount').then((notificationCount) => {
+      let count = (this.state.remoteSecrets.length - this.state.localSecrets.length) + Number(notificationCount);
+      let arrLength = this.state.localSecrets.length - 1;
       
-      this.props.route.cookieData.notificationCount = remoteSecrets.length - localSecrets.length;
-    }*/
+      this.state.localSecrets.forEach((item, index) => {
+        if (JSON.stringify(this.state.remoteSecrets[index]) !== JSON.stringify(this.state.localSecrets[index])) {
+          count = count + 1; // unclear if this would see the right quantity
+        }
+        if (arrLength === index) {
+          AsyncStorage.setItem('notificationCount', String(count));
+        }
+      })
+    });
   }
+
   listenForUpdatesToSecrets() {
     AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
       if (user_data_json) {
@@ -187,22 +197,28 @@ class ShowMe extends React.Component {
         this.DB.child('users').child(user_data.uid).child('secrets').on('child_changed', (childSnapshot) => {
           var change = childSnapshot.val();
           if (change !== 'CR' || change !== 'QS') {
-            // update notifications
+            AsyncStorage.getItem('notificationCount').then((notificationCount) => {
+              let count = Number(notificationCount) + 1;
+              AsyncStorage.setItem('notificationCount', String(count));
+            });
           }
         })
       }
     });
   }
-  componentWillMount() {
-    if (Utility.getAuthStatus()) {
+
+  componentWillMount () {
+    /*if (Utility.getAuthStatus()) {
       Utility.setLocalAuth(true);
-    }
+    }*/
     this.getLocalSecrets();
     this.getRemoteSecrets();
   }
+
   componentDidMount() {
     this.listenForUpdatesToSecrets();
   }
+
   renderScene (route, navigator) {
     switch (route.name) {
       case 'SelectCategory':
@@ -244,10 +260,11 @@ class ShowMe extends React.Component {
         );
       default:
         return (
-          <SelectCategory navigator={navigator} route={route} />
+          <SelectCategory navigator={navigator} route={route} db={this.db} />
         );
       }
   }
+  
   render () {
     return (
       <Navigator

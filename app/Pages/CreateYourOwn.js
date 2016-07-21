@@ -169,7 +169,7 @@ class CreateYourOwn extends React.Component {
                   onPress={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: this.state.submittedSecret})}}>
                   <View style={StylingGlobals.horizontalCenter}>
                     <Image 
-                      source={require("../img/game67.png")} style={styles.icon} />
+                      source={require("../img/send-secret.png")} style={styles.icon} /> 
                     <Text style={styles.buttonText}>Send Secret</Text>
                   </View>
               </TouchableHighlight>
@@ -194,7 +194,7 @@ class CreateYourOwn extends React.Component {
       </View>
     );
   }
-}
+} // original img name: game67
 
 var styles = StyleSheet.create({
   pageContainer: StylingGlobals.container,

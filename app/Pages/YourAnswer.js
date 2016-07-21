@@ -22,6 +22,7 @@ class YourAnswer extends React.Component {
       animating: false
     }
     this.privateSecrets = this.props.db.child('privateSecrets');
+    this.users = this.props.db.child('users');
   }
   
   responderOrAsker(localID, secret) {
@@ -40,23 +41,33 @@ class YourAnswer extends React.Component {
     this.setState({animating: !this.state.animating});
   }
 
+  notify(notificationText) {
+    this.toggleActivityIndicator();
+    this.setState({notificationText: notificationText});
+  }
+
   submitAnswer() {
-    this.toggleActivityIndicator()
     if (this.state.answer.length > 5) {
+      this.toggleActivityIndicator()
       let secretID = this.props.route.cookieData.key;
       AsyncStorage.getItem('userData').then((user_data_json) => {
         let user_data = JSON.parse(user_data_json); 
-        let userStatus = this.responderOrAsker(user_data.uid, this.props.route.cookieData)
-        let updatedAnswer = {}
+        let userStatus = this.responderOrAsker(user_data.uid, this.props.route.cookieData);
+        let updatedAnswer = {};
         updatedAnswer[userStatus] = this.state.answer;
-        this.privateSecrets.child(secretID).update(updatedAnswer, this.toggleActivityIndicator()); // Will need to check if BR now in the future
+        this.privateSecrets.child(secretID).update(updatedAnswer, this.notify('Success'));
+        var otherAnswer = userStatus === 'responderAnswer' ? 'askerAnswer' : 'responderAnswer';
+        if (this.props.route.cookieData[otherAnswer]) {
+          this.users.child(this.props.route.cookieData.responderID).child('secrets').child(secretID).set('BR');
+          this.users.child(this.props.route.cookieData.askerID).child('secrets').child(secretID).set('BR');
+        }
       })
     } else {
-      // Error handling: provide an answer you jerk
+      this.setState({notificationText: 'Please provide an answer'});
     }
   }
 
-  render(){
+  render() {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView style={styles.form}>
@@ -71,7 +82,8 @@ class YourAnswer extends React.Component {
           <ActivityIndicator animationControl={this.state.animating}/>
           <TouchableHighlight style={[styles.button, StylingGlobals.horizontalCenter]} onPress={() => this.submitAnswer()}>
             <Text style={styles.buttonText}>Update</Text>
-          </TouchableHighlight> 
+          </TouchableHighlight>
+          {this.state.notificationText ? <Text style={styles.notificationText}>{this.state.notificationText}</Text> : null}
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
@@ -91,6 +103,12 @@ var styles = StyleSheet.create({
     paddingLeft: 5,
     marginTop: 12,
     marginBottom: 12
+  },
+  notificationText: {
+    color: StylingGlobals.colors.mainColor,
+    textAlign: 'center',
+    marginTop: 5,
+    fontSize: 16,
   },
   button: {
     backgroundColor: StylingGlobals.colors.mainColor,

@@ -69,7 +69,7 @@ class Gateway extends React.Component {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
-          <Image style={styles.heroImage} source={require("../img/chat21.png")} />
+          <Image style={styles.heroImage} source={require("../img/send-secret.png")} />
 
           <View style={styles.fbContainer}>
             <Text style={styles.fbText}>Continue with Facebook</Text>
@@ -119,7 +119,7 @@ class Gateway extends React.Component {
                   style={styles.emailButton} 
                   underlayColor={StylingGlobals.colors.pressDown} 
                   onPress={() => this.checkEmail()} >
-                <Image style={styles.emailRightArrow} source={require("../img/right-arrow.png")} />
+                <Image style={styles.emailRightArrow} source={require("../img/arrow-right.png")} />
               </TouchableHighlight>
             </View>
             { this.state.validEmail ?
