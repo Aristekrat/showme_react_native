@@ -23,6 +23,8 @@ class YourAnswer extends React.Component {
     }
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
+    this.answers = this.props.db.child('answers');
+    this.currentSecret = this.props.route.cookieData;
   }
   
   responderOrAsker(localID, secret) {
@@ -32,12 +34,11 @@ class YourAnswer extends React.Component {
       return "responderAnswer";
     } else {
       // the user is seeing a secret they shouldn't, serious error
-      return null
+      return null;
     }
   }
 
-  // Needs to be moved to common utils
-  toggleActivityIndicator() {
+  toggleActivityIndicator() { // Needs to be moved to common utils
     this.setState({animating: !this.state.animating});
   }
 
@@ -49,22 +50,35 @@ class YourAnswer extends React.Component {
   submitAnswer() {
     if (this.state.answer.length > 5) {
       this.toggleActivityIndicator()
-      let secretID = this.props.route.cookieData.key;
+      let secretID = this.currentSecret.key;
       AsyncStorage.getItem('userData').then((user_data_json) => {
         let user_data = JSON.parse(user_data_json); 
         let userStatus = this.responderOrAsker(user_data.uid, this.props.route.cookieData);
         let updatedAnswer = {};
         updatedAnswer[userStatus] = this.state.answer;
-        this.privateSecrets.child(secretID).update(updatedAnswer, this.notify('Success'));
-        var otherAnswer = userStatus === 'responderAnswer' ? 'askerAnswer' : 'responderAnswer';
-        if (this.props.route.cookieData[otherAnswer]) {
-          this.users.child(this.props.route.cookieData.responderID).child('secrets').child(secretID).set('BR');
-          this.users.child(this.props.route.cookieData.askerID).child('secrets').child(secretID).set('BR');
-        }
+        this.answers.child(secretID).update(updatedAnswer, this.updateUsersTable(userStatus, user_data.uid));
       })
     } else {
       this.setState({notificationText: 'Please provide an answer'});
     }
+  }
+
+  updateUsersTable(userStatus, userId) {
+    this.answers.child(this.currentSecret.key).once('value', (snapshot) => {
+      var ans = snapshot.val();
+      if (ans.askerAnswer && ans.responderAnswer) {
+        this.performUserSecretsUpdate('BR');
+      } else {
+        var secretState = userStatus === 'askerAnswer' ? 'AA' : 'RA'
+        this.performUserSecretsUpdate(secretState);
+      };
+    });
+  }
+
+  performUserSecretsUpdate(stateToUpdate) {
+    this.users.child(this.currentSecret.responderID).child('secrets').child(this.currentSecret.key).update({answerState: stateToUpdate});
+    this.users.child(this.currentSecret.askerID).child('secrets').child(this.currentSecret.key).update({answerState: stateToUpdate});
+    this.notify('Success');
   }
 
   render() {

@@ -64,9 +64,10 @@ class CreateYourOwn extends React.Component {
     this.publicSecrets = this.props.db.child('publicSecrets');
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
+    this.answers = this.props.db.child('answers');
   }
 
-  componentWillMount(){
+  componentWillMount() {
     let self = this;
     AsyncStorage.getItem('userData').then((user_data_json) => {
       let user_data = JSON.parse(user_data_json); 
@@ -80,14 +81,16 @@ class CreateYourOwn extends React.Component {
       self.setState({animating: !self.state.animating});
       if (!this.state.public) {
         // add to privateSecrets TODO Public and Private should be split into the same, seperate function
-        var secretData = {question: self.state.text, state: 'CR', askerID: self.state.uid, askerName: '', askerAnswer: '', responderID: '', responderName: '', responderAnswer: '',};
+        var secretData = {question: self.state.text, askerID: self.state.uid, askerName: '', responderID: '', responderName: ''};
         var privateSecret = this.privateSecrets.push(secretData, function (err, snapshot) {
           if (err) {
             this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
           } else {
-              secretData.key = privateSecret.key();
+              var sKey = privateSecret.key();
+              self.answers.child(sKey).set({askerAnswer: '', responderAnswer: ''});
+              self.users.child(self.state.uid).child('secrets').child(sKey).set({answerState: 'NA', sentState: 'CR'});
+              secretData.key = sKey;
               secretData.public = false;
-              self.users.child(self.state.uid).child('secrets').child(privateSecret.key()).set('CR');
               self.setState({
                 animating: !self.state.animating, 
                 submitSuccess: true, 

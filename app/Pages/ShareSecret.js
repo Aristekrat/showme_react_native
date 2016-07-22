@@ -27,27 +27,12 @@ class ShareSecret extends React.Component {
       uid: ''
     }
     this.privateSecrets = this.props.db.child('privateSecrets');
+    this.users = this.props.db.child('users');
+    this.currentSecret = this.props.route.cookieData;
   }
-  sendText() {
-    var self = this;
-    console.log(this.state.ph.length);
-    
-    // Should look up whether this is already a private secret, update if so. If not:
-    // Not 100% sure this will work within the push function, need to test
-    this.privateSecrets.push({
-        question: this.props.route.cookieData.text, 
-        state: 'QS', 
-        askerID: self.state.uid, 
-        askerName: '', 
-        askerAnswer: '', 
-        responderID: this.state.ph, 
-        responderName: '', 
-        responderAnswer: ''}, 
-        function (err, snapshot) {
 
-        }
-    );
-        
+  sendText() {
+    this.updateSentStatus();
       /*
       Composer.composeMessageWithArgs({
           'messageText': 'I want to share a secret with you: ',
@@ -77,12 +62,31 @@ class ShareSecret extends React.Component {
       */
   }
 
+  tempFunc() {
+    var other;
+    if (this.currentSecret.askerID === '25c07e84-dca3-415e-9f61-f2a6a6d6147a') {
+      other = '5fc1427d-6be6-4e06-b71e-4bc64a251ff1';
+    } else {
+      other = '25c07e84-dca3-415e-9f61-f2a6a6d6147a';
+    }
+    return other; 
+  }
+
+  updateSentStatus() {
+    var responderId = this.tempFunc();
+    var updatedSecret = {
+      responderID: responderId,
+    };
+    this.privateSecrets.child(this.currentSecret.key).update(updatedSecret);
+    this.users.child(this.currentSecret.askerID).child('secrets').child(this.currentSecret.key).update({sentState: 'QS'});
+    this.users.child(responderId).child('secrets').child(this.currentSecret.key).update({sentState: 'RR'});
+  }
+
   componentDidMount() {
     console.log(this.props.route.cookieData);
     AsyncStorage.getItem('userData')
       .then((user_data_json) => {
         if (!user_data_json) {
-          // Err
           console.log("ERR - NO DATA");
         } else {
           let user_data = JSON.parse(user_data_json);

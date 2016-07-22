@@ -21,7 +21,7 @@ class MySecret extends React.Component {
           <View style={styles.secretContainer}>
             <Text style={styles.author}>from {this.props.author}</Text>
             <Text style={styles.question}>Q: {this.props.question}</Text>
-            <Text style={styles.answer}>A: {this.props.answer}</Text>
+            <Text style={styles.answer}>{this.props.answer}</Text>
           </View>
       </TouchableHighlight>
     )
@@ -47,7 +47,10 @@ var styles = StyleSheet.create({
     margin: 5,
   },
   answer: {
-    margin: 5,
+    marginTop: 5,
+    marginLeft: 5,
+    marginRight: 5,
+    marginBottom: 1,
   },
 });
 

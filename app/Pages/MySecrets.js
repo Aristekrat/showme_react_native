@@ -63,12 +63,11 @@ class MySecrets extends React.Component {
           this.toggleActivityIndicator();
           this.initalDisplay();
         }
-
       })
     });
   }
 
-  componentDidMount () {
+  componentDidMount() {
     AsyncStorage.getItem('secrets').then((secrets_data_json) => {
       if (secrets_data_json) {
         let secrets_data = JSON.parse(secrets_data_json);
@@ -87,7 +86,8 @@ class MySecrets extends React.Component {
       this.setState({displaying: "NR"})
     } else {
       // Probably want to refine this function to load the last / most updated, OK for now,
-      this.setState({displaying: this.mySecrets[0].state})
+      console.log(this.mySecrets[0].state.sentState);
+      this.setState({displaying: this.mySecrets[0].state.sentState})
       AsyncStorage.setItem('notificationCount', String(0));
     }
   }
@@ -97,13 +97,13 @@ class MySecrets extends React.Component {
     if (!arrayOfSecrets) { // refactor to use default arg
       var arrayOfSecrets = this.mySecrets;
     }
-    if (this.state.displaying === 'CR') {
+    if (currentState === 'CR') { // determines the correct route to link to, should probably split this functionality off
       var route = 'ShareSecret'; 
-    } else if (this.state.displaying === 'QS' || this.state.displaying === 'RR') {
+    } else if (currentState === 'QS' || currentState === 'RR') {
       var route = 'YourAnswer';
     }
     return arrayOfSecrets.map((item, index) => {
-      if (item.state === currentState) {
+      if (item.state.sentState === currentState) {
         // Beginnings of robust 'from' functionality, look to split it from this function
         if (this.state.uid === item.askerID) {
           item.askerName = "You";
