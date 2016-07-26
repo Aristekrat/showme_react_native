@@ -12,6 +12,8 @@ import SignIn from './app/Pages/SignIn.js';
 import StylingGlobals from './app/StylingGlobals.js';
 import Gateway from './app/Pages/Gateway.js';
 import Utility from './app/Globals/UtilityFunctions.js';
+import ReactMixin from 'react-mixin';
+import ReactTimer from 'react-timer-mixin';
 import {
   AppRegistry,
   StyleSheet,
@@ -165,7 +167,9 @@ class ShowMe extends React.Component {
               // At the end of iteration, display results
               if (count === resultsCount) {
                 this.setNotificationCount();
-                AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets));
+                this.listenForUpdatesToSecrets();
+                // Activating the below line will cause setNotificationCount to stop working. 
+                //AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets));
               }
             })
           })
@@ -178,15 +182,33 @@ class ShowMe extends React.Component {
     AsyncStorage.getItem('notificationCount').then((notificationCount) => {
       let count = (this.state.remoteSecrets.length - this.state.localSecrets.length) + Number(notificationCount);
       let arrLength = this.state.localSecrets.length - 1;
+      let updatedSecrets = []
       
       this.state.localSecrets.forEach((item, index) => {
         if (JSON.stringify(this.state.remoteSecrets[index]) !== JSON.stringify(this.state.localSecrets[index])) {
           count = count + 1; // unclear if this would see the right quantity
+          this.setUpdatedSecrets(this.state.remoteSecrets[index].key);
         }
         if (arrLength === index) {
           AsyncStorage.setItem('notificationCount', String(count));
+          if (updatedSecrets.length > 0) {
+            AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
+          }
         }
       })
+    });
+  }
+
+  setUpdatedSecrets(key) {
+    // sets key / value pair for the secrets that have been freshly updated
+    AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
+      if (!updatedSecrets) {
+        var updatedSecrets = {}
+      } else {
+        var updatedSecrets = JSON.parse(updatedSecretsString);
+      }
+      updatedSecrets[key] = true;
+      AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets)); 
     });
   }
 
@@ -195,19 +217,19 @@ class ShowMe extends React.Component {
       if (user_data_json) {
         let user_data = JSON.parse(user_data_json);
         this.DB.child('users').child(user_data.uid).child('secrets').on('child_changed', (childSnapshot) => {
-          var change = childSnapshot.val();
-          if (change !== 'CR' || change !== 'QS') {
-            AsyncStorage.getItem('notificationCount').then((notificationCount) => {
-              let count = Number(notificationCount) + 1;
-              AsyncStorage.setItem('notificationCount', String(count));
-            });
-          }
+          var change = childSnapshot.val(); // TODO Try and filter out user initiated changes
+          AsyncStorage.getItem('notificationCount').then((notificationCount) => {
+            if (!notificationCount) { var notificationCount = 0 }
+            let count = Number(notificationCount) + 1;
+            AsyncStorage.setItem('notificationCount', String(count));
+          });
+          this.setUpdatedSecrets(childSnapshot.key())
         })
       }
     });
   }
 
-  componentWillMount () {
+  componentWillMount() {
     /*if (Utility.getAuthStatus()) {
       Utility.setLocalAuth(true);
     }*/
@@ -216,7 +238,10 @@ class ShowMe extends React.Component {
   }
 
   componentDidMount() {
-    this.listenForUpdatesToSecrets();
+    this.setTimeout (
+      () => { this.listenForUpdatesToSecrets(); AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets)); }, 
+      5000
+    );
   }
 
   renderScene (route, navigator) {
@@ -278,11 +303,13 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'MySecrets'
+          name: 'Gateway'
         }} />
     );
   }
 };
+
+ReactMixin(ShowMe.prototype, ReactTimer);
 
 var styles = StyleSheet.create({
     navBar: {

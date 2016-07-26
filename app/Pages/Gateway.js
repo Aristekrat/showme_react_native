@@ -69,7 +69,7 @@ class Gateway extends React.Component {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
-          <Image style={styles.heroImage} source={require("../img/send-secret.png")} />
+          <Image style={styles.heroImage} source={require("../img/show-me-skirt.png")} />
 
           <View style={styles.fbContainer}>
             <Text style={styles.fbText}>Continue with Facebook</Text>
@@ -138,15 +138,13 @@ class Gateway extends React.Component {
 
 const styles = StyleSheet.create({
   heroImage: {
-    width: 125,
-    height: 125,
+    width: 185,
+    height: 185,
     alignSelf: 'center',
-    tintColor: StylingGlobals.colors.mainColor,
   },
   fbContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 15,
     marginBottom: 15,  
   },
   fbText: {

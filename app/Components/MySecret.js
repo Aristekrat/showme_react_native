@@ -17,7 +17,8 @@ class MySecret extends React.Component {
     return (
       <TouchableHighlight 
           underlayColor={StylingGlobals.colors.accentPressDown} 
-          onPress={this.props.updateSecret}>
+          onPress={this.props.updateSecret}
+          style={this.props.updated ? styles.active : null}>
           <View style={styles.secretContainer}>
             <Text style={styles.author}>from {this.props.author}</Text>
             <Text style={styles.question}>Q: {this.props.question}</Text>
@@ -34,8 +35,9 @@ var styles = StyleSheet.create({
     borderBottomColor: '#eee',
     marginLeft: 10,
     marginRight: 10,
-    padding: 5,
+    padding: 5, 
     flex: 1,
+    paddingBottom: 15,
   },
   author: {
     color: '#999',
@@ -45,6 +47,11 @@ var styles = StyleSheet.create({
   },
   question: {
     margin: 5,
+  },
+  active: {
+    backgroundColor: StylingGlobals.colors.accentPressDown,
+    borderBottomColor: StylingGlobals.colors.border,
+    borderBottomWidth: 1,
   },
   answer: {
     marginTop: 5,

@@ -4,6 +4,8 @@ import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
+import ReactMixin from 'react-mixin';
+import ReactTimer from 'react-timer-mixin';
 import {
   StyleSheet,
   Text,
@@ -67,18 +69,24 @@ class YourAnswer extends React.Component {
     this.answers.child(this.currentSecret.key).once('value', (snapshot) => {
       var ans = snapshot.val();
       if (ans.askerAnswer && ans.responderAnswer) {
-        this.performUserSecretsUpdate('BR');
+        var update = {answerState: 'BR', sentState: 'SO'}
+        this.performUserSecretsUpdate(update);
       } else {
         var secretState = userStatus === 'askerAnswer' ? 'AA' : 'RA'
-        this.performUserSecretsUpdate(secretState);
+        var update = {answerState: secretState}
+        this.performUserSecretsUpdate(update);
       };
     });
   }
 
   performUserSecretsUpdate(stateToUpdate) {
-    this.users.child(this.currentSecret.responderID).child('secrets').child(this.currentSecret.key).update({answerState: stateToUpdate});
-    this.users.child(this.currentSecret.askerID).child('secrets').child(this.currentSecret.key).update({answerState: stateToUpdate});
+    this.users.child(this.currentSecret.responderID).child('secrets').child(this.currentSecret.key).update(stateToUpdate);
+    this.users.child(this.currentSecret.askerID).child('secrets').child(this.currentSecret.key).update(stateToUpdate);
     this.notify('Success');
+    this.setTimeout (
+      () => { this.props.navigator.pop(); }, 
+      500    
+    );
   }
 
   render() {
@@ -104,6 +112,8 @@ class YourAnswer extends React.Component {
     );
   }
 }
+
+ReactMixin(YourAnswer.prototype, ReactTimer);
 
 var styles = StyleSheet.create({
   form: {

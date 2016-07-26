@@ -56,11 +56,12 @@ class SelectSecret extends React.Component {
         this.postVoteAmt(2, key);
       } 
       */
+      /*
       var foo = this.secrets[0]
       foo.score = 1;
       this.setState(foo); // This does update state on this 
-
-      /*var foo; // Allows unlimited voting for dev purposes.
+      */
+      var foo; // Allows unlimited voting for dev purposes.
       if (action === 'upvote') {
         foo = 1;
       } else if (action === 'downvote') {
@@ -68,7 +69,6 @@ class SelectSecret extends React.Component {
       }
       this.postUsersVote(action, key);
       this.postVoteAmt(foo, key);
-      */
     } else {
       // TODO handling for user unknown
     }

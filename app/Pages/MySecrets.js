@@ -27,11 +27,28 @@ class MySecrets extends React.Component {
       animating: true,
     };
     this.mySecrets = [];
+    this.answersList = [];
     this.users = this.props.db.child('users');
     this.privateSecrets = this.props.db.child('privateSecrets');
+    this.answers = this.props.db.child('answers');
+  }
+
+  getAnswer(usArray, key) {
+    if (usArray[key].sentState === 'SO') {
+      this.answers.child(key).on('value', (snapshot) => {
+        var answer = snapshot.val();
+        answer.key = key; 
+        this.answersList.push(answer);
+      });
+    }
   }
 
   componentWillMount() {
+    AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
+      if (updatedSecretsString) {
+        this.setState({updatedSecrets: JSON.parse(updatedSecretsString)});
+      };
+    });
     // TODO refactor to a gen use utility function, used in index.ios.js as well
     AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data? Needs protection
       let user_data = JSON.parse(user_data_json);
@@ -45,9 +62,16 @@ class MySecrets extends React.Component {
           var resultsCount = userKeys.length - 1;
           // Find all the secret entries
           userKeys.forEach((result, count) => {
+            this.getAnswer(userSecrets, result);
+            
             this.privateSecrets.child(result).on('value', (secret) => {
               var sv = secret.val()
               sv.state = userSecrets[result]; // Show state from the users table, not the secrets table
+              if (this.answersList[this.answersList.length - 1]) {
+                if (this.answersList[this.answersList.length - 1].key === result) {
+                  sv.answer = this.answersList.pop()
+                }
+              }
               sv.key = result;
               this.mySecrets.push(sv)
               // At the end of iteration, display results
@@ -71,7 +95,7 @@ class MySecrets extends React.Component {
     AsyncStorage.getItem('secrets').then((secrets_data_json) => {
       if (secrets_data_json) {
         let secrets_data = JSON.parse(secrets_data_json);
-        this.listSecrets(secrets_data); // Pretty imperfect. Leaves the wheel spinning and doesn't do initial display properly. Come back to this.
+        this.listSecrets(secrets_data);
       }
     })
   }
@@ -85,37 +109,56 @@ class MySecrets extends React.Component {
     if (this.mySecrets.length === 0) { // User has no secrets
       this.setState({displaying: "NR"})
     } else {
-      // Probably want to refine this function to load the last / most updated, OK for now,
-      console.log(this.mySecrets[0].state.sentState);
-      this.setState({displaying: this.mySecrets[0].state.sentState})
-      AsyncStorage.setItem('notificationCount', String(0));
+      this.setState({displaying: this.mySecrets[0].state.sentState}); // Probably want to refine this function to load the last / most updated, OK for now
     }
   }
 
-  listSecrets (arrayOfSecrets) {
+  removeNotifications(key) {
+    if (this.state.updatedSecrets && this.state.updatedSecrets[key]) {
+      var removeViewed = JSON.parse(JSON.stringify(this.state.updatedSecrets));
+      delete removeViewed[key];
+      AsyncStorage.setItem('updatedSecrets', String(removeViewed));
+      AsyncStorage.setItem('notificationCount', String(0));
+    };
+  }
+
+  setUpdateSecretFunc(currentState, item) {
+    if (currentState === 'CR') { // determines the correct route to link to, should probably split this functionality off
+      return this.props.navigator.push({ name: 'ShareSecret', cookieData: item });
+    } else if (currentState === 'QS' || currentState === 'RR') {
+      return this.props.navigator.push({ name: 'YourAnswer', cookieData: item })
+    } else if (currentState === 'SO') {
+      return null;
+    }
+  }
+
+  setAskerName(askerID, askerName) {
+    if (this.state.uid === askerID) {
+      return "You";
+    } else if (!askerName) {
+      return "Anonymous";
+    } else {
+      return askerName;
+    }
+  }
+
+  listSecrets (arrayOfSecrets) { // This function is doing too much. Bits of it need to be split off
     let currentState = this.state.displaying;
     if (!arrayOfSecrets) { // refactor to use default arg
       var arrayOfSecrets = this.mySecrets;
     }
-    if (currentState === 'CR') { // determines the correct route to link to, should probably split this functionality off
-      var route = 'ShareSecret'; 
-    } else if (currentState === 'QS' || currentState === 'RR') {
-      var route = 'YourAnswer';
-    }
     return arrayOfSecrets.map((item, index) => {
       if (item.state.sentState === currentState) {
-        // Beginnings of robust 'from' functionality, look to split it from this function
-        if (this.state.uid === item.askerID) {
-          item.askerName = "You";
-        } else if (!item.askerName) {
-          item.askerName = "Anonymous";
-        }
+        item.askerName = this.setAskerName(item.askerID, item.askerName);
+        this.removeNotifications(item.key);
         return (
           <Secret 
             author={item.askerName} 
             question={item.question} 
-            answer={item.responderAnswer} 
-            updateSecret={() => this.props.navigator.push({ name: route, cookieData: item }) } />
+            answer={item.answer ? 'A: ' + item.answer.responderAnswer : null} 
+            updateSecret={() =>  this.setUpdateSecretFunc(currentState, item)}
+            updated={this.state.updatedSecrets ? this.state.updatedSecrets[item.key] : false}
+            />
         );
       }
     });
@@ -130,7 +173,7 @@ class MySecrets extends React.Component {
     let helperText;
     let secretsList = this.listSecrets();
     switch(this.state.displaying) {
-      case "BR":
+      case "SO":
         helperText = null;
         break;
       case "QS":
@@ -151,9 +194,9 @@ class MySecrets extends React.Component {
         <ScrollView>
           <View style={styles.header}>
             <TouchableHighlight 
-                style={[styles.headerButton, styles.firstHeaderButton, this.state.displaying === "BR" ? styles.active : null]} 
+                style={[styles.headerButton, styles.firstHeaderButton, this.state.displaying === "SO" ? styles.active : null]} 
                 underlayColor={StylingGlobals.colors.accentColor} 
-                onPress={() => this.setTab('BR')} >
+                onPress={() => this.setTab('SO')} >
               <Text style={styles.headerButtonText}>Answered</Text>
             </TouchableHighlight>
             <TouchableHighlight 

@@ -83,7 +83,6 @@ class ShareSecret extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.props.route.cookieData);
     AsyncStorage.getItem('userData')
       .then((user_data_json) => {
         if (!user_data_json) {
