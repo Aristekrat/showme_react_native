@@ -67,19 +67,23 @@ class MySecrets extends React.Component {
             this.privateSecrets.child(result).on('value', (secret) => {
               var sv = secret.val()
               sv.state = userSecrets[result]; // Show state from the users table, not the secrets table
-              if (this.answersList[this.answersList.length - 1]) {
-                if (this.answersList[this.answersList.length - 1].key === result) {
-                  sv.answer = this.answersList.pop()
-                }
+              if (this.answersList[this.answersList.length - 1] && this.answersList[this.answersList.length - 1].key === result) {              
+                sv.answer = this.answersList.pop();
               }
               sv.key = result;
               this.mySecrets.push(sv)
               // At the end of iteration, display results
               if (count === resultsCount) {
-                this.initalDisplay()
-                this.listSecrets()
-                this.toggleActivityIndicator()
-                AsyncStorage.setItem('secrets', JSON.stringify(this.mySecrets));
+                this.setTimeout (
+                  () => { 
+                    this.initalDisplay()
+                    this.listSecrets()
+                    this.toggleActivityIndicator()
+                    AsyncStorage.setItem('secrets', JSON.stringify(this.mySecrets)); 
+                  }, 
+                  5000
+                );
+
               }
             })
           })
@@ -142,6 +146,14 @@ class MySecrets extends React.Component {
     }
   }
 
+  setAnswerNotifiction(itemState) {
+    if (itemState.sentState === 'QS' && itemState.answerState === 'RA' || itemState.sentState === 'RR' && itemState.answerState === 'AA') {
+      return "They've answered! To see it, write your own answer now.";
+    } else {
+      return null;
+    }
+  }
+
   listSecrets (arrayOfSecrets) { // This function is doing too much. Bits of it need to be split off
     let currentState = this.state.displaying;
     if (!arrayOfSecrets) { // refactor to use default arg
@@ -149,13 +161,16 @@ class MySecrets extends React.Component {
     }
     return arrayOfSecrets.map((item, index) => {
       if (item.state.sentState === currentState) {
+        let answerNotification = this.setAnswerNotifiction(item.state);
         item.askerName = this.setAskerName(item.askerID, item.askerName);
         this.removeNotifications(item.key);
         return (
           <Secret 
             author={item.askerName} 
-            question={item.question} 
+            question={item.question}
+            key={item.key}
             answer={item.answer ? 'A: ' + item.answer.responderAnswer : null} 
+            answerNotification={answerNotification}
             updateSecret={() =>  this.setUpdateSecretFunc(currentState, item)}
             updated={this.state.updatedSecrets ? this.state.updatedSecrets[item.key] : false}
             />

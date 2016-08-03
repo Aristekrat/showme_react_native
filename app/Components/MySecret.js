@@ -23,6 +23,7 @@ class MySecret extends React.Component {
             <Text style={styles.author}>from {this.props.author}</Text>
             <Text style={styles.question}>Q: {this.props.question}</Text>
             <Text style={styles.answer}>{this.props.answer}</Text>
+            <Text style={styles.notification}>{this.props.answerNotification}</Text>
           </View>
       </TouchableHighlight>
     )
@@ -59,6 +60,12 @@ var styles = StyleSheet.create({
     marginRight: 5,
     marginBottom: 1,
   },
+  notification: {
+    marginTop: 5,
+    marginLeft: 5,
+    fontSize: 10,
+    color: StylingGlobals.colors.mainColor
+  }
 });
 
 module.exports = MySecret;

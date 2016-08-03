@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 
 class SelectSecret extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       source: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
@@ -24,11 +24,13 @@ class SelectSecret extends React.Component {
     this.secrets = [];
     this.publicSecrets = this.props.db.child('publicSecrets').child(this.props.route.category);
   }
+
   postUsersVote(theVote, key) {
     var updateData = {};
     updateData[this.state.uid] = theVote;
     this.publicSecrets.child(key).child('votes').update(updateData)
   }
+
   postVoteAmt(voteAmt, key) {
     this.publicSecrets.child(key).child('score').transaction((currentRank) => {
       return currentRank + voteAmt;
@@ -37,9 +39,9 @@ class SelectSecret extends React.Component {
       this.publicSecrets.child(key).setPriority(-foo);
     });
   }
+
   vote(action, currentState, key) {
     if (this.state.uid) { // Known user
-      /*
       if (!currentState) { // First vote
         if (action === 'upvote') {
           this.postUsersVote('upvote', key);
@@ -55,12 +57,12 @@ class SelectSecret extends React.Component {
         this.postUsersVote('upvote', key);
         this.postVoteAmt(2, key);
       } 
-      */
       /*
       var foo = this.secrets[0]
       foo.score = 1;
       this.setState(foo); // This does update state on this 
       */
+      /*
       var foo; // Allows unlimited voting for dev purposes.
       if (action === 'upvote') {
         foo = 1;
@@ -69,10 +71,12 @@ class SelectSecret extends React.Component {
       }
       this.postUsersVote(action, key);
       this.postVoteAmt(foo, key);
+      */
     } else {
       // TODO handling for user unknown
     }
   }
+
   componentWillMount() {
     AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
       var user_data = JSON.parse(user_data_json);
@@ -93,6 +97,7 @@ class SelectSecret extends React.Component {
       })
     });
   }
+  
   render() {
     return (
       <View style={StylingGlobals.container}>

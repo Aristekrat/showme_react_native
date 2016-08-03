@@ -25,6 +25,7 @@ class TabBar extends React.Component {
   setActiveTab() {
     switch(this.props.route.name) {
       case "MySecrets":
+      case "YourAnswer":
         this.state.selectedTab = 'tabOne';
         break;
       case "SelectCategory":
@@ -36,6 +37,7 @@ class TabBar extends React.Component {
       case "MyAccount":
       case "SignIn":
       case "Registration":
+      case "Gateway":
         this.state.selectedTab = 'tabThree';
         break; 
     }
@@ -77,7 +79,7 @@ class TabBar extends React.Component {
     );
   }
 
-  render(){
+  render() {
     return (
       <View style={styles.tabContainer}>
         <TabBarIOS  
@@ -87,7 +89,7 @@ class TabBar extends React.Component {
               selected={this.state.selectedTab === 'tabOne'}
               onPress={() => this.setTab('tabOne', this.props.tabOne)}
               title={"My Secrets"}
-              icon={require('../img/tabicon-mysecret.png')} // envelope76
+              icon={require('../img/tabicon-mysecret.png')}
               style={styles.tabItem}
               badge={this.state.notifications !== '0' ? this.state.notifications : null} >
                 <View></View>
@@ -95,10 +97,11 @@ class TabBar extends React.Component {
             
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabTwo'}
-              onPress={() => this.setTab('tabTwo', this.props.tabTwo)}
+              onPress={() => this.props.introPopup ? this.props.introPopup() : this.setTab('tabTwo', this.props.tabTwo)}
               title={"New"}
-              icon={require('../img/tabicon-new.png')} // romantic41
-              style={styles.tabItem}>
+              icon={require('../img/tabicon-new.png')}
+              style={styles.tabItem}
+              badge={this.props.introBadge ? this.props.introBadge : null}>
                 <View></View>
             </TabBarIOS.Item>
 

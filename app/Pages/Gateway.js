@@ -31,6 +31,7 @@ class Gateway extends React.Component {
       validEmail: true
     },
     this.userIndex = this.props.db.child('userIndex');
+    this.users = this.props.db.child('users');
   }
 
   validateEmail(email) {
@@ -70,9 +71,9 @@ class Gateway extends React.Component {
       <View style={StylingGlobals.container}>
         <ScrollView>
           <Image style={styles.heroImage} source={require("../img/show-me-skirt.png")} />
+          <Text style={styles.heroText}>Show Me lets you trade secrets with your friends.</Text>
 
           <View style={styles.fbContainer}>
-            <Text style={styles.fbText}>Continue with Facebook</Text>
             <LoginButton 
                 style={styles.fbutton}
                 readPermissions={["public_profile", "email"]}
@@ -93,6 +94,9 @@ class Gateway extends React.Component {
                             } else {
                               AsyncStorage.setItem('userData', JSON.stringify(authData));
                               Utility.setLocalAuth();
+                              var email = Utility.escapeEmail(authData.auth.token.email);
+                              this.userIndex.child(email).set(true);
+                              this.users.child(authData.uid).set({email: email, secrets: {} });
                               this.props.navigator.push({name: 'SelectCategory'})
                             }
                           })
@@ -142,10 +146,17 @@ const styles = StyleSheet.create({
     height: 185,
     alignSelf: 'center',
   },
+  heroText: {
+    alignSelf: 'center',
+    marginBottom: 25,
+    marginTop: -15,
+    color: StylingGlobals.colors.mainColor,
+  },
   fbContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,  
+    marginTop: 15,
   },
   fbText: {
     marginBottom: 5,

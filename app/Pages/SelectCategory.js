@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import Category from '../Components/Category.js';
+import SModal from '../Components/SModal.js';
 import CreateYourOwn from './CreateYourOwn.js';
 import SelectSecret from './SelectSecret.js';
 import {
@@ -12,12 +13,16 @@ import {
   View,
   ScrollView,
   Image,
-  TouchableHighlight
+  AsyncStorage,
+  TouchableHighlight, 
 } from 'react-native';
 
 class SelectCategory extends React.Component {
   constructor(props){
     super(props);
+    this.state = {
+      hasBeenIntroduced: true,
+    };
     this.categories = [{
       'title': 'Create Your Own'
     }, {
@@ -34,12 +39,26 @@ class SelectCategory extends React.Component {
       'title': 'From Your Past'
     }];
   }
+  
   selectThisCategory (categoryName, viewName) {
     this.props.navigator.push({
       name: 'SelectSecret',
       category: categoryName
     })
   }
+
+  sawIntro() {
+    AsyncStorage.setItem('hasBeenIntroduced', 'true');
+  }
+
+  componentWillMount() {
+    AsyncStorage.getItem('hasBeenIntroduced').then((hasBeenIntroducedString) => {
+      if (!hasBeenIntroducedString) {
+        this.setState({hasBeenIntroduced: false});
+      }
+    })
+  }
+
   render(){
     return (
       <View style={StylingGlobals.container}>
@@ -73,7 +92,20 @@ class SelectCategory extends React.Component {
             imgSource={require("../img/caticon-past.png")} // music-player17
             elsewhere={this.selectThisCategory.bind(this, this.categories[6].title, SelectSecret)} />
         </ScrollView>
-        <TabBar navigator={this.props.navigator} route={this.props.route} db={this.props.db} />
+        <SModal modalText={"Use this menu to create a new secret or select a premade secret"} ref="smodal" />
+        <TabBar 
+          navigator={this.props.navigator} 
+          route={this.props.route} 
+          db={this.props.db}
+          introBadge={this.state.hasBeenIntroduced ? 0 : 1 }
+          ref="tabbar"
+          introPopup={this.state.hasBeenIntroduced ? null : () => { 
+              this.refs.smodal.setModalVisible(true); 
+              this.setState({hasBeenIntroduced: true}); 
+              this.sawIntro();
+            } 
+          }
+        />
       </View>
     );
   }
@@ -82,7 +114,7 @@ class SelectCategory extends React.Component {
 var styles = StyleSheet.create({
   content: {
     
-  }
+  },
 });
 
 module.exports = SelectCategory;

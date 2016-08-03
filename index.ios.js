@@ -167,7 +167,6 @@ class ShowMe extends React.Component {
               // At the end of iteration, display results
               if (count === resultsCount) {
                 this.setNotificationCount();
-                this.listenForUpdatesToSecrets();
                 // Activating the below line will cause setNotificationCount to stop working. 
                 //AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets));
               }
@@ -186,6 +185,7 @@ class ShowMe extends React.Component {
       
       this.state.localSecrets.forEach((item, index) => {
         if (JSON.stringify(this.state.remoteSecrets[index]) !== JSON.stringify(this.state.localSecrets[index])) {
+          //console.log("DETECTED A DIFFERENCE", JSON.stringify(this.state.remoteSecrets[index]), JSON.stringify(this.state.localSecrets[index]));
           count = count + 1; // unclear if this would see the right quantity
           this.setUpdatedSecrets(this.state.remoteSecrets[index].key);
         }
@@ -235,6 +235,7 @@ class ShowMe extends React.Component {
     }*/
     this.getLocalSecrets();
     this.getRemoteSecrets();
+    console.log("COMPONENT WILL MOUNT RAN ON INDEX");
   }
 
   componentDidMount() {
@@ -303,7 +304,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'Gateway'
+          name: 'MySecrets'
         }} />
     );
   }

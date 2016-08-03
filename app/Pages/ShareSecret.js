@@ -4,6 +4,7 @@ import React from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import BigButton from '../Components/BigButton.js';
 import TabBar from '../Components/TabBar.js';
+import Contacts from 'react-native-contacts';
 
 import {
   StyleSheet,
@@ -15,9 +16,9 @@ import {
   AsyncStorage,
 } from 'react-native';
  
-import Communications from 'react-native-communications';
+//import Communications from 'react-native-communications';
 //import Composer from 'react-native-message-composer';
-var Composer = require('NativeModules').RNMessageComposer;
+//var Composer = require('NativeModules').RNMessageComposer;
  
 class ShareSecret extends React.Component { 
   constructor(props){
@@ -82,6 +83,17 @@ class ShareSecret extends React.Component {
     this.users.child(responderId).child('secrets').child(this.currentSecret.key).update({sentState: 'RR'});
   }
 
+  componentWillMount() {
+    
+    /*Contacts.getAll((err, contacts) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(contacts);
+      }
+    })*/
+  }
+
   componentDidMount() {
     AsyncStorage.getItem('userData')
       .then((user_data_json) => {
@@ -92,6 +104,7 @@ class ShareSecret extends React.Component {
           this.setState({uid: user_data.uid});
         }
     });
+    console.log(Contacts);
   }
 
   render() {

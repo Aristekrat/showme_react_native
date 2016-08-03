@@ -49,7 +49,9 @@ var styles = StyleSheet.create({
     },
     contentContainer: {
       flexDirection: 'row',
+      paddingTop: 15,
       padding: 10,
+      height: 50,
     },
     secretText: {
       fontSize: 12,

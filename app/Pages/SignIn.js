@@ -38,10 +38,6 @@ class SignIn extends React.Component {
     this.setState({animating: !this.state.animating});
   }
 
-  escapeEmail(email) {
-    return (email || '').replace('.', ',');
-  }
-
   registerUser() {
     var self = this;
     this.toggleActivityIndicator();
@@ -64,7 +60,7 @@ class SignIn extends React.Component {
       } else {
         self.toggleActivityIndicator();
         self.setState({response: 'Success.'});
-        var t = self.escapeEmail(self.state.username)
+        var t = Utility.escapeEmail(self.state.username)
         self.users.child(userData.uid).set({email: self.state.username, secrets: {} });
         self.usersIndex.child(t).set(true);
         AsyncStorage.setItem('userData', JSON.stringify(userData));

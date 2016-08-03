@@ -25,6 +25,9 @@ var Utility = {
 	setLocalAuth: function (setTo) {
 		this.authStatus = setTo;
 	},
+	escapeEmail(email) {
+		return (email || '').replace('.', ',');
+	},
 	logout: function() {
 		this.unAuth();
 		this.setLocalAuth(false);
