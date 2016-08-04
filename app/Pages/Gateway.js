@@ -43,12 +43,6 @@ class Gateway extends React.Component {
     return (email || '').replace('.', ',');
   }
 
-  isDuplicateEmail(email) {
-    this.props.db.child('/registeredEmail'+this.escapeEmail(email)).once('value', function(snapshot) {
-      console.log(snapshot.val() !== null);
-    });
-  }
-
   checkEmail() {
     var self = this;
     if (self.validateEmail(self.state.emailAddress)) {

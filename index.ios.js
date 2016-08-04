@@ -235,7 +235,6 @@ class ShowMe extends React.Component {
     }*/
     this.getLocalSecrets();
     this.getRemoteSecrets();
-    console.log("COMPONENT WILL MOUNT RAN ON INDEX");
   }
 
   componentDidMount() {
@@ -304,7 +303,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'MySecrets'
+          name: 'Gateway'
         }} />
     );
   }
