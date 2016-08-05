@@ -149,34 +149,48 @@ class ShowMe extends React.Component {
     })
   }
 
+  // Used within get remote secrets to set the local state 
+  setRemoteSecrets(state, key, answer = null) {
+    this.DB.child('privateSecrets').child(key).on('value', (secret) => {
+      var sv = secret.val();
+      sv.state = state; 
+      sv.key = key;
+      sv.answer = answer;
+      this.state.remoteSecrets.push(sv);
+    })
+  }
+
+  // Transformer
   getRemoteSecrets() {
-    AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
-      let user_data = JSON.parse(user_data_json);
-      this.DB.child('users').child(user_data.uid).child('secrets').once('value', (snapshot) => { 
-        var userSecrets = snapshot.val();
-        if (userSecrets) {
-          var userKeys = Object.keys(userSecrets);
-          var resultsCount = userKeys.length - 1;
-          // Find all the secret entries
-          userKeys.forEach((result, count) => {
-            this.DB.child('privateSecrets').child(result).on('value', (secret) => {
-              var sv = secret.val()
-              sv.state = userSecrets[result]; // Show state from the users table, not the secrets table
-              sv.key = result;
-              this.state.remoteSecrets.push(sv)
-              // At the end of iteration, display results
-              if (count === resultsCount) {
-                this.setNotificationCount();
-                // Activating the below line will cause setNotificationCount to stop working. 
-                //AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets));
+    AsyncStorage.getItem('userData').then((user_data_json) => { 
+      if (user_data_json) {
+        let user_data = JSON.parse(user_data_json); // TODO Needs to check AUTH, implement this at the end
+        this.DB.child('users').child(user_data.uid).child('secrets').once('value', (snapshot) => { 
+          var userSecrets = snapshot.val();
+          if (userSecrets) {
+            var userKeys = Object.keys(userSecrets);
+            var resultsCount = userKeys.length - 1;
+
+            userKeys.forEach((result, count) => {
+              if (userSecrets[result].sentState === 'SO') {
+                this.DB.child('answers').child(result).on('value', (snapshot) => {
+                  var answer = snapshot.val();
+                  answer.key = result; 
+                  this.setRemoteSecrets(userSecrets[result], result, answer);
+                });
+              } else {
+                this.setRemoteSecrets(userSecrets[result], result);
               }
             })
-          })
-        }
-      })
+          }
+        })
+      } else {
+        // What to do if the system can't find any user data?
+      }
     });
   }
 
+  // Compares the local and remote secrets and then sets the notification count on detecting differences
   setNotificationCount() {
     AsyncStorage.getItem('notificationCount').then((notificationCount) => {
       let count = (this.state.remoteSecrets.length - this.state.localSecrets.length) + Number(notificationCount);
@@ -185,8 +199,7 @@ class ShowMe extends React.Component {
       
       this.state.localSecrets.forEach((item, index) => {
         if (JSON.stringify(this.state.remoteSecrets[index]) !== JSON.stringify(this.state.localSecrets[index])) {
-          //console.log("DETECTED A DIFFERENCE", JSON.stringify(this.state.remoteSecrets[index]), JSON.stringify(this.state.localSecrets[index]));
-          count = count + 1; // unclear if this would see the right quantity
+          count = count + 1;
           this.setUpdatedSecrets(this.state.remoteSecrets[index].key);
         }
         if (arrLength === index) {
@@ -199,8 +212,8 @@ class ShowMe extends React.Component {
     });
   }
 
+  // Sets local key / value pair for the secrets that have been freshly updated; notification related
   setUpdatedSecrets(key) {
-    // sets key / value pair for the secrets that have been freshly updated
     AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
       if (!updatedSecrets) {
         var updatedSecrets = {}
@@ -212,8 +225,8 @@ class ShowMe extends React.Component {
     });
   }
 
-  listenForUpdatesToSecrets() {
-    AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
+  listenForUpdatesToSecrets() { // All notification
+    AsyncStorage.getItem('userData').then((user_data_json) => { 
       if (user_data_json) {
         let user_data = JSON.parse(user_data_json);
         this.DB.child('users').child(user_data.uid).child('secrets').on('child_changed', (childSnapshot) => {
@@ -225,6 +238,8 @@ class ShowMe extends React.Component {
           });
           this.setUpdatedSecrets(childSnapshot.key())
         })
+      } else {
+        // What to do if the system can't find any user data?
       }
     });
   }
@@ -239,7 +254,11 @@ class ShowMe extends React.Component {
 
   componentDidMount() {
     this.setTimeout (
-      () => { this.listenForUpdatesToSecrets(); AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets)); }, 
+      () => {
+        this.setNotificationCount(); 
+        this.listenForUpdatesToSecrets(); 
+        AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets)); 
+      }, 
       5000
     );
   }
@@ -303,7 +322,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'Gateway'
+          name: 'MySecrets'
         }} />
     );
   }

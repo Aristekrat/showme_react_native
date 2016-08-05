@@ -23,111 +23,49 @@ class MySecrets extends React.Component {
     super(props);
     this.state = {
       displaying: "",
-      uid: "",
       animating: true,
+      uid: "",
     };
     this.mySecrets = [];
-    this.answersList = [];
-    this.users = this.props.db.child('users');
-    this.privateSecrets = this.props.db.child('privateSecrets');
-    this.answers = this.props.db.child('answers');
-  }
-
-  getAnswer(usArray, key) {
-    if (usArray[key].sentState === 'SO') {
-      this.answers.child(key).on('value', (snapshot) => {
-        var answer = snapshot.val();
-        answer.key = key; 
-        this.answersList.push(answer);
-      });
-    }
   }
 
   componentWillMount() {
+    AsyncStorage.getItem('userData').then((user_data_json) => { 
+      if (user_data_json) {
+        let user_data = JSON.parse(user_data_json);
+        this.setState({uid: user_data.uid});
+      };
+    });
+    // Gets the initial data that will help the system determine if a secret has been updated
     AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
       if (updatedSecretsString) {
         this.setState({updatedSecrets: JSON.parse(updatedSecretsString)});
       };
     });
-    // TODO refactor to a gen use utility function, used in index.ios.js as well
-    AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data? Needs protection
-      let user_data = JSON.parse(user_data_json);
-      this.setState({uid: user_data.uid});
-
-      // Lookup keys associated with user
-      this.users.child(user_data.uid).child('secrets').once('value', (snapshot) => {
-        var userSecrets = snapshot.val();
-        if (userSecrets) {
-          var userKeys = Object.keys(userSecrets);
-          var resultsCount = userKeys.length - 1;
-          // Find all the secret entries
-          userKeys.forEach((result, count) => {
-            this.getAnswer(userSecrets, result);
-            
-            this.privateSecrets.child(result).on('value', (secret) => {
-              var sv = secret.val()
-              sv.state = userSecrets[result]; // Show state from the users table, not the secrets table
-              if (this.answersList[this.answersList.length - 1] && this.answersList[this.answersList.length - 1].key === result) {              
-                sv.answer = this.answersList.pop();
-              }
-              sv.key = result;
-              this.mySecrets.push(sv)
-              // At the end of iteration, display results
-              if (count === resultsCount) {
-                this.setTimeout (
-                  () => { 
-                    this.initalDisplay()
-                    this.listSecrets()
-                    this.toggleActivityIndicator()
-                    AsyncStorage.setItem('secrets', JSON.stringify(this.mySecrets)); 
-                  }, 
-                  5000
-                );
-
-              }
-            })
-          })
-        } else {
-          this.toggleActivityIndicator();
-          this.initalDisplay();
-        }
-      })
-    });
-  }
-
-  componentDidMount() {
-    AsyncStorage.getItem('secrets').then((secrets_data_json) => {
-      if (secrets_data_json) {
-        let secrets_data = JSON.parse(secrets_data_json);
-        this.listSecrets(secrets_data);
+    AsyncStorage.getItem('secrets').then((secrets_data_string) => {
+      if (secrets_data_string) {
+        let secrets_data = JSON.parse(secrets_data_string);
+        this.mySecrets = secrets_data;
+        this.initalDisplay();
+        this.listSecrets();
+        this.toggleActivityIndicator();
       }
     })
   }
 
-  // Needs to be moved to common utils
-  toggleActivityIndicator() {
-    this.setState({animating: !this.state.animating});
-  }
-
-  initalDisplay() {
-    if (this.mySecrets.length === 0) { // User has no secrets
-      this.setState({displaying: "NR"})
-    } else {
-      this.setState({displaying: this.mySecrets[0].state.sentState}); // Probably want to refine this function to load the last / most updated, OK for now
-    }
-  }
-
+  // Removes notifications from AsyncStorage, the timing of the call is determined in listSecrets
   removeNotifications(key) {
     if (this.state.updatedSecrets && this.state.updatedSecrets[key]) {
       var removeViewed = JSON.parse(JSON.stringify(this.state.updatedSecrets));
       delete removeViewed[key];
-      AsyncStorage.setItem('updatedSecrets', String(removeViewed));
+      AsyncStorage.setItem('updatedSecrets', JSON.stringify(removeViewed));
       AsyncStorage.setItem('notificationCount', String(0));
     };
   }
 
+  // Determines the correct route for a secret to link to in listSecrets
   setUpdateSecretFunc(currentState, item) {
-    if (currentState === 'CR') { // determines the correct route to link to, should probably split this functionality off
+    if (currentState === 'CR') { 
       return this.props.navigator.push({ name: 'ShareSecret', cookieData: item });
     } else if (currentState === 'QS' || currentState === 'RR') {
       return this.props.navigator.push({ name: 'YourAnswer', cookieData: item })
@@ -136,8 +74,9 @@ class MySecrets extends React.Component {
     }
   }
 
+  // Sets the 'Asker' field in an individual secret, called in listSecrets
   setAskerName(askerID, askerName) {
-    if (this.state.uid === askerID) {
+    if (this.state.uid && this.state.uid === askerID) {
       return "You";
     } else if (!askerName) {
       return "Anonymous";
@@ -146,6 +85,7 @@ class MySecrets extends React.Component {
     }
   }
 
+  // Adds a special notification to a secret if the other person has answered
   setAnswerNotifiction(itemState) {
     if (itemState.sentState === 'QS' && itemState.answerState === 'RA' || itemState.sentState === 'RR' && itemState.answerState === 'AA') {
       return "They've answered! To see it, write your own answer now.";
@@ -154,11 +94,9 @@ class MySecrets extends React.Component {
     }
   }
 
-  listSecrets (arrayOfSecrets) { // This function is doing too much. Bits of it need to be split off
+  // The main implementation function to actually wire secrets in the view
+  listSecrets (arrayOfSecrets = this.mySecrets) { 
     let currentState = this.state.displaying;
-    if (!arrayOfSecrets) { // refactor to use default arg
-      var arrayOfSecrets = this.mySecrets;
-    }
     return arrayOfSecrets.map((item, index) => {
       if (item.state.sentState === currentState) {
         let answerNotification = this.setAnswerNotifiction(item.state);
@@ -175,13 +113,27 @@ class MySecrets extends React.Component {
             updated={this.state.updatedSecrets ? this.state.updatedSecrets[item.key] : false}
             />
         );
-      }
+      } 
     });
   }
 
   setTab(state) {
     this.setState({displaying: state});
-    this.listSecrets();
+    //this.listSecrets();
+  }
+
+  // Needs to be moved to common utils
+  toggleActivityIndicator() {
+    this.setState({animating: !this.state.animating});
+  }
+
+  // Chooses which tab to display on first View load
+  initalDisplay() {
+    if (this.mySecrets.length === 0) { // User has no secrets
+      this.setState({displaying: "NR"})
+    } else {
+      this.setState({displaying: this.mySecrets[0].state.sentState}); // Probably want to refine this function to load the last / most updated, OK for now
+    }
   }
 
   render() {
@@ -193,7 +145,7 @@ class MySecrets extends React.Component {
         break;
       case "QS":
       case "RR":
-        helperText = <Text style={styles.helperText}>Tap to write your answer</Text>
+        helperText = <Text style={styles.helperText}>Tap to answer</Text>
         break;
       case "CR":
         helperText = <Text style={styles.helperText}>Tap to send</Text>
@@ -235,7 +187,7 @@ class MySecrets extends React.Component {
           </View>
           <View style={styles.contentContainer}>
             <ActivityIndicator animationControl={this.state.animating}/>
-            {secretsList[0] || this.state.animating ? helperText : <Text style={styles.helperText}>No secrets of this type yet</Text> }
+            {helperText}
             {secretsList}
           </View>
         </ScrollView>
@@ -244,6 +196,9 @@ class MySecrets extends React.Component {
     );
   }
 }
+
+// This conditional stopped working
+// {secretsList[0] || this.state.animating ? helperText : <Text style={styles.helperText}>No secrets of this type yet</Text> }
 
 ReactMixin(MySecrets.prototype, ReactTimer);
 
