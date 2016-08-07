@@ -84,14 +84,15 @@ class ShareSecret extends React.Component {
   }
 
   componentWillMount() {
-    
-    /*Contacts.getAll((err, contacts) => {
+    /* Now working? At least working more than it was.
+    Contacts.getAll((err, contacts) => {
       if (err) {
         console.log(err);
       } else {
         console.log(contacts);
       }
-    })*/
+    });
+    */
   }
 
   componentDidMount() {

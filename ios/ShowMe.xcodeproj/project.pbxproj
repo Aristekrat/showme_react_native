@@ -25,6 +25,8 @@
 		435FFA181CF57E4E00AB54E1 /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 435FFA151CF57E4E00AB54E1 /* FBSDKLoginKit.framework */; };
 		435FFA191CF57E4E00AB54E1 /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 435FFA161CF57E4E00AB54E1 /* FBSDKShareKit.framework */; };
 		43C069C01D2C6F2E00D3716D /* libRNMessageComposer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 43C069BF1D2C6EE800D3716D /* libRNMessageComposer.a */; };
+		43D6DF131D563FB400AD6103 /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D6DF0C1D563E9600AD6103 /* libRCTPushNotification.a */; };
+		43D6DF1A1D5651FD00AD6103 /* libRCTContacts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D6DF191D5651C900AD6103 /* libRCTContacts.a */; };
 		43D7FFCB1CF7C101001E8808 /* Bolts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D7FFCA1CF7C101001E8808 /* Bolts.framework */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 /* End PBXBuildFile section */
@@ -107,6 +109,20 @@
 			remoteGlobalIDString = C23F08041AFAB5C100312C72;
 			remoteInfo = RNMessageComposer;
 		};
+		43D6DF0B1D563E9600AD6103 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43D6DF011D563E9500AD6103 /* RCTPushNotification.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RCTPushNotification;
+		};
+		43D6DF181D5651C900AD6103 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43D6DF141D5651C900AD6103 /* RCTContacts.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1441618E1BD0A79300FA4F59;
+			remoteInfo = RCTContacts;
+		};
 		78C398B81ACF4ADC00677621 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */;
@@ -147,6 +163,8 @@
 		435FFA151CF57E4E00AB54E1 /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKLoginKit.framework; path = ../../../../Documents/FacebookSDK/FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		435FFA161CF57E4E00AB54E1 /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKShareKit.framework; path = ../../../../Documents/FacebookSDK/FBSDKShareKit.framework; sourceTree = "<group>"; };
 		43C069AF1D2C6EE800D3716D /* RNMessageComposer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNMessageComposer.xcodeproj; path = "../node_modules/react-native-message-composer/RNMessageComposer.xcodeproj"; sourceTree = "<group>"; };
+		43D6DF011D563E9500AD6103 /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
+		43D6DF141D5651C900AD6103 /* RCTContacts.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTContacts.xcodeproj; path = "../node_modules/react-native-contacts/ios/RCTContacts.xcodeproj"; sourceTree = "<group>"; };
 		43D7FFCA1CF7C101001E8808 /* Bolts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Bolts.framework; path = ../../../../Documents/FacebookSDK/Bolts.framework; sourceTree = "<group>"; };
 		43F4A76A1D20C43600E84FA1 /* Images-2.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Images-2.xcassets"; path = "ShowMe/Images-2.xcassets"; sourceTree = "<group>"; };
 		7014B341A6134705B0ADAF67 /* RCTFBSDK.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTFBSDK.xcodeproj; path = "../node_modules/react-native-fbsdk/iOS/RCTFBSDK.xcodeproj"; sourceTree = "<group>"; };
@@ -168,7 +186,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				43C069C01D2C6F2E00D3716D /* libRNMessageComposer.a in Frameworks */,
+				43D6DF131D563FB400AD6103 /* libRCTPushNotification.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
+				43D6DF1A1D5651FD00AD6103 /* libRCTContacts.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
 				435FFA181CF57E4E00AB54E1 /* FBSDKLoginKit.framework in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
@@ -312,6 +332,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		43D6DF021D563E9500AD6103 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				43D6DF0C1D563E9600AD6103 /* libRCTPushNotification.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		43D6DF151D5651C900AD6103 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				43D6DF191D5651C900AD6103 /* libRCTContacts.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		78C398B11ACF4ADC00677621 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -323,6 +359,8 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				43D6DF141D5651C900AD6103 /* RCTContacts.xcodeproj */,
+				43D6DF011D563E9500AD6103 /* RCTPushNotification.xcodeproj */,
 				43C069AF1D2C6EE800D3716D /* RNMessageComposer.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
@@ -443,6 +481,10 @@
 					ProjectRef = 00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */;
 				},
 				{
+					ProductGroup = 43D6DF151D5651C900AD6103 /* Products */;
+					ProjectRef = 43D6DF141D5651C900AD6103 /* RCTContacts.xcodeproj */;
+				},
+				{
 					ProductGroup = 4324CE981D22390300662760 /* Products */;
 					ProjectRef = 7014B341A6134705B0ADAF67 /* RCTFBSDK.xcodeproj */;
 				},
@@ -461,6 +503,10 @@
 				{
 					ProductGroup = 00C302D41ABCB9D200DB3ED1 /* Products */;
 					ProjectRef = 00C302D31ABCB9D200DB3ED1 /* RCTNetwork.xcodeproj */;
+				},
+				{
+					ProductGroup = 43D6DF021D563E9500AD6103 /* Products */;
+					ProjectRef = 43D6DF011D563E9500AD6103 /* RCTPushNotification.xcodeproj */;
 				},
 				{
 					ProductGroup = 139105B71AF99BAD00B5F7CC /* Products */;
@@ -564,6 +610,20 @@
 			fileType = archive.ar;
 			path = libRNMessageComposer.a;
 			remoteRef = 43C069BE1D2C6EE800D3716D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		43D6DF0C1D563E9600AD6103 /* libRCTPushNotification.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTPushNotification.a;
+			remoteRef = 43D6DF0B1D563E9600AD6103 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		43D6DF191D5651C900AD6103 /* libRCTContacts.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTContacts.a;
+			remoteRef = 43D6DF181D5651C900AD6103 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		78C398B91ACF4ADC00677621 /* libRCTLinking.a */ = {
@@ -711,6 +771,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../node_modules/react-native/React/**",
 					"$(SRCROOT)/../node_modules/react-native-fbsdk/iOS/RCTFBSDK/**",
+					"$(SRCROOT)/../node_modules/react-native/Libraries/PushNotificationIOS/**",
 				);
 				INFOPLIST_FILE = ShowMe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -737,6 +798,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../node_modules/react-native/React/**",
 					"$(SRCROOT)/../node_modules/react-native-fbsdk/iOS/RCTFBSDK/**",
+					"$(SRCROOT)/../node_modules/react-native/Libraries/PushNotificationIOS/**",
 				);
 				INFOPLIST_FILE = ShowMe/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
