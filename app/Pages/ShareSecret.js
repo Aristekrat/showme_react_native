@@ -105,7 +105,6 @@ class ShareSecret extends React.Component {
           this.setState({uid: user_data.uid});
         }
     });
-    console.log(Contacts);
   }
 
   render() {

@@ -58,14 +58,23 @@ class SignIn extends React.Component {
             break;
         }
       } else {
-        self.toggleActivityIndicator();
-        self.setState({response: 'Success.'});
         var t = Utility.escapeEmail(self.state.username)
         self.users.child(userData.uid).set({email: self.state.username, secrets: {} });
         self.usersIndex.child(t).set(true);
-        AsyncStorage.setItem('userData', JSON.stringify(userData));
-        Utility.setLocalAuth();
-        self.props.navigator.push({name: 'SelectCategory'});
+        self.props.db.authWithPassword({
+          email: self.state.username,
+          password: self.state.password
+        }, function (error, authData) {
+          if (error) {
+            // err handling
+          } else {
+            self.toggleActivityIndicator();
+            self.setState({response: 'Success.'});
+            Utility.setLocalAuth(true);
+            self.props.navigator.push({name: 'SelectCategory'});
+          }
+        })
+
       }
     }) // End parent function
   }
@@ -97,7 +106,7 @@ class SignIn extends React.Component {
       } else {
         self.setState({response: 'Success.'});
         self.toggleActivityIndicator();
-        AsyncStorage.setItem('userData', JSON.stringify(userData));
+        //AsyncStorage.setItem('userData', JSON.stringify(userData));
         Utility.setLocalAuth(true);
         self.props.navigator.push({name: 'SelectCategory'});
       }

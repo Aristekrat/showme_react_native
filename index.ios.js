@@ -142,10 +142,10 @@ class ShowMe extends React.Component {
 
   getLocalSecrets() {
     AsyncStorage.getItem('secrets').then((secret_data_json) => {
-      let secret_data = JSON.parse(secret_data_json);
-      if (secret_data) {
+      if (secret_data_json) {
+        let secret_data = JSON.parse(secret_data_json);
         this.setState({localSecrets: secret_data})
-      } 
+      }
     })
   }
 
@@ -244,12 +244,44 @@ class ShowMe extends React.Component {
     });
   }
 
+  // This function listens for any firebase auth, saves the auth data, and transitions anon auths to signed in auths when appropriate
+  anonAuthHandler() {
+    this.DB.onAuth((authData) => {
+      if (authData) {
+        if (authData.provider === 'anonymous') {
+          AsyncStorage.setItem('userData', JSON.stringify(authData));
+        } else {
+          AsyncStorage.getItem('userData').then((user_data_string) => { 
+            if (user_data_string) {
+              let user_data = JSON.parse(user_data_string);
+              if (user_data.provider === 'anonymous') {
+                var anonRef = this.DB.child('users').child(user_data.uid);
+                anonRef.once('value', (anonSnapshot) => {
+                  let anonData = anonSnapshot.val();
+                  if (anonData.secrets) {
+                    this.DB.child('users').child(authData.uid).child('secrets').update(anonData.secrets);
+                  }
+                  anonRef.remove();
+                });
+              }
+            } else { // First time login, non-anon option chosen
+              AsyncStorage.setItem('userData', JSON.stringify(authData));
+            }
+          });
+        }
+      } else {
+        console.log("Not currently auth'd");
+      }
+    })   
+  }
+
   componentWillMount() {
     /*if (Utility.getAuthStatus()) {
       Utility.setLocalAuth(true);
     }*/
     this.getLocalSecrets();
     this.getRemoteSecrets();
+    this.anonAuthHandler();
   }
 
   componentDidMount() {
@@ -322,7 +354,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'MySecrets'
+          name: 'Gateway'
         }} />
     );
   }

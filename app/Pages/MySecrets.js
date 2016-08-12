@@ -36,12 +36,14 @@ class MySecrets extends React.Component {
         this.setState({uid: user_data.uid});
       };
     });
+    
     // Gets the initial data that will help the system determine if a secret has been updated
     AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
       if (updatedSecretsString) {
         this.setState({updatedSecrets: JSON.parse(updatedSecretsString)});
       };
     });
+
     AsyncStorage.getItem('secrets').then((secrets_data_string) => {
       if (secrets_data_string) {
         let secrets_data = JSON.parse(secrets_data_string);
@@ -50,7 +52,8 @@ class MySecrets extends React.Component {
         this.listSecrets();
         this.toggleActivityIndicator();
       }
-    })
+    });
+
   }
 
   // Removes notifications from AsyncStorage, the timing of the call is determined in listSecrets

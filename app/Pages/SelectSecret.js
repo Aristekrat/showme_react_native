@@ -78,24 +78,30 @@ class SelectSecret extends React.Component {
   }
 
   componentWillMount() {
+    console.log("AUTHD?", this.props.db.getAuth());
+
     AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
-      var user_data = JSON.parse(user_data_json);
-      if (user_data.uid) {
-        this.setState({uid: user_data.uid});
-      } 
-      this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
-        var secret = snapshot.val();
-        secret.key = snapshot.key();
-        secret.vote = secret.votes[this.state.uid];
-        delete secret.votes;
-        this.secrets.push(secret);
-        this.setState({
-          source: this.state.source.cloneWithRows(this.secrets)
-        })
-      }, function (errorObject) {
-        console.log("The read failed: " + errorObject.code); // TODO real error handling
-      })
+      if (user_data_json) {
+        var user_data = JSON.parse(user_data_json);
+        if (user_data.uid) {
+          this.setState({uid: user_data.uid});
+        } 
+      }
     });
+
+    // Does some processing and then adds the secrets to the View.
+    this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
+      var secret = snapshot.val();
+      secret.key = snapshot.key();
+      secret.vote = secret.votes[this.state.uid];
+      delete secret.votes;
+      this.secrets.push(secret);
+      this.setState({
+        source: this.state.source.cloneWithRows(this.secrets)
+      })
+    }, function (errorObject) {
+      console.log("The read failed: " + errorObject.code); // TODO real error handling
+    })
   }
   
   render() {

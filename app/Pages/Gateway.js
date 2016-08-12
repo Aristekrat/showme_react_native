@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 
 const FBSDK = require('react-native-fbsdk');
+const FBLoginManager = require('NativeModules').FBLoginManager;
 const {
   LoginManager,
   LoginButton,
@@ -58,6 +59,24 @@ class Gateway extends React.Component {
     } else {
       self.setState({validEmail: false});
     }
+  }
+
+  anonAuth() {
+    this.props.db.authAnonymously((err, authData) => {
+      if (err) {
+        // handle failure 
+        console.log("ERROR", err);
+      } else {
+        this.users.child(authData.uid).set({email: ""});
+        this.props.navigator.push({name: 'SelectCategory'});
+      };
+    });
+  };
+
+  componentWillMount() {
+    // AsyncStorage.removeItem('userData');
+    // AsyncStorage.removeItem('notificationCount');
+    // FBLoginManager.logOut();
   }
 
   render() {
@@ -126,7 +145,7 @@ class Gateway extends React.Component {
                 <Text style={styles.errorText}>Please use a valid email</Text>
             }
           </View>
-          <ArrowLink skipTo={() => this.props.navigator.push({name: 'SelectCategory'})}>Skip for Now</ArrowLink>
+          <ArrowLink skipTo={() => this.anonAuth() }>Skip for Now</ArrowLink>
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
