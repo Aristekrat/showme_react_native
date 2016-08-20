@@ -75,8 +75,9 @@ class Gateway extends React.Component {
 
   componentWillMount() {
     // AsyncStorage.removeItem('userData');
-    // AsyncStorage.removeItem('notificationCount');
-    // FBLoginManager.logOut();
+    //AsyncStorage.removeItem('notificationCount');
+    //FBLoginManager.logOut();
+    AsyncStorage.removeItem('hasBeenIntroduced');
   }
 
   render() {

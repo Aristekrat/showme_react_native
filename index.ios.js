@@ -141,9 +141,9 @@ class ShowMe extends React.Component {
   }
 
   getLocalSecrets() {
-    AsyncStorage.getItem('secrets').then((secret_data_json) => {
-      if (secret_data_json) {
-        let secret_data = JSON.parse(secret_data_json);
+    AsyncStorage.getItem('secrets').then((secret_data_string) => {
+      if (secret_data_string) {
+        let secret_data = JSON.parse(secret_data_string);
         this.setState({localSecrets: secret_data})
       }
     })
@@ -258,7 +258,7 @@ class ShowMe extends React.Component {
                 var anonRef = this.DB.child('users').child(user_data.uid);
                 anonRef.once('value', (anonSnapshot) => {
                   let anonData = anonSnapshot.val();
-                  if (anonData.secrets) {
+                  if (anonData && anonData.secrets) {
                     this.DB.child('users').child(authData.uid).child('secrets').update(anonData.secrets);
                   }
                   anonRef.remove();
@@ -269,9 +269,7 @@ class ShowMe extends React.Component {
             }
           });
         }
-      } else {
-        console.log("Not currently auth'd");
-      }
+      } 
     })   
   }
 
@@ -354,7 +352,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: 'Gateway'
+          name: "CreateSecret"
         }} />
     );
   }

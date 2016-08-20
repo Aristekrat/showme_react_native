@@ -23,7 +23,10 @@ class BigButton extends React.Component {
 const styles = StyleSheet.create({
   bigButtonContainer: {
   	backgroundColor: StylingGlobals.colors.mainColor,
-  	margin: 30,
+  	marginLeft: 30,
+    marginRight: 30,
+    marginTop: 15,
+    marginBottom: 15,
   	padding: 15,
   },
   buttonText: {

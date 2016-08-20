@@ -7,6 +7,8 @@ import Category from '../Components/Category.js';
 import SModal from '../Components/SModal.js';
 import CreateYourOwn from './CreateYourOwn.js';
 import SelectSecret from './SelectSecret.js';
+import Contacts from 'react-native-contacts';
+
 import {
   StyleSheet,
   Text,
@@ -56,7 +58,18 @@ class SelectCategory extends React.Component {
       if (!hasBeenIntroducedString) {
         this.setState({hasBeenIntroduced: false});
       }
-    })
+    });
+
+    /*
+    Contacts.getAll((err, contacts) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(contacts);
+        AsyncStorage.setItem('userContacts', JSON.stringify(contacts));
+      }
+    });
+    */
   }
 
   render(){

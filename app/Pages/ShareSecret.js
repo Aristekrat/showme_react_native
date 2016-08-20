@@ -13,34 +13,121 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  PickerIOS,
   AsyncStorage,
 } from 'react-native';
  
 //import Communications from 'react-native-communications';
 //import Composer from 'react-native-message-composer';
-//var Composer = require('NativeModules').RNMessageComposer;
- 
+var Composer = require('NativeModules').RNMessageComposer;
+//onValueChange={(contact) => this.setState({category, index: 0})}>
+
+const PickerItemIOS = PickerIOS.Item;
+
+const dummy = [
+  { 
+    givenName: 'Prof. David',
+    thumbnailPath: '',
+    phoneNumbers: [{ number: '(541) 953-0253', label: 'mobile' } ],
+    familyName: 'Aguilera',
+    emailAddresses: [],
+    recordID: 66 
+  },
+  { 
+    givenName: 'Billie',
+    thumbnailPath: '',
+    phoneNumbers: [ { number: '(720) 886-0400', label: 'mobile' } ],
+    familyName: 'Unterfend',
+    emailAddresses: [],
+    recordID: 76 
+  },
+  { 
+    givenName: 'Meredith',
+    thumbnailPath: '',
+    phoneNumbers: [ { number: '(757) 305-8735', label: 'home' } ],
+    familyName: 'Bowles',
+    emailAddresses: [ { email: 'aman_uruloki@hotmail.com', label: '' } ],
+    recordID: 90 
+  },
+  { 
+    givenName: 'Brian',
+    thumbnailPath: '/var/mobile/Containers/Data/Application/DB2F7899-15D3-437B-90E4-6EFDCAE0655A/tmp/thumbimage_TNpXx.png',
+    phoneNumbers: 
+     [ { number: '(541) 513-0548', label: 'mobile' },
+       { number: '(541) 935-0404', label: 'home' } ],
+    familyName: 'Case',
+    emailAddresses: [ { email: 'aristekrat@gmail.com', label: 'home' } ],
+    recordID: 33 
+  },   
+];
+
+/*
+          selectedValue={this.state.category}
+          onValueChange={(category) => this.setState({category, index: 0})}>
+
+          onValueChange={(category) => this.setState({category, index: 0})}>
+          {CATEGORIES.map((category) => (
+            <PickerItemIOS
+              key={category}
+              value={category}
+              label={category} />
+          ))}
+
+array.forEach(function(entry) {
+
+*/
+
+class UserContacts extends React.Component { 
+  constructor(props) {
+    super(props);
+    this.state = {
+      ph: dummy[0].phoneNumbers[0].number,
+    } 
+  }
+
+  render () {
+    return (
+      <View style={styles.userContacts}>
+        <PickerIOS 
+          selectedValue={this.state.contact}
+          onValueChange={
+            (contact) => {
+              this.setState({ph: contact.phoneNumbers[0].number, contact: contact})
+            } 
+          }>
+          {dummy.map((contact, index) => (
+            <PickerItemIOS
+              key={contact}
+              value={contact}
+              label={contact.givenName + " " + contact.familyName } />
+          ))}
+        </PickerIOS>
+      </View>
+    );
+  }
+};
+
 class ShareSecret extends React.Component { 
   constructor(props){
     super(props);
     this.state = {
       ph: '',
-      uid: ''
+      uid: '',
+      contacts: '',
     }
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
     this.currentSecret = this.props.route.cookieData;
   }
 
-  sendText() {
-    this.updateSentStatus();
-      /*
-      Composer.composeMessageWithArgs({
-          'messageText': 'I want to share a secret with you: ',
-          'subject':'My Sample Subject',
-          'recipients':['5415130548']
-      },
-      (result) => {
+  sendText(phoneNumber) {
+    console.log(phoneNumber);
+    //this.updateSentStatus();      
+    Composer.composeMessageWithArgs({
+        'messageText': 'I want to share a secret with you: ',
+        'subject':'My Sample Subject',
+        'recipients': [phoneNumber]
+    }, (result) => {
           switch(result) {
               case Composer.Sent:
                   console.log('the message has been sent');
@@ -60,7 +147,6 @@ class ShareSecret extends React.Component {
           }
       }
     );
-      */
   }
 
   tempFunc() {
@@ -84,15 +170,7 @@ class ShareSecret extends React.Component {
   }
 
   componentWillMount() {
-    /* Now working? At least working more than it was.
-    Contacts.getAll((err, contacts) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(contacts);
-      }
-    });
-    */
+    //console.log("OMGHERE", this.props.route.contacts); Getting it.
   }
 
   componentDidMount() {
@@ -111,6 +189,21 @@ class ShareSecret extends React.Component {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
+          <Text style={styles.prompt}>Choose who you want to send to...</Text>
+          <UserContacts ref="userContacts" />
+          <Text style={styles.label}>You'll have a chance to review before you send</Text>
+          <BigButton do={() => this.sendText(this.refs.userContacts.state.ph)}>
+            Continue
+          </BigButton>
+          <Text style={styles.exclusive}>Show Me is exclusively available on iPhones</Text>
+        </ScrollView>
+        <TabBar navigator={this.props.navigator} route={this.props.route} />
+      </View>
+    );
+  }
+};
+ 
+/*
           <Text style={styles.prompt}>Enter phone number</Text>
           <TextInput 
             style={styles.phoneInput}
@@ -120,22 +213,8 @@ class ShareSecret extends React.Component {
             onChangeText={(ph) => this.setState({ph})}
             selectionColor={StylingGlobals.colors.navColor}
           />
-          <BigButton do={() => this.sendText()}>
-            Continue
-          </BigButton>
-        </ScrollView>
-        <TabBar navigator={this.props.navigator} route={this.props.route} />
-      </View>
-    );
-  }
-};
- 
-var styles = StyleSheet.create({
-  prompt: {
-    marginLeft: 30,
-    marginTop: 20,
-  },
-  phoneInput: {
+
+            phoneInput: {
     backgroundColor: '#fff',
     justifyContent: 'center', 
     alignItems: 'center',
@@ -145,6 +224,28 @@ var styles = StyleSheet.create({
     height: 45,
     borderColor: StylingGlobals.colors.border,
     borderWidth: 1  
+  },
+
+   var secretData = {text: this.state.text, category: this.refs.catPicker.state.category, score: 1, votes: voteData, '.priority': -1};
+        
+
+*/
+
+var styles = StyleSheet.create({
+  prompt: {
+    marginLeft: 30,
+    marginTop: 20,
+  },
+  userContacts: {
+    marginTop: -20,
+  },
+  label: {
+    marginLeft: 30,
+    fontSize: 12,
+  },
+  exclusive: {
+    marginLeft: 30,
+    fontSize: 12,
   },
 });
 

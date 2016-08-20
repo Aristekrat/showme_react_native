@@ -78,14 +78,19 @@ class SelectSecret extends React.Component {
   }
 
   componentWillMount() {
-    console.log("AUTHD?", this.props.db.getAuth());
-
-    AsyncStorage.getItem('userData').then((user_data_json) => { // What to do if the system can't find any user data?
-      if (user_data_json) {
-        var user_data = JSON.parse(user_data_json);
+    AsyncStorage.getItem('userData').then((user_data_string) => { // What to do if the system can't find any user data?
+      if (user_data_string) {
+        let user_data = JSON.parse(user_data_string);
         if (user_data.uid) {
           this.setState({uid: user_data.uid});
         } 
+      }
+    });
+
+    AsyncStorage.getItem('userContacts').then((user_contacts_string) => {
+      if (user_contacts_string) {
+        let user_contacts = JSON.parse(user_contacts_string);
+        this.setState({contacts: user_contacts});
       }
     });
 
@@ -116,7 +121,7 @@ class SelectSecret extends React.Component {
               <Secret 
                 secretText={rowData.text}
                 count={rowData.score} 
-                selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData})}} 
+                selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData, contacts: this.state.contacts})}} 
                 vote={rowData.vote}
                 upvote={() => this.vote('upvote', rowData.vote, rowData.key)}
                 downvote={() => this.vote('downvote', rowData.vote, rowData.key)}

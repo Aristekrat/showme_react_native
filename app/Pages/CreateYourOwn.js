@@ -19,14 +19,13 @@ import {
 
 var PickerItemIOS = PickerIOS.Item;
 
-var CATEGORIES = ["Love", "Sex", "Social", "Funny", "Embarassing", "Past"]
+const CATEGORIES = ["Love", "Sex", "Social", "Funny", "Embarassing", "Past"]
 
 class CategoryPicker extends React.Component { 
   constructor(props) {
     super(props);
     this.state = {
       category: 'Social',
-      index: 3,
       loaded: false
     } 
   }
@@ -36,7 +35,7 @@ class CategoryPicker extends React.Component {
       <View style={styles.categoryPicker}>
         <PickerIOS
           selectedValue={this.state.category}
-          onValueChange={(category) => this.setState({category, index: 0})}>
+          onValueChange={(category) => this.setState({category})}>
           {CATEGORIES.map((category) => (
             <PickerItemIOS
               key={category}
@@ -50,7 +49,7 @@ class CategoryPicker extends React.Component {
 };
 
 class CreateYourOwn extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       public: false,
@@ -75,6 +74,20 @@ class CreateYourOwn extends React.Component {
     });
   }
 
+  addLocalSecret(localSecret) {
+    localSecret.state = 'CR'; 
+    localSecret.answer = null;
+    AsyncStorage.getItem('secrets').then((secrets_data_string) => {
+      if (secrets_data_string) {
+        let secrets_data = JSON.parse(secrets_data_string);
+        secrets_data.push(localSecret);
+        AsyncStorage.setItem('secrets', JSON.stringify(secrets_data));
+      } else {
+        AsyncStorage.setItem('secrets', localSecret);
+      }
+    });
+  }
+
   submitSecret() {
     var self = this;
     if (this.state.text !== '') {
@@ -82,7 +95,7 @@ class CreateYourOwn extends React.Component {
       if (!this.state.public) {
         // add to privateSecrets TODO Public and Private should be split into the same, seperate function
         var secretData = {question: self.state.text, askerID: self.state.uid, askerName: '', responderID: '', responderName: ''};
-        var privateSecret = this.privateSecrets.push(secretData, function (err, snapshot) {
+        var privateSecret = this.privateSecrets.push(secretData, (err, snapshot) => {
           if (err) {
             this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
           } else {
@@ -90,6 +103,7 @@ class CreateYourOwn extends React.Component {
               self.answers.child(sKey).set({askerAnswer: '', responderAnswer: ''});
               self.users.child(self.state.uid).child('secrets').child(sKey).set({answerState: 'NA', sentState: 'CR'});
               secretData.key = sKey;
+              this.addLocalSecret(secretData);
               secretData.public = false;
               self.setState({
                 animating: !self.state.animating, 
@@ -137,7 +151,7 @@ class CreateYourOwn extends React.Component {
       <View style={StylingGlobals.container}>
         <ScrollView style={styles.form}>
           <View style={styles.row}>
-            <Text style={styles.label}>Secret Text</Text>
+            <Text style={styles.label}>Secret Question</Text>
             <TextInput
                 style={styles.textInput}  
                 autoFocus={true}
@@ -147,7 +161,12 @@ class CreateYourOwn extends React.Component {
               { this.state.errorMessage ? <Text style={styles.errorText}>{this.state.errorMessage}</Text> : null }
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Make Public</Text>
+            <Text style={styles.publicExplanatory}>Allow other people to use this question? 
+            { this.state.public ?
+              ' Yes' : 
+              ' No'
+            }
+            </Text>
             <Switch 
               onValueChange={() => this.setState({public: !this.state.public})} 
               onTintColor={StylingGlobals.colors.pressDown}
@@ -160,7 +179,7 @@ class CreateYourOwn extends React.Component {
               <CategoryPicker ref="catPicker" />
             </View> 
             : 
-            null 
+            null
           }
           { // Success notification block or submit block
             this.state.submitSuccess ? 
@@ -216,6 +235,10 @@ var styles = StyleSheet.create({
   },
   label: {
     marginBottom: 3
+  },
+  publicExplanatory: {
+    fontSize: 11,
+    marginBottom: 4,
   },
   button: {
     backgroundColor: StylingGlobals.colors.mainColor,

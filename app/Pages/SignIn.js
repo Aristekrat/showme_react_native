@@ -42,9 +42,10 @@ class SignIn extends React.Component {
     var self = this;
     this.toggleActivityIndicator();
     self.setState({response: ''});
+    let email = self.state.username.trim();
 
     self.props.db.createUser({
-      email: self.state.username,
+      email: email,
       password: self.state.password
     }, function (error, userData) {
       if (error) {
@@ -58,8 +59,8 @@ class SignIn extends React.Component {
             break;
         }
       } else {
-        var t = Utility.escapeEmail(self.state.username)
-        self.users.child(userData.uid).set({email: self.state.username, secrets: {} });
+        var t = Utility.escapeEmail(email)
+        self.users.child(userData.uid).set({email: email, secrets: {} });
         self.usersIndex.child(t).set(true);
         self.props.db.authWithPassword({
           email: self.state.username,
@@ -83,8 +84,10 @@ class SignIn extends React.Component {
     var self = this; 
     self.toggleActivityIndicator();
     self.setState({response: ''});
+    let email = self.state.username.trim();
+
     self.usersIndex.authWithPassword({
-      email: self.state.username, 
+      email: email, 
       password: self.state.password
     }, function (error, userData) {
       if (error) {
@@ -106,7 +109,7 @@ class SignIn extends React.Component {
       } else {
         self.setState({response: 'Success.'});
         self.toggleActivityIndicator();
-        //AsyncStorage.setItem('userData', JSON.stringify(userData));
+        AsyncStorage.setItem('userData', JSON.stringify(userData));
         Utility.setLocalAuth(true);
         self.props.navigator.push({name: 'SelectCategory'});
       }

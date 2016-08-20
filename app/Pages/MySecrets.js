@@ -47,6 +47,7 @@ class MySecrets extends React.Component {
     AsyncStorage.getItem('secrets').then((secrets_data_string) => {
       if (secrets_data_string) {
         let secrets_data = JSON.parse(secrets_data_string);
+        //let secrets_data = JSON.parse('[{"askerID":"05e5f76b-2409-419a-b580-ab21a5b9c959","askerName":"","question":"Here\'s my super special secret","responderID":"","responderName":"","state":{"answerState":"NA","sentState":"CR"},"key":"-KPVw1HuBaxcbFr6x0qW","answer":null},{"askerID":"05e5f76b-2409-419a-b580-ab21a5b9c959","askerName":"","question":"Super specialest secret","responderID":"","responderName":"","state":{"answerState":"NA","sentState":"CR"},"key":"-KPVwHW-vc8YSWi0H9Ut","answer":null},{"askerID":"05e5f76b-2409-419a-b580-ab21a5b9c959","askerName":"","question":"Even more top secret","responderID":"","responderName":"","state":{"answerState":"NA","sentState":"CR"},"key":"-KPVx-Ga0t7o4XOaCkbO","answer":null},{"askerID":"05e5f76b-2409-419a-b580-ab21a5b9c959","askerName":"","question":"Here I am creating another","responderID":"9487f61d-b3ec-45c7-a511-cffa73ac14a9","responderName":"","state":{"answerState":"NA","sentState":"QS"},"key":"-KPVxEzuGw-qlSqJZ3l4","answer":null},{"askerID":"c374a55d-c9c8-4d83-8eac-799741fd8218","askerName":"","question":"Another great secret","responderID":"9487f61d-b3ec-45c7-a511-cffa73ac14a9","responderName":"","state":{"answerState":"AA","sentState":"QS"},"key":"-KPVyAwWwUrOwJXgT3xO","answer":null}]');
         this.mySecrets = secrets_data;
         this.initalDisplay();
         this.listSecrets();
