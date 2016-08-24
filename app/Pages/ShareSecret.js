@@ -28,7 +28,7 @@ const dummy = [
   { 
     givenName: 'Prof. David',
     thumbnailPath: '',
-    phoneNumbers: [{ number: '(541) 953-0253', label: 'mobile' } ],
+    phoneNumbers: [{ number: '(111) 953-0253', label: 'mobile' } ],
     familyName: 'Aguilera',
     emailAddresses: [],
     recordID: 66 
@@ -36,7 +36,7 @@ const dummy = [
   { 
     givenName: 'Billie',
     thumbnailPath: '',
-    phoneNumbers: [ { number: '(720) 886-0400', label: 'mobile' } ],
+    phoneNumbers: [ { number: '(222) 886-0400', label: 'mobile' } ],
     familyName: 'Unterfend',
     emailAddresses: [],
     recordID: 76 
@@ -44,7 +44,7 @@ const dummy = [
   { 
     givenName: 'Meredith',
     thumbnailPath: '',
-    phoneNumbers: [ { number: '(757) 305-8735', label: 'home' } ],
+    phoneNumbers: [ { number: '(333) 305-8735', label: 'home' } ],
     familyName: 'Bowles',
     emailAddresses: [ { email: 'aman_uruloki@hotmail.com', label: '' } ],
     recordID: 90 
@@ -53,7 +53,7 @@ const dummy = [
     givenName: 'Brian',
     thumbnailPath: '/var/mobile/Containers/Data/Application/DB2F7899-15D3-437B-90E4-6EFDCAE0655A/tmp/thumbimage_TNpXx.png',
     phoneNumbers: 
-     [ { number: '(541) 513-0548', label: 'mobile' },
+     [ { number: '(444) 513-0548', label: 'mobile' },
        { number: '(541) 935-0404', label: 'home' } ],
     familyName: 'Case',
     emailAddresses: [ { email: 'aristekrat@gmail.com', label: 'home' } ],
@@ -61,26 +61,11 @@ const dummy = [
   },   
 ];
 
-/*
-          selectedValue={this.state.category}
-          onValueChange={(category) => this.setState({category, index: 0})}>
-
-          onValueChange={(category) => this.setState({category, index: 0})}>
-          {CATEGORIES.map((category) => (
-            <PickerItemIOS
-              key={category}
-              value={category}
-              label={category} />
-          ))}
-
-array.forEach(function(entry) {
-
-*/
-
 class UserContacts extends React.Component { 
   constructor(props) {
     super(props);
     this.state = {
+      contact: 0,
       ph: dummy[0].phoneNumbers[0].number,
     } 
   }
@@ -91,14 +76,14 @@ class UserContacts extends React.Component {
         <PickerIOS 
           selectedValue={this.state.contact}
           onValueChange={
-            (contact) => {
-              this.setState({ph: contact.phoneNumbers[0].number, contact: contact})
+            (contactIndex) => {
+              this.setState({ph: dummy[contactIndex].phoneNumbers[0].number, contact: contactIndex});
             } 
           }>
           {dummy.map((contact, index) => (
             <PickerItemIOS
               key={contact}
-              value={contact}
+              value={index}
               label={contact.givenName + " " + contact.familyName } />
           ))}
         </PickerIOS>
@@ -120,9 +105,7 @@ class ShareSecret extends React.Component {
     this.currentSecret = this.props.route.cookieData;
   }
 
-  sendText(phoneNumber) {
-    console.log(phoneNumber);
-    //this.updateSentStatus();      
+  sendText(phoneNumber) {   
     Composer.composeMessageWithArgs({
         'messageText': 'I want to share a secret with you: ',
         'subject':'My Sample Subject',

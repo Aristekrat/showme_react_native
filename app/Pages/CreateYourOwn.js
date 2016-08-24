@@ -86,54 +86,56 @@ class CreateYourOwn extends React.Component {
         AsyncStorage.setItem('secrets', localSecret);
       }
     });
+  };
+
+  success(secretData) {
+    this.setState ({
+      animating: !this.state.animating, 
+      submitSuccess: true, 
+      text: '', 
+      submittedSecret: secretData,
+      errorMessage: '',
+    });
+  }
+
+  pushToPrivateSecrets() {
+    let psData = {question: this.state.text, askerID: this.state.uid, askerName: '', responderID: '', responderName: ''};
+    let privateSecret = this.privateSecrets.push(psData, (err, snapshot) => {
+      if (err) {
+        this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
+      } else {
+          var sKey = privateSecret.key();
+          this.answers.child(sKey).set({askerAnswer: '', responderAnswer: ''});
+          this.users.child(this.state.uid).child('secrets').child(sKey).set({answerState: 'NA', sentState: 'CR'});
+          psData.key = sKey;
+          this.addLocalSecret(psData);
+          psData.public = false; // I'm not sure what the point of this line is. 
+          this.success(psData); 
+      }
+    });
+  }
+
+  pushToPublicSecrets(notYet = false) {
+    var voteData = {}
+    voteData[this.state.uid] = 'upvote';
+    let secretData = {text: this.state.text, category: this.refs.catPicker.state.category, score: 1, votes: voteData, '.priority': -1};
+    var publicSecret = this.publicSecrets.child(this.refs.catPicker.state.category).push(secretData, (err) => {
+      if (err) {
+        this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
+      } else {
+        notYet ? this.pushToPrivateSecrets() : this.success();
+      }
+    })
   }
 
   submitSecret() {
     var self = this;
     if (this.state.text !== '') {
-      self.setState({animating: !self.state.animating});
+      this.setState({animating: !self.state.animating});
       if (!this.state.public) {
-        // add to privateSecrets TODO Public and Private should be split into the same, seperate function
-        var secretData = {question: self.state.text, askerID: self.state.uid, askerName: '', responderID: '', responderName: ''};
-        var privateSecret = this.privateSecrets.push(secretData, (err, snapshot) => {
-          if (err) {
-            this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
-          } else {
-              var sKey = privateSecret.key();
-              self.answers.child(sKey).set({askerAnswer: '', responderAnswer: ''});
-              self.users.child(self.state.uid).child('secrets').child(sKey).set({answerState: 'NA', sentState: 'CR'});
-              secretData.key = sKey;
-              this.addLocalSecret(secretData);
-              secretData.public = false;
-              self.setState({
-                animating: !self.state.animating, 
-                submitSuccess: true, 
-                text: '', 
-                submittedSecret: secretData,
-                errorMessage: '',
-              });
-          }
-        })
+        this.pushToPrivateSecrets();
       } else {
-        // add to publicSecrets
-        var voteData = {}
-        voteData[this.state.uid] = 'upvote';
-        var secretData = {text: this.state.text, category: this.refs.catPicker.state.category, score: 1, votes: voteData, '.priority': -1};
-        var publicSecret = this.publicSecrets.child(this.refs.catPicker.state.category).push(secretData, function (err) {
-          if (err) {
-            this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
-          } else {
-            secretData.public = true;
-            secretData.key = publicSecret.key();
-            self.setState({
-              animating: !self.state.animating, 
-              submitSuccess: true, 
-              text: '', 
-              submittedSecret: secretData, 
-              errorMessage: '',
-            });
-          }
-        })
+        this.pushToPublicSecrets(true);
       }
     } else {
       this.setState({errorMessage: 'Please enter your question'})
