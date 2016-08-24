@@ -138,6 +138,7 @@ class ShowMe extends React.Component {
       remoteSecrets: [],
       localSecrets: [],
     };
+    totalResults: '';
   }
 
   getLocalSecrets() {
@@ -169,7 +170,7 @@ class ShowMe extends React.Component {
           var userSecrets = snapshot.val();
           if (userSecrets) {
             var userKeys = Object.keys(userSecrets);
-            var resultsCount = userKeys.length - 1;
+            this.totalResults = userKeys.length;
 
             userKeys.forEach((result, count) => {
               if (userSecrets[result].sentState === 'SO') {
@@ -188,6 +189,27 @@ class ShowMe extends React.Component {
         // What to do if the system can't find any user data?
       }
     });
+  }
+
+  // Processes data and sets up event listeners after all data is received from the remote
+  allRemoteSecretsRetrieved() {
+    this.setNotificationCount(); 
+    this.listenForUpdatesToSecrets(); 
+    AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets)); 
+  }    
+
+  // Waits until all remote secrets are received then calls the implementation function
+  checkIfRemoteSecretsReceived() {
+    this.setTimeout (
+      () => {
+        if (this.state.remoteSecrets.length === this.totalResults) {
+          this.allRemoteSecretsRetrieved();
+        } else {
+          this.checkIfRemoteSecretsReceived();
+        }
+      },
+      1000
+    )
   }
 
   // Compares the local and remote secrets and then sets the notification count on detecting differences
@@ -283,14 +305,7 @@ class ShowMe extends React.Component {
   }
 
   componentDidMount() {
-    this.setTimeout (
-      () => {
-        this.setNotificationCount(); 
-        this.listenForUpdatesToSecrets(); 
-        AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets)); 
-      }, 
-      5000
-    );
+    this.checkIfRemoteSecretsReceived();
   }
 
   renderScene (route, navigator) {
@@ -352,7 +367,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "ShareSecret"
+          name: "MySecrets"
         }} />
     );
   }

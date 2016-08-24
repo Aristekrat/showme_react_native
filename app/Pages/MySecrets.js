@@ -123,7 +123,7 @@ class MySecrets extends React.Component {
 
   setTab(state) {
     this.setState({displaying: state});
-    //this.listSecrets();
+    this.listSecrets();
   }
 
   // Needs to be moved to common utils

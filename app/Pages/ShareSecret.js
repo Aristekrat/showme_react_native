@@ -185,34 +185,6 @@ class ShareSecret extends React.Component {
     );
   }
 };
- 
-/*
-          <Text style={styles.prompt}>Enter phone number</Text>
-          <TextInput 
-            style={styles.phoneInput}
-            autoFocus={true}
-            keyboardType={'numeric'} 
-            ref="ph"
-            onChangeText={(ph) => this.setState({ph})}
-            selectionColor={StylingGlobals.colors.navColor}
-          />
-
-            phoneInput: {
-    backgroundColor: '#fff',
-    justifyContent: 'center', 
-    alignItems: 'center',
-    marginLeft: 30,
-    marginRight: 30,
-    marginTop: 5,
-    height: 45,
-    borderColor: StylingGlobals.colors.border,
-    borderWidth: 1  
-  },
-
-   var secretData = {text: this.state.text, category: this.refs.catPicker.state.category, score: 1, votes: voteData, '.priority': -1};
-        
-
-*/
 
 var styles = StyleSheet.create({
   prompt: {
