@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
+import GetSecrets from '../Globals/GetSecrets.js';
 import {
   StyleSheet,
   Text,
@@ -75,7 +76,7 @@ class CreateYourOwn extends React.Component {
   }
 
   addLocalSecret(localSecret) {
-    localSecret.state = 'CR'; 
+    localSecret.state = { answerState: 'NA', sentState: 'CR' },
     localSecret.answer = null;
     AsyncStorage.getItem('secrets').then((secrets_data_string) => {
       if (secrets_data_string) {
@@ -105,10 +106,13 @@ class CreateYourOwn extends React.Component {
         this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
       } else {
           var sKey = privateSecret.key();
+          let initialState = {answerState: 'NA', sentState: 'CR'};
           this.answers.child(sKey).set({askerAnswer: '', responderAnswer: ''});
-          this.users.child(this.state.uid).child('secrets').child(sKey).set({answerState: 'NA', sentState: 'CR'});
+          this.users.child(this.state.uid).child('secrets').child(sKey).set(initialState);
           psData.key = sKey;
-          this.addLocalSecret(psData);
+          psData.state = initialState;
+          psData.answer = null;
+          GetSecrets.pushLocalSecret(psData);
           psData.public = false; // I'm not sure what the point of this line is. 
           this.success(psData); 
       }

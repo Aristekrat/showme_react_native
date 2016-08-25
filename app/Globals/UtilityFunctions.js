@@ -6,8 +6,10 @@ import Firebase from 'firebase';
 const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 
 var Utility = {
+	dbURL: FirebaseURL,
+	authStatus: false,
 	getRef: function () {
-		return new Firebase(FirebaseURL)
+		return new Firebase(this.dbURL)
 	},
 	getAuthStatus: function() {
 	  var ref = Utility.getRef();
@@ -32,7 +34,6 @@ var Utility = {
 		this.unAuth();
 		this.setLocalAuth(false);
 	},
-	authStatus: false
 }
 
 /*

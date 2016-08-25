@@ -12,6 +12,7 @@ import SignIn from './app/Pages/SignIn.js';
 import StylingGlobals from './app/StylingGlobals.js';
 import Gateway from './app/Pages/Gateway.js';
 import Utility from './app/Globals/UtilityFunctions.js';
+import GetSecrets from './app/Globals/GetSecrets.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 import {
@@ -141,11 +142,12 @@ class ShowMe extends React.Component {
     totalResults: '';
   }
 
+  /*
   getLocalSecrets() {
     AsyncStorage.getItem('secrets').then((secret_data_string) => {
       if (secret_data_string) {
         let secret_data = JSON.parse(secret_data_string);
-        this.setState({localSecrets: secret_data})
+        this.setState({localSecrets: secret_data}); // Needs to be changed
       }
     })
   }
@@ -161,7 +163,7 @@ class ShowMe extends React.Component {
     })
   }
 
-  // Transformer
+  // Queries the DB for all remote secrets
   getRemoteSecrets() {
     AsyncStorage.getItem('userData').then((user_data_json) => { 
       if (user_data_json) {
@@ -190,19 +192,21 @@ class ShowMe extends React.Component {
       }
     });
   }
+  */
 
   // Processes data and sets up event listeners after all data is received from the remote
   allRemoteSecretsRetrieved() {
     this.setNotificationCount(); 
     this.listenForUpdatesToSecrets(); 
-    AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets)); 
+    GetSecrets.pushSecretsToAsyncStore();
+    //AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets)); // Replace this with a GetSecrets func
   }    
 
   // Waits until all remote secrets are received then calls the implementation function
-  checkIfRemoteSecretsReceived() {
+  checkIfRemoteSecretsReceived() { // Add optional arg and move to GetSecrets? Doubt I can use a mixin there
     this.setTimeout (
       () => {
-        if (this.state.remoteSecrets.length === this.totalResults) {
+        if (GetSecrets.remoteSecrets.length === GetSecrets.totalResults) { // Replace this with a GetSecrets func
           this.allRemoteSecretsRetrieved();
         } else {
           this.checkIfRemoteSecretsReceived();
@@ -299,8 +303,8 @@ class ShowMe extends React.Component {
     /*if (Utility.getAuthStatus()) {
       Utility.setLocalAuth(true);
     }*/
-    this.getLocalSecrets();
-    this.getRemoteSecrets();
+    GetSecrets.getLocalSecrets();
+    GetSecrets.getRemoteSecrets();
     this.anonAuthHandler();
   }
 
