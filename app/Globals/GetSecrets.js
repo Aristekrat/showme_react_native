@@ -3,8 +3,7 @@ import {
 } from 'react-native';
 import Utility from './UtilityFunctions.js';
 
-
-var GetSecrets = {
+const GetSecrets = {
 	DB: Utility.getRef(),
 	remoteSecrets: [],
 	localSecrets: [],
@@ -33,6 +32,7 @@ var GetSecrets = {
   // Queries the DB for all remote secrets
   getRemoteSecrets: function() {
   	this.remoteSecrets.length = 0;
+    this.totalResults = '';
     AsyncStorage.getItem('userData').then((user_data_json) => { 
       if (user_data_json) {
         let user_data = JSON.parse(user_data_json); // TODO Needs to check AUTH, implement this at the end

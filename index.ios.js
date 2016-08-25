@@ -142,58 +142,6 @@ class ShowMe extends React.Component {
     totalResults: '';
   }
 
-  /*
-  getLocalSecrets() {
-    AsyncStorage.getItem('secrets').then((secret_data_string) => {
-      if (secret_data_string) {
-        let secret_data = JSON.parse(secret_data_string);
-        this.setState({localSecrets: secret_data}); // Needs to be changed
-      }
-    })
-  }
-
-  // Used within get remote secrets to set the local state 
-  setRemoteSecrets(state, key, answer = null) {
-    this.DB.child('privateSecrets').child(key).on('value', (secret) => {
-      var sv = secret.val();
-      sv.state = state; 
-      sv.key = key;
-      sv.answer = answer;
-      this.state.remoteSecrets.push(sv);
-    })
-  }
-
-  // Queries the DB for all remote secrets
-  getRemoteSecrets() {
-    AsyncStorage.getItem('userData').then((user_data_json) => { 
-      if (user_data_json) {
-        let user_data = JSON.parse(user_data_json); // TODO Needs to check AUTH, implement this at the end
-        this.DB.child('users').child(user_data.uid).child('secrets').once('value', (snapshot) => { 
-          var userSecrets = snapshot.val();
-          if (userSecrets) {
-            var userKeys = Object.keys(userSecrets);
-            this.totalResults = userKeys.length;
-
-            userKeys.forEach((result, count) => {
-              if (userSecrets[result].sentState === 'SO') {
-                this.DB.child('answers').child(result).on('value', (snapshot) => {
-                  var answer = snapshot.val();
-                  answer.key = result; 
-                  this.setRemoteSecrets(userSecrets[result], result, answer);
-                });
-              } else {
-                this.setRemoteSecrets(userSecrets[result], result);
-              }
-            })
-          }
-        })
-      } else {
-        // What to do if the system can't find any user data?
-      }
-    });
-  }
-  */
-
   // Processes data and sets up event listeners after all data is received from the remote
   allRemoteSecretsRetrieved() {
     this.setNotificationCount(); 
@@ -206,7 +154,7 @@ class ShowMe extends React.Component {
   checkIfRemoteSecretsReceived() { // Add optional arg and move to GetSecrets? Doubt I can use a mixin there
     this.setTimeout (
       () => {
-        if (GetSecrets.remoteSecrets.length === GetSecrets.totalResults) { // Replace this with a GetSecrets func
+        if (GetSecrets.remoteSecrets.length === GetSecrets.totalResults) {
           this.allRemoteSecretsRetrieved();
         } else {
           this.checkIfRemoteSecretsReceived();
@@ -371,7 +319,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "MySecrets"
+          name: "SignIn"
         }} />
     );
   }

@@ -68,13 +68,15 @@ class CreateYourOwn extends React.Component {
   }
 
   componentWillMount() {
-    let self = this;
-    AsyncStorage.getItem('userData').then((user_data_json) => {
-      let user_data = JSON.parse(user_data_json); 
-      self.setState({uid: user_data.uid});
+    AsyncStorage.getItem('userData').then((user_data_string) => {
+      if (user_data_string) {
+        let user_data = JSON.parse(user_data_string); 
+        this.setState({uid: user_data.uid});
+      }
     });
   }
 
+  // Adds a secret to the asyncstore after it is created, so it's visible in MySecrets
   addLocalSecret(localSecret) {
     localSecret.state = { answerState: 'NA', sentState: 'CR' },
     localSecret.answer = null;
@@ -89,6 +91,7 @@ class CreateYourOwn extends React.Component {
     });
   };
 
+  // sets success state after secret submission
   success(secretData) {
     this.setState ({
       animating: !this.state.animating, 
@@ -99,6 +102,7 @@ class CreateYourOwn extends React.Component {
     });
   }
 
+  // Pushes to DB. If successful, does some data processing and starts the push to the local async store and calls the success func
   pushToPrivateSecrets() {
     let psData = {question: this.state.text, askerID: this.state.uid, askerName: '', responderID: '', responderName: ''};
     let privateSecret = this.privateSecrets.push(psData, (err, snapshot) => {
@@ -119,6 +123,7 @@ class CreateYourOwn extends React.Component {
     });
   }
 
+  // Pushes to public secrets DB collection & calls pushtoprivate if called with a true val in the first arg
   pushToPublicSecrets(notYet = false) {
     var voteData = {}
     voteData[this.state.uid] = 'upvote';
@@ -132,10 +137,10 @@ class CreateYourOwn extends React.Component {
     })
   }
 
+  // An implementation function that calls either pushToPrivateSecrets or publicSecrets with pushToPrivate as a callback
   submitSecret() {
-    var self = this;
     if (this.state.text !== '') {
-      this.setState({animating: !self.state.animating});
+      this.setState({animating: !this.state.animating});
       if (!this.state.public) {
         this.pushToPrivateSecrets();
       } else {

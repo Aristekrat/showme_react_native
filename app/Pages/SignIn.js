@@ -9,6 +9,8 @@ import ShareSecret from './ShareSecret.js';
 import MySecrets from './MySecrets.js';
 import MyAccount from './MyAccount.js';
 import Utility from '../Globals/UtilityFunctions.js';
+import GetSecrets from '../Globals/GetSecrets.js';
+
 import {
   StyleSheet,
   Text,
@@ -38,6 +40,24 @@ class SignIn extends React.Component {
     this.setState({animating: !this.state.animating});
   }
 
+  errorHandler(error) {
+    this.toggleActivityIndicator();
+    switch (error.code) {
+      case 'INVALID_EMAIL':
+        this.setState({response: 'Invalid email.'}); // Enter correct email
+        break;
+      case 'INVALID_USER':
+        this.setState({response: 'Invalid user.'}); // Display forgot
+        break;
+      case 'INVALID_PASSWORD':
+        this.setState({response: 'Invalid password.'}); // Display forgot
+        break;
+      default:
+        this.setState({response: 'Unknown error.'}); // Display skip 
+        break;
+    }
+  }
+
   registerUser() {
     var self = this;
     this.toggleActivityIndicator();
@@ -47,22 +67,15 @@ class SignIn extends React.Component {
     self.props.db.createUser({
       email: email,
       password: self.state.password
-    }, function (error, userData) {
+    }, (error, userData) => {
       if (error) {
-        self.toggleActivityIndicator();
-        switch (error.code) {
-          case 'INVALID_EMAIL':
-            self.setState({response: 'Invalid email.'});
-            break;
-          default:
-            self.setState({response: 'Unknown error.'});
-            break;
-        }
+        self.errorHandler(error);
       } else {
         var t = Utility.escapeEmail(email)
         self.users.child(userData.uid).set({email: email, secrets: {} });
         self.usersIndex.child(t).set(true);
-        self.props.db.authWithPassword({
+        this.loginUser();
+        /*self.props.db.authWithPassword({ // I should just call login here
           email: self.state.username,
           password: self.state.password
         }, function (error, authData) {
@@ -74,44 +87,30 @@ class SignIn extends React.Component {
             Utility.setLocalAuth(true);
             self.props.navigator.push({name: 'SelectCategory'});
           }
-        })
-
+        }) */
       }
     }) // End parent function
   }
 
   loginUser() {
     var self = this; 
-    self.toggleActivityIndicator();
-    self.setState({response: ''});
-    let email = self.state.username.trim();
-
-    self.usersIndex.authWithPassword({
+    let email = this.state.username.trim();
+    this.toggleActivityIndicator();
+    this.setState({response: ''});
+    
+    this.props.db.authWithPassword({
       email: email, 
-      password: self.state.password
-    }, function (error, userData) {
+      password: this.state.password
+    }, (error, userData) => {
       if (error) {
-        self.toggleActivityIndicator();
-        switch (error.code) {
-          case 'INVALID_EMAIL':
-            self.setState({response: 'Invalid email.'}); // Enter correct email
-            break;
-          case 'INVALID_USER':
-            self.setState({response: 'Invalid user.'}); // Display forgot
-            break;
-          case 'INVALID_PASSWORD':
-            self.setState({response: 'Invalid password.'}); // Display forgot
-            break;
-          default:
-            self.setState({response: 'Unknown error.'}); // Display skip 
-            break;
-        }
+        this.errorHandler(error);
       } else {
-        self.setState({response: 'Success.'});
-        self.toggleActivityIndicator();
+        this.setState({response: 'Success.'});
+        this.toggleActivityIndicator();
         AsyncStorage.setItem('userData', JSON.stringify(userData));
         Utility.setLocalAuth(true);
-        self.props.navigator.push({name: 'SelectCategory'});
+        GetSecrets.getRemoteSecrets();
+        this.props.navigator.push({name: 'SelectCategory', refresh: true});
       }
     })
   }

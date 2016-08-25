@@ -7,7 +7,9 @@ import Category from '../Components/Category.js';
 import SModal from '../Components/SModal.js';
 import CreateYourOwn from './CreateYourOwn.js';
 import SelectSecret from './SelectSecret.js';
-import Contacts from 'react-native-contacts';
+import ReactMixin from 'react-mixin';
+import ReactTimer from 'react-timer-mixin';
+import GetSecrets from '../Globals/GetSecrets.js';
 
 import {
   StyleSheet,
@@ -53,6 +55,20 @@ class SelectCategory extends React.Component {
     AsyncStorage.setItem('hasBeenIntroduced', 'true');
   }
 
+  // Largely duplicated in index, need to figure out how to split this guy off while retaining the setTimeout core
+  checkIfRemoteSecretsReceived() {
+    this.setTimeout (
+      () => {
+        if (GetSecrets.remoteSecrets.length === GetSecrets.totalResults) {
+          GetSecrets.pushSecretsToAsyncStore();
+        } else {
+          this.checkIfRemoteSecretsReceived();
+        }
+      },
+      1000
+    )
+  }
+
   componentWillMount() {
     AsyncStorage.getItem('hasBeenIntroduced').then((hasBeenIntroducedString) => {
       if (!hasBeenIntroducedString) {
@@ -60,16 +76,10 @@ class SelectCategory extends React.Component {
       }
     });
 
-    /*
-    Contacts.getAll((err, contacts) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(contacts);
-        AsyncStorage.setItem('userContacts', JSON.stringify(contacts));
-      }
-    });
-    */
+    if (this.props.route.refresh) {
+      this.checkIfRemoteSecretsReceived();
+    }
+
   }
 
   render(){
@@ -127,5 +137,7 @@ class SelectCategory extends React.Component {
 var styles = StyleSheet.create({
 
 });
+
+ReactMixin(SelectCategory.prototype, ReactTimer);
 
 module.exports = SelectCategory;
