@@ -11,6 +11,17 @@ import {
 } from 'react-native';
 
 class Secret extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: this.props.count
+    };
+  }
+
+  updateCount(newNumber) {
+    this.setState({count: newNumber});
+  }
+
   render() {
     return (
       <View style={styles.secretContainer}>
@@ -24,17 +35,17 @@ class Secret extends React.Component {
           </View>
         </TouchableHighlight>
         <View style={styles.voteContainer}>
-          <TouchableHighlight style={styles.upVote} onPress={this.props.upvote} underlayColor={StylingGlobals.colors.accentPressDown}>
+          <TouchableHighlight style={styles.upVote} onPress={() => { this.props.upvote(); this.updateCount(this.state.count + 1) } } underlayColor={StylingGlobals.colors.accentPressDown}>
             <Image 
               source={require("../img/arrow-up.png")}
               style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'upvote' ? styles.active : null]} />   
           </TouchableHighlight>
-          <TouchableHighlight style={styles.downVote} onPress={this.props.downvote} underlayColor={StylingGlobals.colors.accentPressDown}>
+          <TouchableHighlight style={styles.downVote} onPress={() => { this.props.downvote(); this.updateCount(this.state.count - 1) } } underlayColor={StylingGlobals.colors.accentPressDown}>
             <Image 
               source={require("../img/arrow-down.png")}
               style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'downvote' ? styles.active : null]} />   
           </TouchableHighlight>
-          <Text style={styles.count}>{this.props.count}</Text>
+          <Text style={styles.count}>{this.state.count}</Text>
         </View>
       </View>
     )

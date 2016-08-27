@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import StylingGlobals from '../StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import Secret from '../Components/SelectableSecret.js';
+import ActivityIndicator from '../Components/ActivityIndicator.js';
 import {
   StyleSheet,
   Text,
@@ -19,15 +20,22 @@ class SelectSecret extends React.Component {
     super(props);
     this.state = {
       source: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-      uid: ''
+      warning: false,
+      animating: true,
     }
     this.secrets = [];
+    this.knownUser = false;
     this.publicSecrets = this.props.db.child('publicSecrets').child(this.props.route.category);
+  }
+
+  // Needs to be moved to common utils
+  toggleActivityIndicator() {
+    this.setState({animating: !this.state.animating});
   }
 
   postUsersVote(theVote, key) {
     var updateData = {};
-    updateData[this.state.uid] = theVote;
+    updateData[this.knownUser] = theVote;
     this.publicSecrets.child(key).child('votes').update(updateData)
   }
 
@@ -40,40 +48,18 @@ class SelectSecret extends React.Component {
     });
   }
 
-  vote(action, currentState, key) {
-    if (this.state.uid) { // Known user
-      if (!currentState) { // First vote
-        if (action === 'upvote') {
-          this.postUsersVote('upvote', key);
-          this.postVoteAmt(1, key);
-        } else if (action === 'downvote') {
-          this.postUsersVote('downvote', key);
-          this.postVoteAmt(-1, key);
-        }
-      } else if (currentState === 'upvote' && action === 'downvote') { // Reverse vote
-        this.postUsersVote('downvote', key);
-        this.postVoteAmt(-2, key);
-      } else if (currentState === 'downvote' && action === 'upvote') {
-        this.postUsersVote('upvote', key);
-        this.postVoteAmt(2, key);
-      } 
-      /*
-      var foo = this.secrets[0]
-      foo.score = 1;
-      this.setState(foo); // This does update state on this 
-      */
-      /*
-      var foo; // Allows unlimited voting for dev purposes.
-      if (action === 'upvote') {
-        foo = 1;
-      } else if (action === 'downvote') {
-        foo = -1;
+  // problems: voteState doesn't update without an app refresh, probably need to save secrets locally and check that
+  vote(action, voteState, key, voteAmt) {
+    if (this.knownUser) { 
+      if (!voteState) { // First vote
+        this.postUsersVote(action, key);
+        this.postVoteAmt(voteAmt, key);
+      } else if (voteState !== action) { // Reverse vote
+        this.postUsersVote(action, key);
+        this.postVoteAmt((voteAmt * 2), key);
       }
-      this.postUsersVote(action, key);
-      this.postVoteAmt(foo, key);
-      */
     } else {
-      // TODO handling for user unknown
+      this.setState({warning: true});
     }
   }
 
@@ -82,7 +68,7 @@ class SelectSecret extends React.Component {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
         if (user_data.uid) {
-          this.setState({uid: user_data.uid});
+          this.knownUser = user_data.uid;
         } 
       }
     });
@@ -98,12 +84,13 @@ class SelectSecret extends React.Component {
     this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
       var secret = snapshot.val();
       secret.key = snapshot.key();
-      secret.vote = secret.votes[this.state.uid];
+      secret.vote = secret.votes[this.knownUser];
       delete secret.votes;
       this.secrets.push(secret);
       this.setState({
         source: this.state.source.cloneWithRows(this.secrets)
-      })
+      });
+      this.toggleActivityIndicator();
     }, function (errorObject) {
       console.log("The read failed: " + errorObject.code); // TODO real error handling
     })
@@ -112,6 +99,8 @@ class SelectSecret extends React.Component {
   render() {
     return (
       <View style={StylingGlobals.container}>
+        <ActivityIndicator animationControl={this.state.animating}/>
+        {this.state.warn ? <Text style={styles.warning}>You must login to vote</Text> : null }
         <ListView
           dataSource= {
             this.state.source
@@ -121,10 +110,17 @@ class SelectSecret extends React.Component {
               <Secret 
                 secretText={rowData.text}
                 count={rowData.score} 
+                key={rowData.key}
                 selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData, contacts: this.state.contacts})}} 
                 vote={rowData.vote}
-                upvote={() => this.vote('upvote', rowData.vote, rowData.key)}
-                downvote={() => this.vote('downvote', rowData.vote, rowData.key)}
+                upvote={() => { 
+                    this.vote('upvote', rowData.vote, rowData.key, 1); 
+                  }  
+                }
+                downvote={() => { 
+                    this.vote('downvote', rowData.vote, rowData.key, -1); 
+                  } 
+                }
               />
             )
           }} />
@@ -138,7 +134,12 @@ var styles = StyleSheet.create({
   secretContainer: {
     height: 50,
     marginBottom: 50,
-  }
+  },
+  warning: {
+    textAlign: 'center',
+    color: StylingGlobals.colors.mainColor,
+    marginTop: 5,
+  },
 });
 
 
