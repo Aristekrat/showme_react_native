@@ -18,8 +18,11 @@ class Secret extends React.Component {
     };
   }
 
-  updateCount(newNumber) {
-    this.setState({count: newNumber});
+  updateCount(newNumber, action) {
+    let key = this.props.id;
+    if (!this.state[key] || this.state[key] !== action) {
+      this.setState({count: newNumber, [key]: action});
+    } 
   }
 
   render() {
@@ -35,12 +38,12 @@ class Secret extends React.Component {
           </View>
         </TouchableHighlight>
         <View style={styles.voteContainer}>
-          <TouchableHighlight style={styles.upVote} onPress={() => { this.props.upvote(); this.updateCount(this.state.count + 1) } } underlayColor={StylingGlobals.colors.accentPressDown}>
+          <TouchableHighlight style={styles.upVote} onPress={() => { this.props.upvote(); this.updateCount(this.state.count + 1, 'upvote') } } underlayColor={StylingGlobals.colors.accentPressDown}>
             <Image 
               source={require("../img/arrow-up.png")}
               style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'upvote' ? styles.active : null]} />   
           </TouchableHighlight>
-          <TouchableHighlight style={styles.downVote} onPress={() => { this.props.downvote(); this.updateCount(this.state.count - 1) } } underlayColor={StylingGlobals.colors.accentPressDown}>
+          <TouchableHighlight style={styles.downVote} onPress={() => { this.props.downvote(); this.updateCount(this.state.count - 1, 'downvote') } } underlayColor={StylingGlobals.colors.accentPressDown}>
             <Image 
               source={require("../img/arrow-down.png")}
               style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'downvote' ? styles.active : null]} />   

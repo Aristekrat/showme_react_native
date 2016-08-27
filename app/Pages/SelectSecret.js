@@ -36,7 +36,7 @@ class SelectSecret extends React.Component {
   postUsersVote(theVote, key) {
     var updateData = {};
     updateData[this.knownUser] = theVote;
-    this.publicSecrets.child(key).child('votes').update(updateData)
+    this.publicSecrets.child(key).child('votes').update(updateData);
   }
 
   postVoteAmt(voteAmt, key) {
@@ -49,14 +49,18 @@ class SelectSecret extends React.Component {
   }
 
   // problems: voteState doesn't update without an app refresh, probably need to save secrets locally and check that
+  // Need to streamline all the checks, perhaps split it up or figure out a system that can do it all once. 
   vote(action, voteState, key, voteAmt) {
-    if (this.knownUser) { 
-      if (!voteState) { // First vote
-        this.postUsersVote(action, key);
-        this.postVoteAmt(voteAmt, key);
-      } else if (voteState !== action) { // Reverse vote
-        this.postUsersVote(action, key);
-        this.postVoteAmt((voteAmt * 2), key);
+    if (this.knownUser) {
+      if (!this.state[key] || this.state[key] !== action) {
+        this.setState({[key]: action}) 
+        if (!voteState) { // First vote
+          this.postUsersVote(action, key);
+          this.postVoteAmt(voteAmt, key);
+        } else if (voteState !== action) { // Reverse vote
+          this.postUsersVote(action, key);
+          this.postVoteAmt((voteAmt * 2), key);
+        }
       }
     } else {
       this.setState({warning: true});
@@ -111,6 +115,7 @@ class SelectSecret extends React.Component {
                 secretText={rowData.text}
                 count={rowData.score} 
                 key={rowData.key}
+                id={rowData.key}
                 selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData, contacts: this.state.contacts})}} 
                 vote={rowData.vote}
                 upvote={() => { 
