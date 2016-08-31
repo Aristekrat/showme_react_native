@@ -75,19 +75,6 @@ class SignIn extends React.Component {
         self.users.child(userData.uid).set({email: email, secrets: {} });
         self.usersIndex.child(t).set(true);
         this.loginUser();
-        /*self.props.db.authWithPassword({ // I should just call login here
-          email: self.state.username,
-          password: self.state.password
-        }, function (error, authData) {
-          if (error) {
-            // err handling
-          } else {
-            self.toggleActivityIndicator();
-            self.setState({response: 'Success.'});
-            Utility.setLocalAuth(true);
-            self.props.navigator.push({name: 'SelectCategory'});
-          }
-        }) */
       }
     }) // End parent function
   }

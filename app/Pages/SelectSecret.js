@@ -52,7 +52,7 @@ class SelectSecret extends React.Component {
   // Need to streamline all the checks, perhaps split it up or figure out a system that can do it all once. 
   vote(action, voteState, key, voteAmt) {
     if (this.knownUser) {
-      if (!this.state[key] || this.state[key] !== action) {
+      if (!this.state[key] || this.state[key] !== action) { // Checks the local record of voting history, if no vote or diff vote...
         this.setState({[key]: action}) 
         if (!voteState) { // First vote
           this.postUsersVote(action, key);

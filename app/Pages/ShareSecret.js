@@ -37,7 +37,6 @@ const dummy = [
     givenName: 'Billie',
     thumbnailPath: '',
     phoneNumbers: [ { number: '(222) 886-0400', label: 'mobile' } ],
-    familyName: 'Unterfend',
     emailAddresses: [],
     recordID: 76 
   },
@@ -66,8 +65,22 @@ class UserContacts extends React.Component {
     super(props);
     this.state = {
       contact: 0,
-      ph: dummy[0].phoneNumbers[0].number,
+      ph: dummy[0].phoneNumbers[0].number, // dummy ref, change this
+      firstName: dummy[0].givenName,
     } 
+  }
+
+  // Currently just adds a blank family name if none exists
+  filterSecrets() {
+    dummy.map((contact, index) => { // dummy ref, change this
+      if (!contact.familyName) {
+        contact.familyName = "";
+      }
+    })
+  }
+
+  componentWillMount() {
+    this.filterSecrets();
   }
 
   render () {
@@ -77,7 +90,7 @@ class UserContacts extends React.Component {
           selectedValue={this.state.contact}
           onValueChange={
             (contactIndex) => {
-              this.setState({ph: dummy[contactIndex].phoneNumbers[0].number, contact: contactIndex});
+              this.setState({ph: dummy[contactIndex].phoneNumbers[0].number, contact: contactIndex, firstName: dummy[contactIndex].givenName}); // dummy ref, change this
             } 
           }>
           {dummy.map((contact, index) => (
@@ -99,10 +112,52 @@ class ShareSecret extends React.Component {
       ph: '',
       uid: '',
       contacts: '',
+      informationNeeded: 'ReceiverNumber',
     }
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
+    this.phIndex = this.props.db.child('phoneNumberIndex');
     this.currentSecret = this.props.route.cookieData;
+  }
+
+  lookup(receiverPH, firstName) {
+    if (this.state.informationNeeded === 'SenderNumber') {
+      this.phIndex.child(this.state.uid).set(this.state.userPH);
+      // this.sendText(receiverPH);
+      // Full success flow
+    } else {
+      this.phIndex.once('value', (snapshot) => {
+        let phIndex = snapshot.val();
+        let phKeys = Object.keys(phIndex)
+        let lastKey = phKeys[phKeys.length - 1];
+        if (!snapshot.hasChild(this.state.uid)) {
+          this.setState({informationNeeded: 'SenderNumber'});
+        } else {
+          const senderPH = phIndex[this.state.uid];
+          let receiverId = this.checkForReceiverId(phIndex, lastKey, receiverPH);
+          let privateSecretUpdate = {
+            responderID: receiverId,
+            responderPH: receiverPH,
+            responderName: firstName,
+            askerPH: senderPH
+          };
+          this.updateSentStatus(privateSecretUpdate);
+          //this.sendText(receiverPH);
+        }
+      });
+    }
+  }
+
+  checkForReceiverId(phoneNumberIndex, lastKey, receiverPH) {
+    for (var key in phoneNumberIndex) {
+      if (receiverPH === phoneNumberIndex[key]) {
+        return key // Receiving user known
+      } else if (key === lastKey) {
+        return "" // Iteration is at an end
+      } else {
+        continue;
+      }
+    }
   }
 
   sendText(phoneNumber) {   
@@ -132,28 +187,21 @@ class ShareSecret extends React.Component {
     );
   }
 
-  tempFunc() {
-    var other;
-    if (this.currentSecret.askerID === '25c07e84-dca3-415e-9f61-f2a6a6d6147a') {
-      other = '5fc1427d-6be6-4e06-b71e-4bc64a251ff1';
-    } else {
-      other = '25c07e84-dca3-415e-9f61-f2a6a6d6147a';
-    }
-    return other; 
-  }
-
-  updateSentStatus() {
-    var responderId = this.tempFunc();
+  updateSentStatus(updatedSecret) {
+    /*var responderId = this.tempFunc();
     var updatedSecret = {
       responderID: responderId,
-    };
+      responderPH: this.state.ph,
+    };*/
     this.privateSecrets.child(this.currentSecret.key).update(updatedSecret);
     this.users.child(this.currentSecret.askerID).child('secrets').child(this.currentSecret.key).update({sentState: 'QS'});
-    this.users.child(responderId).child('secrets').child(this.currentSecret.key).update({sentState: 'RR'});
+    if (updatedSecret.responderID) {
+      this.users.child(responderId).child('secrets').child(this.currentSecret.key).update({sentState: 'RR'});
+    }
   }
 
   componentWillMount() {
-    //console.log("OMGHERE", this.props.route.contacts); Getting it.
+    //console.log(this.props.route.contacts); Getting it.
   }
 
   componentDidMount() {
@@ -169,16 +217,37 @@ class ShareSecret extends React.Component {
   }
 
   render() {
+    let theAsk;
+    let topMessage;
+    let middleMessage;
+    let bottomMessage;
+    switch(this.state.informationNeeded) {
+      case "ReceiverNumber":
+        topMessage = <Text style={styles.prompt}>Choose who you want to send to...</Text>
+        theAsk = <UserContacts ref="userContacts" />
+        middleMessage = <Text style={styles.label}>You'll have a chance to review before you send</Text>
+        bottomMessage = <Text style={styles.exclusive}>Show Me is exclusively available on iPhones</Text>
+        break;
+      case "SenderNumber":
+        topMessage = <Text style={styles.prompt}>Please enter your phone number</Text>
+        theAsk = <TextInput 
+                    style={styles.textInput}
+                    onChangeText={(PH) => this.setState({userPH: PH})}
+                    selectionColor={StylingGlobals.colors.navColor} />
+        middleMessage = null;
+        bottomMessage = <Text style={styles.exclusive}>Sorry, we will only need to do this once</Text>
+        break;
+    }
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
-          <Text style={styles.prompt}>Choose who you want to send to...</Text>
-          <UserContacts ref="userContacts" />
-          <Text style={styles.label}>You'll have a chance to review before you send</Text>
-          <BigButton do={() => this.sendText(this.refs.userContacts.state.ph)}>
+          {topMessage}
+          {theAsk}
+          {middleMessage}
+          <BigButton do={() => this.lookup(this.refs.userContacts.state.ph, this.refs.userContacts.state.firstName)}>
             Continue
           </BigButton>
-          <Text style={styles.exclusive}>Show Me is exclusively available on iPhones</Text>
+          {bottomMessage}
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
@@ -193,6 +262,17 @@ var styles = StyleSheet.create({
   },
   userContacts: {
     marginTop: -20,
+  },
+  textInput: {
+    height: 50,
+    padding: 2,
+    marginTop: 4,
+    marginBottom: 8,
+    marginLeft: 30,
+    borderColor: '#eee',
+    borderWidth: 1,
+    width: 350,
+    backgroundColor: '#fff'
   },
   label: {
     marginLeft: 30,
