@@ -13,7 +13,8 @@
     "react-native-contacts": "^0.3.0",
     "react-native-fbsdk": "^0.2.0",
     "react-native-message-composer": "0.0.4",
-    "react-timer-mixin": "^0.13.3"
+    "react-timer-mixin": "^0.13.3",
+    "sha1": "^1.1.1"
   },
   "devDependencies": {
     "gulp-watch": "^4.3.8"

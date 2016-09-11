@@ -17,10 +17,7 @@ import {
   AsyncStorage,
 } from 'react-native';
  
-//import Communications from 'react-native-communications';
-//import Composer from 'react-native-message-composer';
 var Composer = require('NativeModules').RNMessageComposer;
-//onValueChange={(contact) => this.setState({category, index: 0})}>
 
 const PickerItemIOS = PickerIOS.Item;
 
@@ -227,7 +224,7 @@ class ShareSecret extends React.Component {
         theAsk = <UserContacts ref="userContacts" />
         middleMessage = <Text style={styles.label}>You'll have a chance to review before you send</Text>
         bottomMessage = <Text style={styles.exclusive}>Show Me is exclusively available on iPhones</Text>
-        break;
+        break; 
       case "SenderNumber":
         topMessage = <Text style={styles.prompt}>Please enter your phone number</Text>
         theAsk = <TextInput 

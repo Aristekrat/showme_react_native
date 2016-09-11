@@ -74,12 +74,12 @@ class SignIn extends React.Component {
         var t = Utility.escapeEmail(email)
         self.users.child(userData.uid).set({email: email, secrets: {} });
         self.usersIndex.child(t).set(true);
-        this.loginUser();
+        this.loginUser(true);
       }
     }) // End parent function
   }
 
-  loginUser() {
+  loginUser(registrationFlag) {
     var self = this; 
     let email = this.state.username.trim();
     this.toggleActivityIndicator();
@@ -97,8 +97,12 @@ class SignIn extends React.Component {
         AsyncStorage.setItem('userData', JSON.stringify(userData));
         Utility.setLocalAuth(true);
         GetSecrets.getRemoteSecrets();
-        this.props.navigator.push({name: 'SelectCategory', refresh: true});
-      }
+        if (!registrationFlag) {
+          this.props.navigator.push({name: 'SelectCategory', refresh: true});
+        } else {
+          this.props.navigator.push({name: 'RegistrationInterim', refresh: false});
+        }
+      } 
     })
   }
 

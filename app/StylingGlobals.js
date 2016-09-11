@@ -29,7 +29,7 @@ var globalStyling = {
 	    flexDirection: 'row', 
 	    justifyContent: 'center', 
 	    alignItems: 'center'		
-	},
+	}
 }
 
 module.exports = globalStyling;

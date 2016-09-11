@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import SelectCategory from './app/Pages/SelectCategory.js';
 import SelectSecret from './app/Pages/SelectSecret.js';
 import ShareSecret from './app/Pages/ShareSecret.js';
+import SecretCode from './app/Pages/SecretCode.js';
 import MySecrets from './app/Pages/MySecrets.js';
 import YourAnswer from './app/Pages/YourAnswer.js';
 import MyAccount from './app/Pages/MyAccount.js';
@@ -11,6 +12,8 @@ import CreateYourOwn from './app/Pages/CreateYourOwn.js';
 import SignIn from './app/Pages/SignIn.js';
 import StylingGlobals from './app/StylingGlobals.js';
 import Gateway from './app/Pages/Gateway.js';
+import ClaimSecret from './app/Pages/ClaimSecret.js';
+import RegistrationInterim from './app/Pages/RegistrationInterim.js';
 import Utility from './app/Globals/UtilityFunctions.js';
 import GetSecrets from './app/Globals/GetSecrets.js';
 import ReactMixin from 'react-mixin';
@@ -41,6 +44,7 @@ var NavigationBarRouteMapper = {
         case 'SelectCategory':
         case 'SelectSecret':
         case 'ShareSecret':
+        case 'SecretCode':
         case 'CreateSecret':
         case 'MySecrets':
         case 'MyAccount':
@@ -48,6 +52,8 @@ var NavigationBarRouteMapper = {
         case 'Register':
         case 'YourAnswer':
         case 'Facebook':
+        case 'RegistrationInterim':
+        case 'ClaimSecret':
           return (
             <TouchableHighlight 
               onPress={() => navigator.pop()} 
@@ -103,6 +109,10 @@ var NavigationBarRouteMapper = {
         return (
           <Text style={styles.navBarTitleText}>Share Secret</Text>
         );
+      case 'SecretCode':
+        return (
+          <Text style={styles.navBarTitleText}>Create Secret Code</Text>
+        );
       case 'CreateSecret':
         return (
           <Text style={styles.navBarTitleText}>Create Secret</Text>
@@ -120,8 +130,13 @@ var NavigationBarRouteMapper = {
           <Text style={styles.navBarTitleText}>Sign In</Text>
         );      
       case 'Register':
+      case 'RegistrationInterim':  
         return (
           <Text style={styles.navBarTitleText}>Register</Text>
+        ); 
+      case 'ClaimSecret':
+        return (
+          <Text style={styles.navBarTitleText}>Claim Secret</Text>
         );
       default: 
         return (
@@ -147,7 +162,6 @@ class ShowMe extends React.Component {
     this.setNotificationCount(); 
     this.listenForUpdatesToSecrets(); 
     GetSecrets.pushSecretsToAsyncStore();
-    //AsyncStorage.setItem('secrets', JSON.stringify(this.state.remoteSecrets)); // Replace this with a GetSecrets func
   }    
 
   // Waits until all remote secrets are received then calls the implementation function
@@ -282,6 +296,10 @@ class ShowMe extends React.Component {
         return (
           <ShareSecret navigator={navigator} route={route} db={this.db} />
         );
+      case 'SecretCode':
+        return (
+          <SecretCode navigator={navigator} route={route} db={this.db} />
+        );
       case 'CreateSecret':
         return (
           <CreateYourOwn navigator={navigator} route={route} db={this.db}/>
@@ -293,11 +311,19 @@ class ShowMe extends React.Component {
       case 'MyAccount':
         return (
           <MyAccount navigator={navigator} route={route} />
-        );  
+        );
+      case 'ClaimSecret':
+        return (
+          <ClaimSecret navigator={navigator} route={route} db={this.db} />
+        );    
       case 'SignIn':
       case 'Register':
         return (
           <SignIn navigator={navigator} route={route} db={this.db}/>
+        );
+      case 'RegistrationInterim':
+        return (
+          <RegistrationInterim navigator={navigator} route={route}/>
         );
       default:
         return (
@@ -319,7 +345,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "SelectCategory"
+          name: "SecretCode"
         }} />
     );
   }
