@@ -15,9 +15,11 @@ class SModal extends React.Component {
       modalVisible: false,
     };
   }
+
   setModalVisible(boolArg) {
     this.setState({modalVisible: boolArg});
   }
+
   render() {
     return (
       <Modal 
@@ -50,6 +52,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     borderColor: StylingGlobals.colors.pressDown,
     borderWidth: 1,
+    width: 320,
   },
   modalText: {
     color: '#fff',

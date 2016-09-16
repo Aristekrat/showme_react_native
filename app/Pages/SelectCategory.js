@@ -79,7 +79,13 @@ class SelectCategory extends React.Component {
     if (this.props.route.refresh) {
       this.checkIfRemoteSecretsReceived();
     }
+  }
 
+  componentDidMount() {
+    if (this.props.route.modalText) {
+      this.refs.smodal.setModalVisible(true);
+      this.setState({modalText: this.props.route.modalText});
+    }
   }
 
   render(){
@@ -115,7 +121,7 @@ class SelectCategory extends React.Component {
             imgSource={require("../img/caticon-past.png")} // music-player17
             elsewhere={this.selectThisCategory.bind(this, this.categories[6].title, SelectSecret)} />
         </ScrollView>
-        <SModal modalText={"Use this menu to create a new secret or select a premade secret"} ref="smodal" />
+        <SModal modalText={this.state.modalText} ref="smodal" />
         <TabBar 
           navigator={this.props.navigator} 
           route={this.props.route} 
@@ -124,7 +130,7 @@ class SelectCategory extends React.Component {
           ref="tabbar"
           introPopup={this.state.hasBeenIntroduced ? null : () => { 
               this.refs.smodal.setModalVisible(true); 
-              this.setState({hasBeenIntroduced: true}); 
+              this.setState({hasBeenIntroduced: true, modalText: 'Use this menu to create a new secret or select a premade secret'}); 
               this.sawIntro();
             } 
           }

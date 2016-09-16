@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import SelectCategory from './app/Pages/SelectCategory.js';
 import SelectSecret from './app/Pages/SelectSecret.js';
 import ShareSecret from './app/Pages/ShareSecret.js';
+import AskNumber from './app/Pages/AskNumber.js';
 import SecretCode from './app/Pages/SecretCode.js';
 import MySecrets from './app/Pages/MySecrets.js';
 import YourAnswer from './app/Pages/YourAnswer.js';
@@ -44,6 +45,7 @@ var NavigationBarRouteMapper = {
         case 'SelectCategory':
         case 'SelectSecret':
         case 'ShareSecret':
+        case 'AskNumber':
         case 'SecretCode':
         case 'CreateSecret':
         case 'MySecrets':
@@ -109,6 +111,10 @@ var NavigationBarRouteMapper = {
         return (
           <Text style={styles.navBarTitleText}>Share Secret</Text>
         );
+      case 'AskNumber':
+        return (
+          <Text style={styles.navBarTitleText}>Your Number</Text>
+        );  
       case 'SecretCode':
         return (
           <Text style={styles.navBarTitleText}>Create Secret Code</Text>
@@ -296,6 +302,10 @@ class ShowMe extends React.Component {
         return (
           <ShareSecret navigator={navigator} route={route} db={this.db} />
         );
+      case 'AskNumber':
+        return (
+          <AskNumber navigator={navigator} route={route} db={this.db} />
+        );  
       case 'SecretCode':
         return (
           <SecretCode navigator={navigator} route={route} db={this.db} />
@@ -345,7 +355,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "SecretCode"
+          name: "ShareSecret"
         }} />
     );
   }

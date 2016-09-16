@@ -5,6 +5,7 @@ import TabBar from '../Components/TabBar.js';
 import generator from '../Components/CodeGenerator/CodeGenerator.js';
 import StylingGlobals from '../StylingGlobals.js';
 import BigButton from '../Components/BigButton.js';
+import SendSecret from '../Globals/SendSecret.js';
 import {
   StyleSheet,
   Text,
@@ -46,6 +47,7 @@ class SecretCode extends React.Component {
     if (this.state.code) {
       var verificationEntry = {}
       this.verificationIndex.child(filteredPH).set(this.state.code);
+      SendSecret.success();
     } else {
       // Tell them to not be jerks
     }
@@ -68,9 +70,9 @@ class SecretCode extends React.Component {
             Submit
           </BigButton> 
           <Text style={styles.or}>- or -</Text>
-          <Text style={styles.paragraph}>Have us make one for you</Text>
+          <Text style={styles.paragraph}>Have us make a secret code for you</Text>
           <BigButton do={() => this.generate()}>
-            {this.state.generated ? "Make another" : "Make one for Me"}
+            {this.state.generated ? "Make Another" : "Make one for Me"}
           </BigButton>        
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
@@ -78,6 +80,12 @@ class SecretCode extends React.Component {
     );
   }
 }
+
+/*
+          <BigButton do={() => this.createCode('(444) 513-0548')}>
+            Submit
+          </BigButton> 
+*/
 
 var styles = StyleSheet.create({
   header: {
