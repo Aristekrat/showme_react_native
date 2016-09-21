@@ -116,7 +116,7 @@ class SelectSecret extends React.Component {
                 count={rowData.score} 
                 key={rowData.key}
                 id={rowData.key}
-                selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData, contacts: this.state.contacts})}} 
+                selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData, publicSecret: true, contacts: this.state.contacts})}} 
                 vote={rowData.vote}
                 upvote={() => { 
                     this.vote('upvote', rowData.vote, rowData.key, 1); 

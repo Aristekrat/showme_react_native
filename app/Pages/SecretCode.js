@@ -42,12 +42,13 @@ class SecretCode extends React.Component {
     this.setState({code: secretCode.join('')});
   }
 
-  createCode(ph) {
-    var filteredPH = ph.replace(/[^0-9 ]/g, "").split(' ').join('');
+  createCode() {
+    let psKey = this.props.route.key;
+    let ph = this.props.route.receiverPH;
+    let filteredPH = ph.replace(/[^0-9 ]/g, "").split(' ').join('');
     if (this.state.code) {
-      var verificationEntry = {}
-      this.verificationIndex.child(filteredPH).set(this.state.code);
-      SendSecret.success();
+      this.verificationIndex.child(psKey).set(this.state.code);
+      SendSecret.router(this.state.code, true);
     } else {
       // Tell them to not be jerks
     }
@@ -66,7 +67,7 @@ class SecretCode extends React.Component {
             onChangeText={(text) => this.setState({code})}
             value={this.state.code} />
           <Text style={styles.paragraph}>We'll use this to securely identify your friend</Text>
-          <BigButton do={() => this.createCode('(444) 513-0548')}>
+          <BigButton do={() => this.createCode()}>
             Submit
           </BigButton> 
           <Text style={styles.or}>- or -</Text>

@@ -3,35 +3,32 @@ import Utility from './UtilityFunctions.js';
 import {
   AsyncStorage
 } from 'react-native';
-
 const Composer = require('NativeModules').RNMessageComposer;
-
-// Need to write a function that checks next steps or just rewrite the lookup function to do so
 
 const SendSecret = {
   DB: Utility.getRef(),
-  //phIndex: this.DB.child('indexes').child('phoneNumberIndex'),
-  //users: this.DB.child('users'),
-  //privateSecrets: this.DB.child('privateSecrets'),
 
   // Needs the uid, but it's the only one. Can call it as an arg. 
-  saveArgs: function (receiverPH, receiverName, senderUID, props) {
+  saveArgs: function (receiverPH, receiverName, senderUID, key, props) {
     this.receiverPH = receiverPH;
     this.receiverName = receiverName;
     this.senderUID = senderUID;
+    this.key = key;
     this.navigator = props.navigator;
     this.route = props.route;
   },
 
   // Probably want to preload this data on the ShareSecret page
   // Get it all working first
-  router: function () {
+  // Save the results of the prior check and don't rerun it
+  router: function (secretCode, sendCode) {
     this.DB.child('indexes').child('phoneNumberIndex').once('value', (snapshot) => { 
       let phIndex = snapshot.val();
       let phKeys = Object.keys(phIndex)
       let receiverId = this.checkForReceiverId(phIndex, phKeys[phKeys.length - 1], this.receiverPH);
-      if (!receiverId) {
-        this.navigator.push({name: 'SecretCode'});
+
+      if (!receiverId && !sendCode) {
+        this.navigator.push({name: 'SecretCode', cookieData: this.route.cookieData, key: this.key, receiverPH: this.receiverPH});
       } else {
         const senderPH = snapshot.hasChild(this.senderUID) ? phIndex[this.senderUID] : '';
         let privateSecretUpdate = {
@@ -40,24 +37,9 @@ const SendSecret = {
           responderName: this.receiverName,
           askerPH: senderPH,
         };
-        this.updateSentStatus(privateSecretUpdate, this.route.cookieData);
+        this.updateSentStatus(privateSecretUpdate);
         //this.sendText(this.receiverPH);
       }
-    });
-  },
-
-  success: function () {
-    this.DB.child('indexes').child('phoneNumberIndex').once('value', (snapshot) => { 
-      let phIndex = snapshot.val();
-      const senderPH = snapshot.hasChild(this.senderUID) ? phIndex[this.senderUID] : '';
-      let privateSecretUpdate = {
-        responderID: receiverId,
-        responderPH: this.receiverPH,
-        responderName: this.receiverName,
-        askerPH: senderPH,
-      };
-      this.updateSentStatus(privateSecretUpdate, this.route.cookieData);
-      this.sendText(this.receiverPH);
     });
   },
 
@@ -86,9 +68,9 @@ const SendSecret = {
     }
   },
 
-  sendText: function(phoneNumber) {   
+  sendText: function(phoneNumber, secretCode) {   
     Composer.composeMessageWithArgs({
-        'messageText': 'I want to share a secret with you: ',
+        'messageText': 'I want to share a secret with you: <url> Your secret code is "' + secretCode + '"',
         'subject':'My Sample Subject',
         'recipients': [phoneNumber]
     }, (result) => {
@@ -115,14 +97,14 @@ const SendSecret = {
     );
   },
 
-  //this.currentSecret = this.props.route.cookieData;
-  updateSentStatus: function(updatedSecret, currentSecret) {
-    this.DB.child('privateSecrets').child(currentSecret.key).update(updatedSecret); //DB Dependency
-    this.DB.child('users').child(currentSecret.askerID).child('secrets').child(currentSecret.key).update({sentState: 'QS'}); // currentSecret dependency
+  updateSentStatus: function(updatedSecret) {
+    this.DB.child('privateSecrets').child(this.key).update(updatedSecret); //DB Dependency
+    this.DB.child('users').child(this.senderUID).child('secrets').child(this.key).update({sentState: 'QS'});
     if (updatedSecret.responderID) {
-      this.DB.child('users').child(responderId).child('secrets').child(currentSecret.key).update({sentState: 'RR'}); // DB Dependency
+      this.DB.child('users').child(updatedSecret.responderID).child('secrets').child(this.key).update({sentState: 'RR'}); // DB Dependency
     }
   },
+
 }
 
 module.exports = SendSecret;

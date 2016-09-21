@@ -77,6 +77,7 @@ class CreateYourOwn extends React.Component {
   }
 
   // Adds a secret to the asyncstore after it is created, so it's visible in MySecrets
+  // TODO Refactor to use the utility func
   addLocalSecret(localSecret) {
     localSecret.state = { answerState: 'NA', sentState: 'CR' },
     localSecret.answer = null;
@@ -103,6 +104,7 @@ class CreateYourOwn extends React.Component {
   }
 
   // Pushes to DB. If successful, does some data processing and starts the push to the local async store and calls the success func
+  // TODO Refactor to util func
   pushToPrivateSecrets() {
     let psData = {question: this.state.text, askerID: this.state.uid, askerName: '', responderID: '', responderName: ''};
     let privateSecret = this.privateSecrets.push(psData, (err, snapshot) => {

@@ -31,7 +31,7 @@ class Gateway extends React.Component {
       emailAddress: '',
       validEmail: true
     },
-    this.userIndex = this.props.db.child('userIndex');
+    this.userIndex = this.props.db.child('indexes').child('userIndex');
     this.users = this.props.db.child('users');
   }
 

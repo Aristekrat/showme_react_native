@@ -6,6 +6,7 @@ import BigButton from '../Components/BigButton.js';
 import UserContacts from '../Components/UserContacts.js';
 import TabBar from '../Components/TabBar.js';
 import SendSecret from '../Globals/SendSecret.js';
+import GetSecrets from '../Globals/GetSecrets.js';
 // import Contacts from 'react-native-contacts';
 
 import {
@@ -26,15 +27,35 @@ class ShareSecret extends React.Component {
     super(props);
     this.state = {
       ph: '',
+      key: this.props.route.cookieData.key,
     };
     uid: '';
-    //this.privateSecrets = this.props.db.child('privateSecrets');
-    //this.users = this.props.db.child('users');
-    //this.phIndex = this.props.db.child('phoneNumberIndex');
-    //this.currentSecret = this.props.route.cookieData;
+    this.privateSecrets = this.props.db.child('privateSecrets');
+    this.users = this.props.db.child('users');
+    this.answers = this.props.db.child('answers');
+  }
+  
+  pushPrivateSecret(uid) {
+    let psData = {question: this.props.route.cookieData.text, askerID: uid}
+    let privateSecret = this.privateSecrets.push(psData, (err, snapshot) => {
+      if (err) {
+        this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
+      } else {
+        var sKey = privateSecret.key();
+        let initialState = {answerState: 'NA', sentState: 'CR'};
+        this.answers.child(sKey).set({askerAnswer: '', responderAnswer: ''});
+        this.users.child(uid).child('secrets').child(sKey).set(initialState);
+        this.setState({key: sKey});
+        psData.key = sKey;
+        console.log(sKey);
+        psData.state = initialState;
+        psData.answer = null;
+        GetSecrets.pushLocalSecret(psData);
+      }
+    });
   }
 
-  componentDidMount() {
+  componentWillMount() {
     AsyncStorage.getItem('userData')
       .then((user_data_json) => {
         if (!user_data_json) {
@@ -42,6 +63,9 @@ class ShareSecret extends React.Component {
         } else {
           let user_data = JSON.parse(user_data_json);
           this.uid = user_data.uid;
+          if (this.props.route.publicSecret) {
+            this.pushPrivateSecret(user_data.uid);
+          }
         }
     });
   }
@@ -54,7 +78,7 @@ class ShareSecret extends React.Component {
           <UserContacts ref="userContacts" />
           <Text style={styles.label}>You'll have a chance to review before you send</Text>
           <BigButton do={() => 
-            { SendSecret.saveArgs(this.refs.userContacts.state.ph, this.refs.userContacts.state.firstName, this.uid, this.props);
+            { SendSecret.saveArgs(this.refs.userContacts.state.ph, this.refs.userContacts.state.firstName, this.uid, this.state.key, this.props);
               SendSecret.router() }}>
             Continue
           </BigButton>

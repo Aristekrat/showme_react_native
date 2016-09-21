@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import TabBar from '../Components/TabBar.js';
-//import generator from '../Components/CodeGenerator/CodeGenerator.js';
+import GetSecrets from '../Globals/GetSecrets.js';
 import StylingGlobals from '../StylingGlobals.js';
 import BigButton from '../Components/BigButton.js';
 import {
@@ -19,8 +19,29 @@ class ClaimSecret extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      code: ''
+      code: 'ImpoliteEnergy'
     }
+    this.verificationCodes = this.props.db.child('indexes').child('verificationCodes');
+    this.verifiedIndex = this.props.db.child('indexes').child('verified');
+  }
+
+  verifyCode() {
+    this.verificationCodes.orderByValue().equalTo(this.state.code).once('value', (snapshot) => {
+      let valReturned = snapshot.val();
+      if (valReturned) {
+        var codeKey = Object.keys(valReturned)[0];
+        AsyncStorage.getItem('userData').then((user_data_json) => { 
+          if (user_data_json) {
+            let user_data = JSON.parse(user_data_json);
+            //this.verifiedIndex.child(user_data.uid).set(true);
+            //this.verificationCodes.child(codeKey).remove();
+            //this.props.navigator.push({name: 'MySecrets'});
+          };
+        });
+      } else {
+        // Sorry, we can't find you
+      }
+    });
   }
 
   render(){
@@ -35,7 +56,7 @@ class ClaimSecret extends React.Component {
             autoFocus={true}
             onChangeText={(text) => this.setState({code})}
             value={this.state.code} />
-          <BigButton do={() => console.log("Hay there!")}>
+          <BigButton do={() => this.verifyCode()}>
             Submit
           </BigButton>        
         </ScrollView>
