@@ -7,6 +7,7 @@ const Composer = require('NativeModules').RNMessageComposer;
 
 const SendSecret = {
   DB: Utility.getRef(),
+  senderPH: "",
 
   // Needs the uid, but it's the only one. Can call it as an arg. 
   saveArgs: function (receiverPH, receiverName, senderUID, key, props) {
@@ -16,56 +17,53 @@ const SendSecret = {
     this.key = key;
     this.navigator = props.navigator;
     this.route = props.route;
+    this.lookUpIdWithPH(receiverPH, 'receiverId', true);
   },
 
-  // Probably want to preload this data on the ShareSecret page
-  // Get it all working first
-  // Save the results of the prior check and don't rerun it
-  router: function (secretCode, sendCode) {
-    this.DB.child('indexes').child('phoneNumberIndex').once('value', (snapshot) => { 
-      let phIndex = snapshot.val();
-      let phKeys = Object.keys(phIndex)
-      let receiverId = this.checkForReceiverId(phIndex, phKeys[phKeys.length - 1], this.receiverPH);
-
-      if (!receiverId && !sendCode) {
-        this.navigator.push({name: 'SecretCode', cookieData: this.route.cookieData, key: this.key, receiverPH: this.receiverPH});
-      } else {
-        const senderPH = snapshot.hasChild(this.senderUID) ? phIndex[this.senderUID] : '';
-        let privateSecretUpdate = {
-          responderID: receiverId,
-          responderPH: this.receiverPH,
-          responderName: this.receiverName,
-          askerPH: senderPH,
-        };
-        this.updateSentStatus(privateSecretUpdate);
-        //this.sendText(this.receiverPH);
-      }
-    });
-  },
-
-  checkForPH: function(uid) {
-    this.DB.child('indexes').child('phoneNumberIndex').once('value', (snapshot) => {
-      let phIndex = snapshot.val();
-      let phKeys = Object.keys(phIndex)
-      if (!snapshot.hasChild(uid)) {
-        this.navigator.push({name: 'AskNumber'});
-        //this.setState({informationNeeded: 'SenderNumber'}); // Change this to a move page signal
-      } else {
-        // PH Knownn
-      }
-    });
-  },
-
-  checkForReceiverId: function(phoneNumberIndex, lastKey, receiverPH) {
-    for (var key in phoneNumberIndex) {
-      if (receiverPH === phoneNumberIndex[key]) {
-        return key // Receiving user known
-      } else if (key === lastKey) {
-        return "" // Iteration is at an end
-      } else {
-        continue;
-      }
+  router: function (secretCode) {
+    if (secretCode) {
+      this.success();
+      //this.sendText(this.receiverPH, secretCode);
+    } else if (!this.receiverId) {
+      this.navigator.push({name: 'SecretCode', cookieData: this.route.cookieData, key: this.key, receiverPH: this.receiverPH});
+    } else {
+      this.success();
+      // Different sendText call
     }
+  },
+
+  success: function () {
+    let privateSecretUpdate = {
+      responderID: this.receiverId,
+      responderPH: this.receiverPH,
+      responderName: this.receiverName,
+      askerPH: this.senderPH,
+    };
+    this.updateSentStatus(privateSecretUpdate);
+  },
+
+  lookUpSenderPH: function (uid) {
+    this.DB.child('indexes').child('phoneNumberIndex').once('value', (snapshot) => {
+      if (snapshot.hasChild(uid)) {
+        let phIndex = snapshot.val();
+        this.senderPH = phIndex[uid];
+      } 
+    }); 
+  },
+
+  lookUpIdWithPH: function (ph, assignVal, routeAfter) {
+    this.DB.child('indexes').child('phoneNumberIndex').orderByValue().equalTo(ph).once('value', (snapshot) => { 
+      let valReturned = snapshot.val();
+      if (valReturned) {
+        this[assignVal] = Object.keys(valReturned)[0];
+      } else {
+        this[assignVal] = "";
+      }
+
+      if (routeAfter) {
+        this.router();
+      }
+    });
   },
 
   sendText: function(phoneNumber, secretCode) {   

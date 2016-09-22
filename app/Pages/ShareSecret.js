@@ -47,7 +47,6 @@ class ShareSecret extends React.Component {
         this.users.child(uid).child('secrets').child(sKey).set(initialState);
         this.setState({key: sKey});
         psData.key = sKey;
-        console.log(sKey);
         psData.state = initialState;
         psData.answer = null;
         GetSecrets.pushLocalSecret(psData);
@@ -66,6 +65,7 @@ class ShareSecret extends React.Component {
           if (this.props.route.publicSecret) {
             this.pushPrivateSecret(user_data.uid);
           }
+          SendSecret.lookUpSenderPH(user_data.uid);
         }
     });
   }
@@ -78,8 +78,8 @@ class ShareSecret extends React.Component {
           <UserContacts ref="userContacts" />
           <Text style={styles.label}>You'll have a chance to review before you send</Text>
           <BigButton do={() => 
-            { SendSecret.saveArgs(this.refs.userContacts.state.ph, this.refs.userContacts.state.firstName, this.uid, this.state.key, this.props);
-              SendSecret.router() }}>
+            { SendSecret.saveArgs(this.refs.userContacts.state.ph, this.refs.userContacts.state.firstName, this.uid, this.state.key, this.props); }
+          }>
             Continue
           </BigButton>
           <Text style={styles.exclusive}>Show Me is exclusively available on iPhones</Text>

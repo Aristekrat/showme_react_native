@@ -48,7 +48,7 @@ class SecretCode extends React.Component {
     let filteredPH = ph.replace(/[^0-9 ]/g, "").split(' ').join('');
     if (this.state.code) {
       this.verificationIndex.child(psKey).set(this.state.code);
-      SendSecret.router(this.state.code, true);
+      SendSecret.router(this.state.code);
     } else {
       // Tell them to not be jerks
     }
