@@ -7,6 +7,7 @@ import UserContacts from '../Components/UserContacts.js';
 import TabBar from '../Components/TabBar.js';
 import SendSecret from '../Globals/SendSecret.js';
 import GetSecrets from '../Globals/GetSecrets.js';
+import ActivityIndicator from '../Components/ActivityIndicator.js';
 // import Contacts from 'react-native-contacts';
 
 import {
@@ -28,6 +29,7 @@ class ShareSecret extends React.Component {
     this.state = {
       ph: '',
       key: this.props.route.cookieData.key,
+      animating: false,
     };
     uid: '';
     this.privateSecrets = this.props.db.child('privateSecrets');
@@ -39,7 +41,7 @@ class ShareSecret extends React.Component {
     let psData = {question: this.props.route.cookieData.text, askerID: uid}
     let privateSecret = this.privateSecrets.push(psData, (err, snapshot) => {
       if (err) {
-        this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
+        this.setState({error: "We're sorry, there was an error connecting to the server"})
       } else {
         var sKey = privateSecret.key();
         let initialState = {answerState: 'NA', sentState: 'CR'};
@@ -78,11 +80,15 @@ class ShareSecret extends React.Component {
           <UserContacts ref="userContacts" />
           <Text style={styles.label}>You'll have a chance to review before you send</Text>
           <BigButton do={() => 
-            { SendSecret.saveArgs(this.refs.userContacts.state.ph, this.refs.userContacts.state.firstName, this.uid, this.state.key, this.props); }
+            { 
+              this.setState({animating: true});
+              SendSecret.saveArgs(this.refs.userContacts.state.ph, this.refs.userContacts.state.firstName, this.uid, this.state.key, this.props); 
+            }
           }>
             Continue
           </BigButton>
           <Text style={styles.exclusive}>Show Me is exclusively available on iPhones</Text>
+          <ActivityIndicator animationControl={this.state.animating} />
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>

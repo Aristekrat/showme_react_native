@@ -112,7 +112,7 @@ class TabBar extends React.Component {
                 <View></View>
             </TabBarIOS.Item>
 
-            {Utility.foo ? null : <TabBarIOS.Item
+            {Utility.verified ? null : <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabThree'}
               onPress={() => this.setTab('tabThree')}
               title={"Claim Secret"}

@@ -28,7 +28,7 @@ const SendSecret = {
       this.navigator.push({name: 'SecretCode', cookieData: this.route.cookieData, key: this.key, receiverPH: this.receiverPH});
     } else {
       this.success();
-      // Different sendText call
+      // this.sendText(this.receiverPH, secretCode);
     }
   },
 

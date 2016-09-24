@@ -6,6 +6,7 @@ import generator from '../Components/CodeGenerator/CodeGenerator.js';
 import StylingGlobals from '../StylingGlobals.js';
 import BigButton from '../Components/BigButton.js';
 import SendSecret from '../Globals/SendSecret.js';
+import ActivityIndicator from '../Components/ActivityIndicator.js';
 import {
   StyleSheet,
   Text,
@@ -22,6 +23,7 @@ class SecretCode extends React.Component {
     this.state = {
       code: '',
       generated: false,
+      animating: false,
     }
     this.verificationIndex = this.props.db.child('indexes').child('verificationCodes');
   }
@@ -47,10 +49,11 @@ class SecretCode extends React.Component {
     let ph = this.props.route.receiverPH;
     let filteredPH = ph.replace(/[^0-9 ]/g, "").split(' ').join('');
     if (this.state.code) {
+      this.setState({animating: true});
       this.verificationIndex.child(psKey).set(this.state.code);
       SendSecret.router(this.state.code);
     } else {
-      // Tell them to not be jerks
+      this.setState({error: "Please enter a secret pass code"});
     }
   }
 
@@ -70,23 +73,23 @@ class SecretCode extends React.Component {
           <BigButton do={() => this.createCode()}>
             Submit
           </BigButton> 
+          {
+            this.state.error ?
+            <Text style={styles.error}>{this.state.error}</Text> :
+            null 
+          }
           <Text style={styles.or}>- or -</Text>
           <Text style={styles.paragraph}>Have us make a secret code for you</Text>
           <BigButton do={() => this.generate()}>
             {this.state.generated ? "Make Another" : "Make one for Me"}
-          </BigButton>        
+          </BigButton>
+           <ActivityIndicator animationControl={this.state.animating} />        
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
     );
   }
 }
-
-/*
-          <BigButton do={() => this.createCode('(444) 513-0548')}>
-            Submit
-          </BigButton> 
-*/
 
 var styles = StyleSheet.create({
   header: {
@@ -102,6 +105,12 @@ var styles = StyleSheet.create({
     borderColor: '#eee',
     paddingLeft: 5,
     marginLeft: 30,
+    marginRight: 30,
+  },
+  error: {
+    marginLeft: 30,
+    fontSize: 16,
+    color: StylingGlobals.colors.pressDown,
     marginRight: 30,
   },
   paragraph: {

@@ -267,6 +267,15 @@ class ShowMe extends React.Component {
     })   
   }
 
+  checkVerificationStatus() {
+    AsyncStorage.getItem('userData').then((user_data_string) => { 
+      if (user_data_string) {
+        let user_data = JSON.parse(user_data_string);
+        Utility.getVerificationStatus(user_data.uid);
+      }
+    });
+  }
+
   componentWillMount() {
     /*if (Utility.getAuthStatus()) {
       Utility.setLocalAuth(true);
@@ -274,6 +283,7 @@ class ShowMe extends React.Component {
     GetSecrets.getLocalSecrets();
     GetSecrets.getRemoteSecrets();
     this.anonAuthHandler();
+    this.checkVerificationStatus();
   }
 
   componentDidMount() {
@@ -355,7 +365,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "ClaimSecret"
+          name: "SecretCode"
         }} />
     );
   }

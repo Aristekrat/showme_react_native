@@ -39,10 +39,10 @@ class ClaimSecret extends React.Component {
         let valReturned = snapshot.val();
         if (valReturned) {
           var codeKey = Object.keys(valReturned)[0];
-          AsyncStorage.getItem('userData').then((user_data_json) => { 
-            if (user_data_json) {
+          AsyncStorage.getItem('userData').then((user_data_string) => { 
+            if (user_data_string) {
               this.setState({animating: false});
-              let user_data = JSON.parse(user_data_json);
+              let user_data = JSON.parse(user_data_string);
               this.privateSecrets.child(codeKey).update({responderID: user_data.uid}, //update private secrets with responder ID
                 () => {
                   this.privateSecrets.child(codeKey).once('value', (snapshot) => {
@@ -65,7 +65,6 @@ class ClaimSecret extends React.Component {
         this.setState({error: "Sorry, we experienced a network error. Please try again", animating: false});
       });     
     }
-
   }
 
   render(){
