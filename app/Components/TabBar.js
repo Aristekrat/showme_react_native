@@ -34,11 +34,14 @@ class TabBar extends React.Component {
       case "ShareSecret":
         this.state.selectedTab = 'tabTwo';
         break;
+      case "ClaimSecret":
+        this.state.selectedTab = 'tabThree';
+        break; 
       case "MyAccount":
       case "SignIn":
       case "Registration":
       case "Gateway":
-        this.state.selectedTab = 'tabThree';
+        this.state.selectedTab = 'tabFour';
         break; 
     }
   }
@@ -54,7 +57,11 @@ class TabBar extends React.Component {
       })
     } else if (tabId === "tabThree") {
       this.props.navigator.push({
-        name: true ? 'SignIn' : 'MyAccount'
+        name: 'ClaimSecret'
+      })
+    } else if (tabId === "tabFour") {
+      this.props.navigator.push({
+        name: Utility.authStatus ? 'MyAccount' : 'SignIn'
       })
     }
   }
@@ -87,7 +94,7 @@ class TabBar extends React.Component {
           barTintColor={StylingGlobals.colors.accentPressDown}>
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabOne'}
-              onPress={() => this.setTab('tabOne', this.props.tabOne)}
+              onPress={() => this.setTab('tabOne')}
               title={"My Secrets"}
               icon={require('../img/tabicon-mysecret.png')}
               style={styles.tabItem}
@@ -97,7 +104,7 @@ class TabBar extends React.Component {
             
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabTwo'}
-              onPress={() => this.props.introPopup ? this.props.introPopup() : this.setTab('tabTwo', this.props.tabTwo)}
+              onPress={() => this.props.introPopup ? this.props.introPopup() : this.setTab('tabTwo')}
               title={"New"}
               icon={require('../img/tabicon-new.png')}
               style={styles.tabItem}
@@ -105,9 +112,18 @@ class TabBar extends React.Component {
                 <View></View>
             </TabBarIOS.Item>
 
-            <TabBarIOS.Item
+            {Utility.foo ? null : <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabThree'}
-              onPress={() => this.setTab('tabThree', this.props.tabThree)}
+              onPress={() => this.setTab('tabThree')}
+              title={"Claim Secret"}
+              icon={require('../img/tabicon-new.png')}
+              style={styles.tabItem}>
+                <View></View>
+            </TabBarIOS.Item>}
+
+            <TabBarIOS.Item
+              selected={this.state.selectedTab === 'tabFour'}
+              onPress={() => this.setTab('tabFour')}
               title={Utility.authStatus ? "My Account" : "Sign In" }
               icon={require('../img/tabicon-signin.png')} // business64
               style={styles.tabItem}>
