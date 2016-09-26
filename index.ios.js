@@ -11,7 +11,7 @@ import YourAnswer from './app/Pages/YourAnswer.js';
 import MyAccount from './app/Pages/MyAccount.js';
 import CreateYourOwn from './app/Pages/CreateYourOwn.js';
 import SignIn from './app/Pages/SignIn.js';
-import StylingGlobals from './app/StylingGlobals.js';
+import StylingGlobals from './app/Globals/StylingGlobals.js';
 import Gateway from './app/Pages/Gateway.js';
 import ClaimSecret from './app/Pages/ClaimSecret.js';
 import RegistrationInterim from './app/Pages/RegistrationInterim.js';
@@ -365,7 +365,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "SecretCode"
+          name: "CreateSecret"
         }} />
     );
   }

@@ -1,7 +1,7 @@
 'use strict';
  
 import React from 'react';
-import StylingGlobals from '../StylingGlobals.js';
+import StylingGlobals from '../Globals/StylingGlobals.js';
 import BigButton from '../Components/BigButton.js';
 import UserContacts from '../Components/UserContacts.js';
 import TabBar from '../Components/TabBar.js';
@@ -37,6 +37,7 @@ class ShareSecret extends React.Component {
     this.answers = this.props.db.child('answers');
   }
   
+  /*
   pushPrivateSecret(uid) {
     let psData = {question: this.props.route.cookieData.text, askerID: uid}
     let privateSecret = this.privateSecrets.push(psData, (err, snapshot) => {
@@ -55,6 +56,7 @@ class ShareSecret extends React.Component {
       }
     });
   }
+  */
 
   componentWillMount() {
     AsyncStorage.getItem('userData')
@@ -65,7 +67,12 @@ class ShareSecret extends React.Component {
           let user_data = JSON.parse(user_data_json);
           this.uid = user_data.uid;
           if (this.props.route.publicSecret) {
-            this.pushPrivateSecret(user_data.uid);
+            //this.pushPrivateSecret(user_data.uid);
+            GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, user_data.uid, (psData)=> {
+              this.setState({key: psData.key});
+            }, ()=> {
+              this.setState({error: "We're sorry, there was an error connecting to the server"})
+            })
           }
           SendSecret.lookUpSenderPH(user_data.uid);
         }

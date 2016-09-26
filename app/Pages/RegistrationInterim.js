@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import TabBar from '../Components/TabBar.js';
-import StylingGlobals from '../StylingGlobals.js';
+import StylingGlobals from '../Globals/StylingGlobals.js';
 import {
   StyleSheet,
   Text,

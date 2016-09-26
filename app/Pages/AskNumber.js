@@ -1,7 +1,7 @@
 'use strict';
  
 import React from 'react';
-import StylingGlobals from '../StylingGlobals.js';
+import StylingGlobals from '../Globals/StylingGlobals.js';
 import BigButton from '../Components/BigButton.js';
 import TabBar from '../Components/TabBar.js';
 import SendSecret from '../Globals/SendSecret.js';

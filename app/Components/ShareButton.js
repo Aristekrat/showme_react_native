@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import StylingGlobals from '../StylingGlobals.js';
+import StylingGlobals from '../Globals/StylingGlobals.js';
 import {
   StyleSheet,
   Text,
@@ -9,19 +9,6 @@ import {
   TouchableHighlight,
   Image
 } from 'react-native';
-
-/*
-var React = require('react-native');
-var StylingGlobals = require('../StylingGlobals.js');
-
-var {
-  StyleSheet,
-  Text,
-  View,
-  TouchableHighlight,
-  Image,
-} = React;
-*/
 
 class ShareButton extends React.Component {
   render(){

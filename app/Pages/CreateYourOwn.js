@@ -1,9 +1,10 @@
 'use strict';
 
 import React, { Component } from 'react';
-import StylingGlobals from '../StylingGlobals.js';
+import StylingGlobals from '../Globals/StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
+import CategoryPicker from '../Components/CategoryPicker.js';
 import GetSecrets from '../Globals/GetSecrets.js';
 import {
   StyleSheet,
@@ -18,6 +19,7 @@ import {
   AsyncStorage
 } from 'react-native';
 
+/*
 var PickerItemIOS = PickerIOS.Item;
 
 const CATEGORIES = ["Love", "Sex", "Social", "Funny", "Embarassing", "Past"]
@@ -48,6 +50,7 @@ class CategoryPicker extends React.Component {
     );
   }
 };
+*/
 
 class CreateYourOwn extends React.Component {
   constructor(props) {
@@ -105,6 +108,7 @@ class CreateYourOwn extends React.Component {
 
   // Pushes to DB. If successful, does some data processing and starts the push to the local async store and calls the success func
   // TODO Refactor to util func
+  /*
   pushToPrivateSecrets() {
     let psData = {question: this.state.text, askerID: this.state.uid, askerName: '', responderID: '', responderName: ''};
     let privateSecret = this.privateSecrets.push(psData, (err, snapshot) => {
@@ -123,6 +127,14 @@ class CreateYourOwn extends React.Component {
           this.success(psData); 
       }
     });
+  }*/
+
+  pushToPrivateSecrets() {
+    GetSecrets.pushPrivateSecret(this.state.text, this.state.uid, (psData) => {
+      this.success(psData);
+    }, () => {
+      this.setState({errorMessage: "We're sorry, there was an error connecting to the server"});
+    })
   }
 
   // Pushes to public secrets DB collection & calls pushtoprivate if called with a true val in the first arg

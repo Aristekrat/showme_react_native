@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { Component } from 'react';
-import StylingGlobals from '../StylingGlobals.js';
+import StylingGlobals from '../Globals/StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import ReactMixin from 'react-mixin';

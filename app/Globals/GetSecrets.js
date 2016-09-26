@@ -74,6 +74,27 @@ const GetSecrets = {
     });
   },
 
+  pushPrivateSecret: function(text, uid, successCB, errCB) {
+    let psData = {question: text, askerID: uid, askerName: '', responderID: '', responderName: ''};
+    let privateSecret = this.DB.child('privateSecrets').push(psData, (err, snapshot) => {
+      if (err) {
+        errCB();  
+      } else {
+        var sKey = privateSecret.key();
+        let initialState = {answerState: 'NA', sentState: 'CR'};
+        this.DB.child('answers').child(sKey).set({askerAnswer: '', responderAnswer: ''});
+        this.DB.child('users').child(uid).child('secrets').child(sKey).set(initialState);
+        psData.key = sKey;
+        psData.state = initialState;
+        psData.answer = null;
+        GetSecrets.pushLocalSecret(psData);
+        if (successCB) {
+          successCB(psData);
+        }
+      }
+    });
+  },
+
   pushSecretsToAsyncStore: function () {
   	let remoteSecrets = this.remoteSecrets;
 		AsyncStorage.setItem('secrets', JSON.stringify(remoteSecrets));
