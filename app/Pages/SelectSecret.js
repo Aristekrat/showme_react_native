@@ -77,13 +77,6 @@ class SelectSecret extends React.Component {
       }
     });
 
-    AsyncStorage.getItem('userContacts').then((user_contacts_string) => {
-      if (user_contacts_string) {
-        let user_contacts = JSON.parse(user_contacts_string);
-        this.setState({contacts: user_contacts});
-      }
-    });
-
     // Does some processing and then adds the secrets to the View.
     this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
       var secret = snapshot.val();
@@ -116,7 +109,7 @@ class SelectSecret extends React.Component {
                 count={rowData.score} 
                 key={rowData.key}
                 id={rowData.key}
-                selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData, publicSecret: true, contacts: this.state.contacts})}} 
+                selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData, publicSecret: true, contacts: this.props.route.contacts})}} 
                 vote={rowData.vote}
                 upvote={() => { 
                     this.vote('upvote', rowData.vote, rowData.key, 1); 

@@ -46,8 +46,8 @@ class SecretCode extends React.Component {
 
   createCode() {
     let psKey = this.props.route.key;
-    let ph = this.props.route.receiverPH;
-    let filteredPH = ph.replace(/[^0-9 ]/g, "").split(' ').join('');
+    //let ph = this.props.route.receiverPH;
+    //let filteredPH = ph.replace(/[^0-9 ]/g, "").split(' ').join('');
     if (this.state.code) {
       this.setState({animating: true});
       this.verificationIndex.child(psKey).set(this.state.code);

@@ -36,27 +36,6 @@ class ShareSecret extends React.Component {
     this.users = this.props.db.child('users');
     this.answers = this.props.db.child('answers');
   }
-  
-  /*
-  pushPrivateSecret(uid) {
-    let psData = {question: this.props.route.cookieData.text, askerID: uid}
-    let privateSecret = this.privateSecrets.push(psData, (err, snapshot) => {
-      if (err) {
-        this.setState({error: "We're sorry, there was an error connecting to the server"})
-      } else {
-        var sKey = privateSecret.key();
-        let initialState = {answerState: 'NA', sentState: 'CR'};
-        this.answers.child(sKey).set({askerAnswer: '', responderAnswer: ''});
-        this.users.child(uid).child('secrets').child(sKey).set(initialState);
-        this.setState({key: sKey});
-        psData.key = sKey;
-        psData.state = initialState;
-        psData.answer = null;
-        GetSecrets.pushLocalSecret(psData);
-      }
-    });
-  }
-  */
 
   componentWillMount() {
     AsyncStorage.getItem('userData')
@@ -84,7 +63,7 @@ class ShareSecret extends React.Component {
       <View style={StylingGlobals.container}>
         <ScrollView>
           <Text style={styles.prompt}>Choose who you want to send to...</Text>
-          <UserContacts ref="userContacts" />
+          <UserContacts ref="userContacts" contacts={this.props.route.contacts}/>
           <Text style={styles.label}>You'll have a chance to review before you send</Text>
           <BigButton do={() => 
             { 

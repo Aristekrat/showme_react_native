@@ -16,6 +16,7 @@ import {
 
 const PickerItemIOS = PickerIOS.Item;
 
+/*
 const dummy = [
   { 
     givenName: 'Prof. David',
@@ -51,28 +52,32 @@ const dummy = [
     recordID: 33 
   },   
 ];
+*/
 
 class UserContacts extends React.Component { 
   constructor(props) {
     super(props);
     this.state = {
       contact: 0,
-      ph: dummy[0].phoneNumbers[0].number, // dummy ref, change this
-      firstName: dummy[0].givenName,
+      contacts: this.props.contacts.filter(this.filterSecrets),
+      ph: this.props.contacts[0].phoneNumbers[0].number,
+      firstName: this.props.contacts[0].givenName
     } 
   }
 
-  // Currently just adds a blank family name if none exists
-  filterSecrets() {
-    dummy.map((contact, index) => { // dummy ref, change this
-      if (!contact.familyName) {
+  // Removes contacts without a phone number
+  filterSecrets(contact) {
+    if (contact.phoneNumbers[0]) {
+      if (!contact.familyName) { // Adds a blank string instead of undefined for unknown names
         contact.familyName = "";
       }
-    })
-  }
-
-  componentWillMount() {
-    this.filterSecrets();
+      if (!contact.givenName) {
+        contact.givenName = "";
+      }
+      return true;
+    } else {
+      return false;
+    }
   }
 
   render () {
@@ -82,10 +87,10 @@ class UserContacts extends React.Component {
           selectedValue={this.state.contact}
           onValueChange={
             (contactIndex) => {
-              this.setState({ph: dummy[contactIndex].phoneNumbers[0].number, contact: contactIndex, firstName: dummy[contactIndex].givenName}); // dummy ref, change this
+              this.setState({ph: this.state.contacts[contactIndex].phoneNumbers[0].number, contact: contactIndex, firstName: this.state.contacts[contactIndex].givenName});
             } 
           }>
-          {dummy.map((contact, index) => (
+          {this.state.contacts.map((contact, index) => (
             <PickerItemIOS
               key={contact}
               value={index}

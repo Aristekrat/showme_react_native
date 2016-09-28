@@ -10,6 +10,7 @@ import SelectSecret from './SelectSecret.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 import GetSecrets from '../Globals/GetSecrets.js';
+import Contacts from 'react-native-contacts';
 
 import {
   StyleSheet,
@@ -44,11 +45,12 @@ class SelectCategory extends React.Component {
     }];
   }
   
-  selectThisCategory (categoryName, viewName) {
+  selectCategory (categoryName) {
     this.props.navigator.push({
       name: 'SelectSecret',
-      category: categoryName
-    })
+      category: categoryName,
+      contacts: this.contacts,
+    });
   }
 
   sawIntro() {
@@ -86,6 +88,16 @@ class SelectCategory extends React.Component {
       this.refs.smodal.setModalVisible(true);
       this.setState({modalText: this.props.route.modalText});
     }
+    // Check if this is in AsyncStorage. If not, make a call. If so, don't bother.
+    Contacts.getAll((err, contacts) => {
+      if(err && err.type === 'permissionDenied'){
+        this.contacts = 'PermissionDenied'
+        AsyncStorage.setItem('contacts', JSON.stringify(this.contacts));
+      } else {
+        this.contacts = contacts;
+        AsyncStorage.setItem('contacts', JSON.stringify(contacts));
+      }
+    });
   }
 
   render(){
@@ -99,27 +111,27 @@ class SelectCategory extends React.Component {
           <Category 
             categoryName={this.categories[1].title} 
             imgSource={require("../img/caticon-love.png")} // 'heart296'
-            elsewhere={this.selectThisCategory.bind(this, this.categories[1].title, SelectSecret, this.props.navigator)} />
+            elsewhere={() =>  this.selectCategory(this.categories[1].title) } />
           <Category 
             categoryName={this.categories[2].title} 
             imgSource={require("../img/caticon-sex.png")} // 'femenine1'
-            elsewhere={this.selectThisCategory.bind(this, this.categories[2].title, SelectSecret)} />
+            elsewhere={() =>  this.selectCategory(this.categories[2].title) } />
           <Category 
             categoryName={this.categories[3].title} 
             imgSource={require("../img/caticon-social.png")} // group12
-            elsewhere={this.selectThisCategory.bind(this, this.categories[3].title, SelectSecret)} />
+            elsewhere={() =>  this.selectCategory(this.categories[3].title) } />
           <Category 
             categoryName={this.categories[4].title} 
             imgSource={require("../img/caticon-funny.png")} // laughing
-            elsewhere={this.selectThisCategory.bind(this, this.categories[4].title, SelectSecret)} />
+            elsewhere={() =>  this.selectCategory(this.categories[4].title) } />
           <Category 
             categoryName={this.categories[5].title} 
             imgSource={require("../img/caticon-embarassing.png")} // wound4
-            elsewhere={this.selectThisCategory.bind(this, this.categories[5].title, SelectSecret)} />
+            elsewhere={() =>  this.selectCategory(this.categories[5].title) } />
           <Category 
             categoryName={this.categories[6].title} 
             imgSource={require("../img/caticon-past.png")} // music-player17
-            elsewhere={this.selectThisCategory.bind(this, this.categories[6].title, SelectSecret)} />
+            elsewhere={() =>  this.selectCategory(this.categories[6].title) } />
         </ScrollView>
         <SModal modalText={this.state.modalText} ref="smodal" />
         <TabBar 

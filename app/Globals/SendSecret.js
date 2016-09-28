@@ -11,13 +11,13 @@ const SendSecret = {
 
   // Needs the uid, but it's the only one. Can call it as an arg. 
   saveArgs: function (receiverPH, receiverName, senderUID, key, props) {
-    this.receiverPH = receiverPH;
+    this.receiverPH = receiverPH.replace(/[^0-9 ]/g, "").split(' ').join('');
     this.receiverName = receiverName;
     this.senderUID = senderUID;
     this.key = key;
     this.navigator = props.navigator;
     this.route = props.route;
-    this.lookUpIdWithPH(receiverPH, 'receiverId', true);
+    this.lookUpIdWithPH(this.receiverPH, 'receiverId', true);
   },
 
   router: function (secretCode) {
@@ -46,7 +46,7 @@ const SendSecret = {
     this.DB.child('indexes').child('phoneNumberIndex').once('value', (snapshot) => {
       if (snapshot.hasChild(uid)) {
         let phIndex = snapshot.val();
-        this.senderPH = phIndex[uid];
+        this.senderPH = phIndex[uid].replace(/[^0-9 ]/g, "").split(' ').join('');
       } 
     }); 
   },
