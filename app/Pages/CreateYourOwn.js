@@ -6,6 +6,7 @@ import TabBar from '../Components/TabBar.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import CategoryPicker from '../Components/CategoryPicker.js';
 import GetSecrets from '../Globals/GetSecrets.js';
+import Contacts from 'react-native-contacts';
 import {
   StyleSheet,
   Text,
@@ -18,39 +19,6 @@ import {
   PickerIOS,
   AsyncStorage
 } from 'react-native';
-
-/*
-var PickerItemIOS = PickerIOS.Item;
-
-const CATEGORIES = ["Love", "Sex", "Social", "Funny", "Embarassing", "Past"]
-
-class CategoryPicker extends React.Component { 
-  constructor(props) {
-    super(props);
-    this.state = {
-      category: 'Social',
-      loaded: false
-    } 
-  }
-
-  render () {
-    return (
-      <View style={styles.categoryPicker}>
-        <PickerIOS
-          selectedValue={this.state.category}
-          onValueChange={(category) => this.setState({category})}>
-          {CATEGORIES.map((category) => (
-            <PickerItemIOS
-              key={category}
-              value={category}
-              label={category} />
-          ))}
-        </PickerIOS>
-      </View>
-    );
-  }
-};
-*/
 
 class CreateYourOwn extends React.Component {
   constructor(props) {
@@ -68,15 +36,6 @@ class CreateYourOwn extends React.Component {
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
     this.answers = this.props.db.child('answers');
-  }
-
-  componentWillMount() {
-    AsyncStorage.getItem('userData').then((user_data_string) => {
-      if (user_data_string) {
-        let user_data = JSON.parse(user_data_string); 
-        this.setState({uid: user_data.uid});
-      }
-    });
   }
 
   // Adds a secret to the asyncstore after it is created, so it's visible in MySecrets
@@ -105,29 +64,6 @@ class CreateYourOwn extends React.Component {
       errorMessage: '',
     });
   }
-
-  // Pushes to DB. If successful, does some data processing and starts the push to the local async store and calls the success func
-  // TODO Refactor to util func
-  /*
-  pushToPrivateSecrets() {
-    let psData = {question: this.state.text, askerID: this.state.uid, askerName: '', responderID: '', responderName: ''};
-    let privateSecret = this.privateSecrets.push(psData, (err, snapshot) => {
-      if (err) {
-        this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
-      } else {
-          var sKey = privateSecret.key();
-          let initialState = {answerState: 'NA', sentState: 'CR'};
-          this.answers.child(sKey).set({askerAnswer: '', responderAnswer: ''});
-          this.users.child(this.state.uid).child('secrets').child(sKey).set(initialState);
-          psData.key = sKey;
-          psData.state = initialState;
-          psData.answer = null;
-          GetSecrets.pushLocalSecret(psData);
-          psData.public = false; // I'm not sure what the point of this line is. 
-          this.success(psData); 
-      }
-    });
-  }*/
 
   pushToPrivateSecrets() {
     GetSecrets.pushPrivateSecret(this.state.text, this.state.uid, (psData) => {
@@ -169,6 +105,28 @@ class CreateYourOwn extends React.Component {
     if (this.state.errorMessage) {
       this.setState({errorMessage: ''})
     }
+  }
+
+  componentWillMount() {
+    AsyncStorage.getItem('userData').then((user_data_string) => {
+      if (user_data_string) {
+        let user_data = JSON.parse(user_data_string); 
+        this.setState({uid: user_data.uid});
+      }
+    });
+  }
+
+  componentDidMount() {
+    // Check if this is in AsyncStorage. If not, make a call. If so, don't bother.
+    Contacts.getAll((err, contacts) => {
+      if(err && err.type === 'permissionDenied'){
+        this.contacts = 'PermissionDenied'
+        AsyncStorage.setItem('contacts', JSON.stringify(this.contacts));
+      } else {
+        this.contacts = contacts;
+        AsyncStorage.setItem('contacts', JSON.stringify(contacts));
+      }
+    });
   }
 
   render(){
@@ -213,7 +171,7 @@ class CreateYourOwn extends React.Component {
               <TouchableHighlight 
                   style={styles.button} 
                   underlayColor={StylingGlobals.colors.pressDown} 
-                  onPress={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: this.state.submittedSecret})}}>
+                  onPress={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: this.state.submittedSecret, contacts: this.contacts})}}>
                   <View style={StylingGlobals.horizontalCenter}>
                     <Image 
                       source={require("../img/send-secret.png")} style={styles.icon} /> 

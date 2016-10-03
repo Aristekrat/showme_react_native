@@ -90,8 +90,6 @@ class SelectCategory extends React.Component {
     }
     // Check if this is in AsyncStorage. If not, make a call. If so, don't bother.
     Contacts.getAll((err, contacts) => {
-      this.contacts = "PermissionDenied";
-      /*
       if(err && err.type === 'permissionDenied'){
         this.contacts = 'PermissionDenied'
         AsyncStorage.setItem('contacts', JSON.stringify(this.contacts));
@@ -99,7 +97,6 @@ class SelectCategory extends React.Component {
         this.contacts = contacts;
         AsyncStorage.setItem('contacts', JSON.stringify(contacts));
       }
-      */
     });
   }
 

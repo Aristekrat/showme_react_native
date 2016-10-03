@@ -72,7 +72,7 @@ class ShareSecret extends React.Component {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
-          {true ?
+          {this.props.route.contacts === "PermissionDenied" ?
             <View>
               <Text style={styles.prompt}>Enter Phone Number</Text>
               <Text style={styles.label}>Enter the phone number of who you want to send this secret to</Text>

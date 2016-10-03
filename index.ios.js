@@ -369,7 +369,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "ShareSecret"
+          name: "CreateSecret"
         }} />
     );
   }
