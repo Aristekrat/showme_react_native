@@ -136,17 +136,13 @@ var NavigationBarRouteMapper = {
           <Text style={styles.navBarTitleText}>Sign In</Text>
         );      
       case 'Register':
-      
+      case 'RegistrationInterim':  
         return (
           <Text style={styles.navBarTitleText}>Register</Text>
         ); 
       case 'ClaimSecret':
         return (
           <Text style={styles.navBarTitleText}>Claim Secret</Text>
-        );
-      case 'RegistrationInterim':  
-        return (
-          <Text style={styles.navBarTitleText}>Welcome</Text>
         );
       default: 
         return (
@@ -369,7 +365,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "CreateSecret"
+          name: "ClaimSecret"
         }} />
     );
   }

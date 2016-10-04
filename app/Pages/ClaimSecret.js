@@ -30,6 +30,7 @@ class ClaimSecret extends React.Component {
     this.users = this.props.db.child('users');
   }
 
+  // TODO refactor this thing, it's much bigger than a well written function should be
   verifyCode() {
     if (!this.state.code) {
       this.setState({error: "Please enter a secret code. You would've got this in a friend's text invitation"});
@@ -45,15 +46,21 @@ class ClaimSecret extends React.Component {
               let user_data = JSON.parse(user_data_string);
               this.privateSecrets.child(codeKey).update({responderID: user_data.uid}, //update private secrets with responder ID
                 () => {
-                  this.privateSecrets.child(codeKey).once('value', (snapshot) => {
-                    GetSecrets.pushLocalSecret(snapshot.val()); //push local secret
+                  this.privateSecrets.child(codeKey).once('value', (childSnapshot) => {
+                    let ps = childSnapshot.val();
+                    ps.state = {
+                      "sentState": "RR",
+                      "answerState": "NA",
+                    };
+                    let secret = [ps];
+                    GetSecrets.pushLocalSecret(ps); 
+                    this.props.navigator.push({name: 'MySecrets', secret: secret});
                   })
                 }
               )
               this.verifiedIndex.child(user_data.uid).set(true);
               this.verificationCodes.child(codeKey).remove();
               this.users.child(user_data.uid).child('secrets').child(codeKey).set({answerState: 'NA', sentState: 'RR'}); // answerState is hard code atm, might be AA, need to check in the future
-              this.props.navigator.push({name: 'MySecrets'});
             } else {
               this.setState({error: "Sorry, we can't find your user id. Please log in", animating: false});
             }
@@ -71,14 +78,15 @@ class ClaimSecret extends React.Component {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
-          <Text style={styles.header}>
+          <Text style={StylingGlobals.header}>
             Enter your code
           </Text>
           <TextInput
-            style={styles.codeInput}  
+            style={StylingGlobals.textInput}  
             autoFocus={true}
             onChangeText={(text) => this.setState({code: text})}
             value={this.state.code} />
+          <Text style={styles.paragraph}>Check the text you received for your code</Text>
           <BigButton do={() => this.verifyCode()}>
             Submit
           </BigButton>
@@ -94,20 +102,10 @@ class ClaimSecret extends React.Component {
 }
 
 var styles = StyleSheet.create({
-  header: {
+  paragraph: {
     marginLeft: 30,
-    marginTop: 20,
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  codeInput: {
-    backgroundColor: '#fff',
-    height: 45,
-    borderWidth: 1,
-    borderColor: '#eee',
-    paddingLeft: 5,
-    marginLeft: 30,
-    marginRight: 30,
+    color: '#555',
+    marginTop: 5,
   },
   error: {
     marginLeft: 30,
@@ -116,6 +114,5 @@ var styles = StyleSheet.create({
     marginRight: 30,
   }
 });
-
 
 module.exports = ClaimSecret;

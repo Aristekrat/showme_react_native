@@ -24,6 +24,27 @@ var globalStyling = {
 	    height: 25,
 	    opacity: 0.5,
 	},
+	textInput: {
+	    backgroundColor: '#fff',
+	    height: 45,
+	    borderWidth: 1,
+	    borderColor: '#cdcdcd',
+	    paddingLeft: 5,
+	    marginLeft: 30,
+	    marginRight: 30,
+	},
+	header: {
+	    marginLeft: 30,
+	    marginTop: 20,
+	    fontSize: 16,
+	    marginBottom: 5,
+	    fontWeight: 'bold',
+	},
+	paragraph: {
+	    marginLeft: 30,
+	    color: '#333',
+	    marginTop: 5,
+	},
 	horizontalCenter: {
 	    flex: 1, 
 	    flexDirection: 'row', 

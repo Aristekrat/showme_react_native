@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import TabBar from '../Components/TabBar.js';
 import BigButton from '../Components/BigButton.js';
 import StylingGlobals from '../Globals/StylingGlobals.js';
+import ArrowLink from '../Components/ArrowLink.js';
 import {
   StyleSheet,
   Text,
@@ -21,51 +22,41 @@ class RegistrationInterim extends React.Component {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
-          <Image style={styles.heroImage} source={require("../img/show-me-skirt.png")} />
-          <Text style={styles.header}>
-            Show Me is Invitation Only
-          </Text>
-          <View>
-            <BigButton do={() => this.props.navigator.push({name: 'SelectCategory'}) }>
-              Enter Invitation
-            </BigButton>
-            <Text style={styles.paragraph}>Choose this if you already have your invitation code</Text>
-          </View>
-          <View style={styles.secondBlock}>
-            <Text style={styles.paragraph}>
-              You can also ask for an invitation
-            </Text>
-            <BigButton do={() => this.props.navigator.push({name: 'SelectCategory'}) }>
-              Request Invitation
-            </BigButton>
+          <Text style={StylingGlobals.header}>Do you have a secret code?</Text>
+          <Text style={StylingGlobals.paragraph}>You would have got this in a text from a friend</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableHighlight onPress={() => this.props.navigator.push({name: 'ClaimSecret'}) } style={styles.button}>
+              <Text style={styles.buttonText}>Yes</Text>
+            </TouchableHighlight>
+            <TouchableHighlight onPress={() => this.props.navigator.push({name: 'SelectCategory'}) } style={styles.button}>
+              <Text style={styles.buttonText}>No</Text>
+            </TouchableHighlight>
           </View>
         </ScrollView>
-        
+        <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
     );
   }
 }
 
-/*
-          <View style={styles.buttonContainer}>
-            <TouchableHighlight 
-                style={styles.button} 
-                underlayColor={StylingGlobals.colors.accentColor} 
-                onPress={() => this.props.navigator.push({name: 'ClaimSecret'}) } >
-              <Text style={styles.buttonText}>Yes</Text>
-            </TouchableHighlight>
-            <TouchableHighlight 
-                style={styles.button} 
-                underlayColor={StylingGlobals.colors.accentColor}
-                onPress={() => this.props.navigator.push({name: 'SelectCategory'}) }>
-              <Text style={styles.buttonText}>No</Text>
-            </TouchableHighlight>
+/* // Invitation only code, not currently used
+          <Image style={styles.heroImage} source={require("../img/show-me-skirt.png")} />
+          <Text style={styles.header}>
+            Show Me is Invitation Only
+          </Text>
+          <View>
+            <BigButton do={() => this.props.navigator.push({name: 'ClaimSecret'}) }>
+              Enter Invitation
+            </BigButton>
+            <Text style={styles.paragraph}>Choose this if you already have your invitation code</Text>
+          </View>
+          <View style={styles.secondBlock}>
+            <Text style={styles.secondBlockParagraph}>
+              You can also ask for an invitation: 
+            </Text>
+            <ArrowLink skipTo={()=> this.switchToRegister()}>Request Invitation</ArrowLink>
           </View>
 
-          <TabBar navigator={this.props.navigator} route={this.props.route} />
-*/
-
-const styles = StyleSheet.create({
   heroImage: {
     width: 185,
     height: 185,
@@ -82,30 +73,29 @@ const styles = StyleSheet.create({
     marginLeft: 30,
   },
   secondBlock: {
-    marginTop: 60,
+    marginTop: 15,
+  },
+  secondBlockParagraph: {
+    textAlign: 'center',
   }
-});
+*/
 
-/*
+const styles = StyleSheet.create({
   buttonContainer: {
-    flex: 1,
     flexDirection: 'row',
+    marginTop: 10,
     justifyContent: 'center',
   },
   button: {
-    margin: 15,
-    padding: 15,
-    width: 120,
     backgroundColor: StylingGlobals.colors.mainColor,
+    padding: 12,
+    width: 110,
+    marginRight: 30,
   },
   buttonText: {
     color: '#fff',
     textAlign: 'center',
-  },
-  bottomText: {
-    marginLeft: 20,
-    fontSize: 12,
   }
-*/
+});
 
 module.exports = RegistrationInterim;
