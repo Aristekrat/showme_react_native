@@ -41,7 +41,7 @@ class SelectCategory extends React.Component {
     }, {
       'title': 'Embarassing'
     }, {
-      'title': 'From Your Past'
+      'title': 'Past'
     }];
   }
   

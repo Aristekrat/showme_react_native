@@ -85,9 +85,9 @@ class SelectSecret extends React.Component {
       delete secret.votes;
       this.secrets.push(secret);
       this.setState({
-        source: this.state.source.cloneWithRows(this.secrets)
+        source: this.state.source.cloneWithRows(this.secrets),
+        animating: false,
       });
-      this.toggleActivityIndicator();
     }, function (errorObject) {
       console.log("The read failed: " + errorObject.code); // TODO real error handling
     })

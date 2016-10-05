@@ -45,6 +45,7 @@ class YourAnswer extends React.Component {
   }
 
   notify(notificationText) {
+    console.log("NOTIFY")
     this.toggleActivityIndicator();
     this.setState({notificationText: notificationText});
   }
@@ -53,7 +54,9 @@ class YourAnswer extends React.Component {
     if (this.state.answer.length > 5) {
       this.toggleActivityIndicator()
       let secretID = this.currentSecret.key;
+      console.log("TOPTRIGGERED");
       AsyncStorage.getItem('userData').then((user_data_json) => {
+        console.log("USERDATASEEN");
         let user_data = JSON.parse(user_data_json); 
         let userStatus = this.responderOrAsker(user_data.uid, this.props.route.cookieData);
         let updatedAnswer = {};
@@ -66,6 +69,7 @@ class YourAnswer extends React.Component {
   }
 
   updateUsersTable(userStatus, userId) {
+    console.log("UPDATEUSERSTABLE");
     this.answers.child(this.currentSecret.key).once('value', (snapshot) => {
       var ans = snapshot.val();
       if (ans.askerAnswer && ans.responderAnswer) {
@@ -80,6 +84,7 @@ class YourAnswer extends React.Component {
   }
 
   performUserSecretsUpdate(stateToUpdate) {
+    console.log("PERFORMUSERSECRETSUPDATE");
     this.users.child(this.currentSecret.responderID).child('secrets').child(this.currentSecret.key).update(stateToUpdate);
     this.users.child(this.currentSecret.askerID).child('secrets').child(this.currentSecret.key).update(stateToUpdate);
     this.notify('Success');
@@ -102,7 +107,9 @@ class YourAnswer extends React.Component {
                 value={this.state.answer} />
           </View>
           <ActivityIndicator animationControl={this.state.animating}/>
-          <TouchableHighlight style={[styles.button, StylingGlobals.horizontalCenter]} onPress={() => this.submitAnswer()}>
+          <TouchableHighlight style={[styles.button, StylingGlobals.horizontalCenter]} 
+              onPress={() => this.submitAnswer()}
+              underlayColor={StylingGlobals.colors.pressDown}>
             <Text style={styles.buttonText}>Update</Text>
           </TouchableHighlight>
           {this.state.notificationText ? <Text style={styles.notificationText}>{this.state.notificationText}</Text> : null}

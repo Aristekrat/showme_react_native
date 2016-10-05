@@ -68,7 +68,7 @@ class Gateway extends React.Component {
         console.log("ERROR", err);
       } else {
         this.users.child(authData.uid).set({email: ""});
-        this.props.navigator.push({name: 'SelectCategory'});
+        this.props.navigator.push({name: 'RegistrationInterim'});
       };
     });
   };

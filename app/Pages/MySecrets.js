@@ -57,6 +57,10 @@ class MySecrets extends React.Component {
         this.toggleActivityIndicator();
       }
     });
+
+    AsyncStorage.getItem('contacts').then((contacts_string) => {
+      this.contacts = JSON.parse(contacts_string);
+    });
   }
 
   // Removes notifications from AsyncStorage, the timing of the call is determined in listSecrets
@@ -72,7 +76,7 @@ class MySecrets extends React.Component {
   // Determines the correct route for a secret to link to in listSecrets
   setUpdateSecretFunc(currentState, item) {
     if (currentState === 'CR') { 
-      return this.props.navigator.push({ name: 'ShareSecret', cookieData: item });
+      return this.props.navigator.push({ name: 'ShareSecret', cookieData: item, contacts: this.contacts });
     } else if (currentState === 'QS' || currentState === 'RR') {
       return this.props.navigator.push({ name: 'YourAnswer', cookieData: item })
     } else if (currentState === 'SO') {
