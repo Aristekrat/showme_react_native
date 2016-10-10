@@ -69,7 +69,7 @@ const GetSecrets = {
         secrets_data.push(newSecret);
         AsyncStorage.setItem('secrets', JSON.stringify(secrets_data));
       } else {
-        AsyncStorage.setItem('secrets', localSecret);
+        AsyncStorage.setItem('secrets', newSecret);
       }
     });
   },

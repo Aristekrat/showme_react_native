@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react';
 import StylingGlobals from '../Globals/StylingGlobals.js';
-import TabBar from '../Components/TabBar.js';
 import ArrowLink from '../Components/ArrowLink.js';
 import Utility from '../Globals/UtilityFunctions.js';
 import {
@@ -85,7 +84,34 @@ class Gateway extends React.Component {
       <View style={StylingGlobals.container}>
         <ScrollView>
           <Image style={styles.heroImage} source={require("../img/show-me-skirt.png")} />
-          <Text style={styles.heroText}>Show Me lets you trade secrets with your friends.</Text>
+          <View style={styles.heroTextContainer}>
+            <Text style={styles.heroText}>Show Me lets you trade secrets with your friends.</Text>
+            <Text style={styles.heroText}>We reveal secret answers only when both of you have answered.</Text>
+          </View> 
+
+          <View style={styles.emailContainer}>
+            <Text style={styles.emailContinueText}>Continue with Email</Text>
+            <View style={styles.emailButtonContainer}>
+              <TextInput 
+                  placeholder="Your email" 
+                  style={styles.emailTextInput} 
+                  ref="emailAddress"
+                  autoCapitalize="none"
+                  keyboardType={'email-address'}
+                  onChangeText={(emailAddress) => this.setState({emailAddress})} />
+              <TouchableHighlight 
+                  style={styles.emailButton} 
+                  underlayColor={StylingGlobals.colors.pressDown} 
+                  onPress={() => this.checkEmail()} >
+                <Image style={styles.emailRightArrow} source={require("../img/arrow-right.png")} />
+              </TouchableHighlight>
+            </View>
+            { this.state.validEmail ?
+                null
+                : 
+                <Text style={styles.errorText}>Please use a valid email</Text>
+            }
+          </View>
 
           <View style={styles.fbContainer}>
             <LoginButton 
@@ -122,33 +148,8 @@ class Gateway extends React.Component {
                 onLogoutFinished={() => console.log("logout.")}
             />
           </View>
-
-          <View style={styles.emailContainer}>
-            <Text style={styles.emailContinueText}>Continue with Email</Text>
-            <View style={styles.emailButtonContainer}>
-              <TextInput 
-                  placeholder="Your email" 
-                  style={styles.emailTextInput} 
-                  ref="emailAddress"
-                  autoCapitalize="none"
-                  keyboardType={'email-address'}
-                  onChangeText={(emailAddress) => this.setState({emailAddress})} />
-              <TouchableHighlight 
-                  style={styles.emailButton} 
-                  underlayColor={StylingGlobals.colors.pressDown} 
-                  onPress={() => this.checkEmail()} >
-                <Image style={styles.emailRightArrow} source={require("../img/arrow-right.png")} />
-              </TouchableHighlight>
-            </View>
-            { this.state.validEmail ?
-                null
-                : 
-                <Text style={styles.errorText}>Please use a valid email</Text>
-            }
-          </View>
           <ArrowLink skipTo={() => this.anonAuth() }>Skip for Now</ArrowLink>
         </ScrollView>
-        <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
     );
   }
@@ -159,21 +160,21 @@ const styles = StyleSheet.create({
     width: 185,
     height: 185,
     alignSelf: 'center',
+    marginTop: -15,
+  },
+  heroTextContainer: {
+    marginBottom: 15,
+    marginTop: -15,
   },
   heroText: {
-    alignSelf: 'center',
-    marginBottom: 25,
-    marginTop: -15,
-    color: StylingGlobals.colors.mainColor,
+    textAlign: 'center',
+    marginBottom: 7,
   },
   fbContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 15,  
     marginTop: 15,
-  },
-  fbText: {
-    marginBottom: 5,
   },
   fbutton: {
     width: 285,
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
     flex: 1, 
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 15,
+    marginTop: 10,
     marginBottom: 15,
   },
   emailContinueText: {
@@ -216,6 +217,11 @@ const styles = StyleSheet.create({
     marginTop: 2,
     marginLeft: 4,
     tintColor: '#fff',
+  },
+  bottomContainer: {
+    marginTop: 15,
+    marginLeft: 30,
+    marginRight: 30,
   },
   errorText: {
     marginTop: 5,

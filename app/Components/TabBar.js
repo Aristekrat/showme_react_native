@@ -116,7 +116,7 @@ class TabBar extends React.Component {
               selected={this.state.selectedTab === 'tabThree'}
               onPress={() => this.setTab('tabThree')}
               title={"Claim Secret"}
-              icon={require('../img/tabicon-new.png')}
+              icon={require('../img/tabicon-claim.png')}
               style={styles.tabItem}>
                 <View></View>
             </TabBarIOS.Item>}

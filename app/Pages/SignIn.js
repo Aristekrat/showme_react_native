@@ -32,7 +32,7 @@ class SignIn extends React.Component {
       password: '',
       response: ''
     }
-    this.usersIndex = this.props.db.child('userIndex');
+    this.usersIndex = this.props.db.child('indexes').child('userIndex');
     this.users = this.props.db.child('users');
   }
 
@@ -59,28 +59,26 @@ class SignIn extends React.Component {
   }
 
   registerUser() {
-    var self = this;
     this.toggleActivityIndicator();
-    self.setState({response: ''});
-    let email = self.state.username.trim();
+    this.setState({response: ''});
+    let email = this.state.username.trim();
 
-    self.props.db.createUser({
+    this.props.db.createUser({
       email: email,
-      password: self.state.password
+      password: this.state.password
     }, (error, userData) => {
       if (error) {
-        self.errorHandler(error);
+        this.errorHandler(error);
       } else {
         var t = Utility.escapeEmail(email)
-        self.users.child(userData.uid).set({email: email, secrets: {} });
-        self.usersIndex.child(t).set(true);
+        this.users.child(userData.uid).set({email: email, secrets: {} });
+        this.usersIndex.child(t).set(true);
         this.loginUser(true);
       }
     }) // End parent function
   }
 
   loginUser(registrationFlag) {
-    var self = this; 
     let email = this.state.username.trim();
     this.toggleActivityIndicator();
     this.setState({response: ''});
@@ -119,21 +117,20 @@ class SignIn extends React.Component {
   }
 
   forgotPassword() {
-    var self = this;
     this.props.db.resetPassword({
       email: this.state.username
     }, function (error) {
         if (error) {
           switch (error.code) {
             case "INVALID_USER":
-              self.setState({response: 'User not found.'}); // Probably want to display registration query
+              this.setState({response: 'User not found.'}); // Probably want to display registration query
               break;
             default:
-              self.setState({response: 'Unknown error.'}); // Display skip
+              this.setState({response: 'Unknown error.'}); // Display skip
               break; 
           }
         } else {
-          self.setState({response: 'Forgot password success.'}); // Display success notification
+          this.setState({response: 'Forgot password success.'}); // Display success notification
         }
     });
   }

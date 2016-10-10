@@ -25,7 +25,7 @@ class MySecrets extends React.Component {
       displaying: "",
       animating: true,
       uid: "",
-      mySecrets: []
+      updatedSecrets: [],
     };
     this.mySecrets = this.props.route.secret ? this.props.route.secret : [];
   }
@@ -38,14 +38,21 @@ class MySecrets extends React.Component {
       };
     });
     
+    if (this.mySecrets.length > 0) {
+      var updated = {}
+      updated[this.props.route.secret.key] = true;
+      this.setState({updatedSecrets: updated});
+    }
     // Gets the initial data that will help the system determine if a secret has been updated
     AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
+      console.log("UPDATEDSECRETSSTRING", updatedSecretsString);
       if (updatedSecretsString) {
-        this.setState({updatedSecrets: JSON.parse(updatedSecretsString)});
+        this.setState({updatedSecrets: Object.assign(this.state.updatedSecrets, JSON.parse(updatedSecretsString)) });
       };
     });
 
     AsyncStorage.getItem('secrets').then((secrets_data_string) => {
+      console.log(secrets_data_string);
       if (secrets_data_string) {
         let secrets_data = JSON.parse(secrets_data_string);
         this.mySecrets = this.mySecrets.concat(secrets_data);

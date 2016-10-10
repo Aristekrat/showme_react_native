@@ -23,12 +23,12 @@ const SendSecret = {
   router: function (secretCode) {
     if (secretCode) {
       this.success();
-      //this.sendText(this.receiverPH, secretCode);
+      this.sendText(this.receiverPH, secretCode);
     } else if (!this.receiverId) {
       this.navigator.push({name: 'SecretCode', cookieData: this.route.cookieData, key: this.key, receiverPH: this.receiverPH});
     } else {
       this.success();
-      // this.sendText(this.receiverPH, secretCode);
+      this.sendText(this.receiverPH, secretCode);
     }
   },
 

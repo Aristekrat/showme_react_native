@@ -65,7 +65,6 @@ var styles = StyleSheet.create({
       flexDirection: 'row',
       paddingTop: 15,
       padding: 10,
-      height: 50,
     },
     secretText: {
       fontSize: 12,
