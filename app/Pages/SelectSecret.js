@@ -97,7 +97,7 @@ class SelectSecret extends React.Component {
     return (
       <View style={StylingGlobals.container}>
         <ActivityIndicator animationControl={this.state.animating}/>
-        {this.state.warn ? <Text style={styles.warning}>You must login to vote</Text> : null }
+        {this.state.warning ? <Text style={styles.warning}>You must login to vote</Text> : null }
         <ListView
           dataSource= {
             this.state.source

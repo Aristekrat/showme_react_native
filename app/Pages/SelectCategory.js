@@ -11,6 +11,8 @@ import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 import GetSecrets from '../Globals/GetSecrets.js';
 import Contacts from 'react-native-contacts';
+import actions from '../State/Actions/Actions';
+import { connect } from 'react-redux';
 
 import {
   StyleSheet,
@@ -25,9 +27,6 @@ import {
 class SelectCategory extends React.Component {
   constructor(props){
     super(props);
-    this.state = {
-      hasBeenIntroduced: true,
-    };
     this.categories = [{
       'title': 'Create Your Own'
     }, {
@@ -54,7 +53,7 @@ class SelectCategory extends React.Component {
   }
 
   sawIntro() {
-    AsyncStorage.setItem('hasBeenIntroduced', 'true');
+    AsyncStorage.setItem('selectCategoryIntro', 'true');
   }
 
   // Largely duplicated in index, need to figure out how to split this guy off while retaining the setTimeout core
@@ -72,9 +71,10 @@ class SelectCategory extends React.Component {
   }
 
   componentWillMount() {
-    AsyncStorage.getItem('hasBeenIntroduced').then((hasBeenIntroducedString) => {
+    AsyncStorage.getItem('selectCategoryIntro').then((hasBeenIntroducedString) => {
       if (!hasBeenIntroducedString) {
-        this.setState({hasBeenIntroduced: false});
+        this.props.actions.intro(false);
+        this.props.actions.setModalText('Use this menu to create a new secret or select a premade secret')
       }
     });
 
@@ -86,7 +86,7 @@ class SelectCategory extends React.Component {
   componentDidMount() {
     if (this.props.route.modalText) {
       this.refs.smodal.setModalVisible(true);
-      this.setState({modalText: this.props.route.modalText});
+      this.props.actions.setModalText(this.props.route.modalText);
     }
     // Check if this is in AsyncStorage. If not, make a call. If so, don't bother.
     Contacts.getAll((err, contacts) => {
@@ -133,16 +133,16 @@ class SelectCategory extends React.Component {
             imgSource={require("../img/caticon-past.png")} // music-player17
             elsewhere={() =>  this.selectCategory(this.categories[6].title) } />
         </ScrollView>
-        <SModal modalText={this.state.modalText} ref="smodal" />
+        <SModal modalText={this.props.modalText} ref="smodal" />
         <TabBar 
           navigator={this.props.navigator} 
           route={this.props.route} 
           db={this.props.db}
-          introBadge={this.state.hasBeenIntroduced ? 0 : 1 }
+          introBadge={this.props.hasBeenIntroduced ? 0 : 1 }
           ref="tabbar"
-          introPopup={this.state.hasBeenIntroduced ? null : () => { 
+          introPopup={this.props.hasBeenIntroduced ? null : () => { 
               this.refs.smodal.setModalVisible(true); 
-              this.setState({hasBeenIntroduced: true, modalText: 'Use this menu to create a new secret or select a premade secret'}); 
+              this.props.actions.intro(true);
               this.sawIntro();
             } 
           }
@@ -158,4 +158,18 @@ var styles = StyleSheet.create({
 
 ReactMixin(SelectCategory.prototype, ReactTimer);
 
-module.exports = SelectCategory;
+const mapStateToProps = (state) => {
+  return {
+    hasBeenIntroduced: state.selectCategoryIntro,
+    modalText: state.modalText
+  };
+}
+
+const mapDispatchToProps = function(dispatch, ownProps) {
+  actions.dispatch = dispatch;
+  return {
+    actions: actions
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SelectCategory);

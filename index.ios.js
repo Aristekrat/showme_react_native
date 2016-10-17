@@ -17,6 +17,7 @@ import ClaimSecret from './app/Pages/ClaimSecret.js';
 import RegistrationInterim from './app/Pages/RegistrationInterim.js';
 import Utility from './app/Globals/UtilityFunctions.js';
 import GetSecrets from './app/Globals/GetSecrets.js';
+import Title from './app/Components/Title.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 import {
@@ -36,121 +37,8 @@ import {
 import Firebase from 'firebase';
 const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 
-// Refactoring to ES6 will throw an application error, not easily refactored
-var NavigationBarRouteMapper = {
-  LeftButton: function(route, navigator, index, navState) {
-    if (index !== 0) {
-      switch (route.name) {
-        case 'MySecrets':
-        case 'SelectCategory':
-        case 'SelectSecret':
-        case 'ShareSecret':
-        case 'AskNumber':
-        case 'SecretCode':
-        case 'CreateSecret':
-        case 'MySecrets':
-        case 'MyAccount':
-        case 'SignIn':
-        case 'Register':
-        case 'YourAnswer':
-        case 'Facebook':
-        case 'RegistrationInterim':
-        case 'ClaimSecret':
-          return (
-            <TouchableHighlight 
-              onPress={() => navigator.pop()} 
-              underlayColor={'transparent'}>
-              <Image 
-                source={require("./app/img/arrow-left.png")}
-                style={styles.navBarLeftImage} />
-            </TouchableHighlight>
-          );
-        default:
-          return null;
-      }
-    } else {
-      return null;
-    }
-  },
-
-  RightButton: function(route, navigator, index, navState) {
-    return (
-      <View>
-      { Utility.authStatus ?
-        <TouchableHighlight 
-          style={styles.navBarRightButton}
-          onPress={() => { Utility.logout(); navigator.replace({name: route.name}); } } >
-          <Text style={styles.navBarButtonText}>Logout</Text>
-        </TouchableHighlight>
-        :
-        null
-      }
-      </View>
-    );
-  },
-
-  Title: function(route, navigator, index, navState) {
-    switch (route.name) {
-      case 'MySecrets':
-        return (
-          <Text style={styles.navBarTitleText}>My Secrets</Text>
-        );
-      case 'YourAnswer':
-        return (
-          <Text style={styles.navBarTitleText}>Your Answer</Text>
-        );
-      case 'SelectCategory':
-        return (
-          <Text style={styles.navBarTitleText}>Select Secret Type</Text>
-        );
-      case 'SelectSecret':
-        return (
-          <Text style={styles.navBarTitleText}>Select Secret</Text>
-        );
-      case 'ShareSecret':
-        return (
-          <Text style={styles.navBarTitleText}>Share Secret</Text>
-        );
-      case 'AskNumber':
-        return (
-          <Text style={styles.navBarTitleText}>Your Number</Text>
-        );  
-      case 'SecretCode':
-        return (
-          <Text style={styles.navBarTitleText}>Create Secret Code</Text>
-        );
-      case 'CreateSecret':
-        return (
-          <Text style={styles.navBarTitleText}>Create Secret</Text>
-        );     
-      case 'MyAccount':
-        return (
-          <Text style={styles.navBarTitleText}>My Account</Text>
-        );
-      case 'Gateway':
-        return (
-          <Text style={styles.navBarTitleText}>Register or Sign In</Text>
-        );    
-      case 'SignIn':
-        return (
-          <Text style={styles.navBarTitleText}>Sign In</Text>
-        );      
-      case 'Register':
-      case 'RegistrationInterim':  
-        return (
-          <Text style={styles.navBarTitleText}>Register</Text>
-        ); 
-      case 'ClaimSecret':
-        return (
-          <Text style={styles.navBarTitleText}>Claim Secret</Text>
-        );
-      default: 
-        return (
-          <Text style={styles.navBarTitleText}>Select Secret Type</Text>
-        );
-    }
-  }
-};
+import { Provider } from 'react-redux';
+import store from './app/State/Store';
 
 class ShowMe extends React.Component {
   constructor(props) {
@@ -318,42 +206,43 @@ class ShowMe extends React.Component {
         );  
       case 'SecretCode':
         return (
-          <SecretCode navigator={navigator} route={route} db={this.db} />
+          <SecretCode navigator={navigator} route={route} db={this.db} store={store} />
         );
       case 'CreateSecret':
         return (
-          <CreateYourOwn navigator={navigator} route={route} db={this.db}/>
+          <CreateYourOwn navigator={navigator} route={route} db={this.db} store={store} />
         );
       case 'Gateway':
         return (
-          <Gateway navigator={navigator} route={route} db={this.db}/>
+          <Gateway navigator={navigator} route={route} db={this.db} store={store} />
         );
       case 'MyAccount':
         return (
-          <MyAccount navigator={navigator} route={route} />
+          <MyAccount navigator={navigator} route={route} store={store}/>
         );
       case 'ClaimSecret':
         return (
-          <ClaimSecret navigator={navigator} route={route} db={this.db} />
+          <ClaimSecret navigator={navigator} route={route} db={this.db} store={store} />
         );    
       case 'SignIn':
       case 'Register':
         return (
-          <SignIn navigator={navigator} route={route} db={this.db}/>
+          <SignIn navigator={navigator} route={route} db={this.db} store={store} />
         );
       case 'RegistrationInterim':
         return (
-          <RegistrationInterim navigator={navigator} route={route}/>
+          <RegistrationInterim navigator={navigator} route={route} store={store} />
         );
       default:
         return (
-          <SelectCategory navigator={navigator} route={route} db={this.db} />
+          <SelectCategory navigator={navigator} route={route} db={this.db} store={store} />
         );
       }
   }
   
   render () {
     return (
+    <Provider store={store}>
       <Navigator
         ref={(navigator) => { this.navigator = navigator}}
         renderScene={this.renderScene}
@@ -361,12 +250,13 @@ class ShowMe extends React.Component {
         cookieData={''}
         navigationBar={
           <Navigator.NavigationBar
-              routeMapper={NavigationBarRouteMapper}
+              routeMapper={Title}
               style={styles.navBar} />
         }
         initialRoute={{
           name: "SelectCategory"
         }} />
+      </Provider>
     );
   }
 };

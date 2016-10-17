@@ -10,9 +10,6 @@ import {
 } from 'react-native';
 
 class MySecret extends React.Component {
-  constructor(props){
-    super(props);
-  }
   render(){
     return (
       <TouchableHighlight 

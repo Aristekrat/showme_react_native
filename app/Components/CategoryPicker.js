@@ -16,8 +16,7 @@ class CategoryPicker extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      category: 'Social',
-      loaded: false
+      category: 'Social'
     } 
   }
   render () {

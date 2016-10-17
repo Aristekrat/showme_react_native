@@ -1,9 +1,11 @@
 'use strict';
 
 import React, { Component } from 'react';
-import StylingGlobals from '../Globals/StylingGlobals.js';
-import ArrowLink from '../Components/ArrowLink.js';
-import Utility from '../Globals/UtilityFunctions.js';
+import StylingGlobals from '../Globals/StylingGlobals';
+import ArrowLink from '../Components/ArrowLink';
+import Utility from '../Globals/UtilityFunctions';
+import actions from '../State/Actions/Actions';
+import { connect } from 'react-redux';
 import {
   StyleSheet,
   Text,
@@ -26,10 +28,6 @@ const {
 class Gateway extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      emailAddress: '',
-      validEmail: true
-    },
     this.userIndex = this.props.db.child('indexes').child('userIndex');
     this.users = this.props.db.child('users');
   }
@@ -44,19 +42,18 @@ class Gateway extends React.Component {
   }
 
   checkEmail() {
-    var self = this;
-    if (self.validateEmail(self.state.emailAddress)) {
-      self.userIndex.once('value', function (snapshot) {
-        if (snapshot.hasChild(self.escapeEmail(self.state.emailAddress))) {
+    if (this.validateEmail(this.props.emailAddress)) {
+      this.userIndex.once('value', (snapshot) => {
+        if (snapshot.hasChild(this.escapeEmail(this.props.emailAddress))) {
           // Go to login
-          self.props.navigator.push({name: 'SignIn', cookieData: self.state.emailAddress})
+          this.props.navigator.push({name: 'SignIn', cookieData: this.props.emailAddress})
         } else {
           // Go to registration
-          self.props.navigator.push({name: 'Register', cookieData: self.state.emailAddress})
+          this.props.navigator.push({name: 'Register', cookieData: this.props.emailAddress})
         }
       });
     } else {
-      self.setState({validEmail: false});
+      this.props.setError("Please enter a valid email");
     }
   }
 
@@ -98,7 +95,7 @@ class Gateway extends React.Component {
                   ref="emailAddress"
                   autoCapitalize="none"
                   keyboardType={'email-address'}
-                  onChangeText={(emailAddress) => this.setState({emailAddress})} />
+                  onChangeText={(emailAddress) => this.props.updateFormInput(emailAddress)} />
               <TouchableHighlight 
                   style={styles.emailButton} 
                   underlayColor={StylingGlobals.colors.pressDown} 
@@ -106,10 +103,10 @@ class Gateway extends React.Component {
                 <Image style={styles.emailRightArrow} source={require("../img/arrow-right.png")} />
               </TouchableHighlight>
             </View>
-            { this.state.validEmail ?
-                null
-                : 
+            { this.props.error ?
                 <Text style={styles.errorText}>Please use a valid email</Text>
+                : 
+                null
             }
           </View>
 
@@ -229,4 +226,17 @@ const styles = StyleSheet.create({
   }
 });
 
-module.exports = Gateway;
+const mapStateToProps = (state) => {
+  return {
+    animating: state.isAnimating,
+    error: state.error,
+    emailAddress: state.emailAddress,
+  };
+}
+
+const mapDispatchToProps = function(dispatch, ownProps) {
+  actions.dispatch = dispatch;
+  return actions;
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Gateway)

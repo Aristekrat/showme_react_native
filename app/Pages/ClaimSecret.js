@@ -6,6 +6,7 @@ import GetSecrets from '../Globals/GetSecrets.js';
 import StylingGlobals from '../Globals/StylingGlobals.js';
 import BigButton from '../Components/BigButton.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
+import actions from '../State/Actions/Actions'
 import {
   StyleSheet,
   Text,
@@ -16,14 +17,11 @@ import {
   AsyncStorage
 } from 'react-native';
 
+import { connect } from 'react-redux'
+
 class ClaimSecret extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      code: '',
-      error: '',
-      animating: false,
-    }
     this.verificationCodes = this.props.db.child('indexes').child('verificationCodes');
     this.verifiedIndex = this.props.db.child('indexes').child('verified');
     this.privateSecrets = this.props.db.child('privateSecrets');
@@ -32,17 +30,19 @@ class ClaimSecret extends React.Component {
 
   // TODO refactor this thing, it's much bigger than a well written function should be
   verifyCode() {
-    if (!this.state.code) {
-      this.setState({error: "Please enter a secret code. You would've got this in a friend's text invitation"});
+    if (!this.props.code) {
+      //this.setState({error: "Please enter a secret code. You would've got this in a friend's text invitation"});
+      this.props.setError("Please enter a secret code. You would've got this in a friend's text invitation");
     } else {
-      this.setState({animating: true});
-      this.verificationCodes.orderByValue().equalTo(this.state.code).once('value', (snapshot) => {
+      this.props.toggleAnimation();
+      this.verificationCodes.orderByValue().equalTo(this.props.code).once('value', (snapshot) => {
         let valReturned = snapshot.val();
         if (valReturned) {
+          // Everthing within this block should be abstracted into its own function
           var codeKey = Object.keys(valReturned)[0];
           AsyncStorage.getItem('userData').then((user_data_string) => { 
             if (user_data_string) {
-              this.setState({animating: false});
+              this.props.toggleAnimation();
               let user_data = JSON.parse(user_data_string);
               this.privateSecrets.child(codeKey).update({responderID: user_data.uid}, //update private secrets with responder ID
                 () => {
@@ -62,16 +62,21 @@ class ClaimSecret extends React.Component {
               //this.verificationCodes.child(codeKey).remove();
               this.users.child(user_data.uid).child('secrets').child(codeKey).set({answerState: 'NA', sentState: 'RR'}); // answerState is hard code atm, might be AA, need to check in the future
             } else {
-              this.setState({error: "Sorry, we can't find your user id. Please log in", animating: false});
+              this.setErrorState("Sorry, we can't find your user id. Please log in");
             }
           });
         } else {
-          this.setState({error: "Sorry, we couldn't find that code", animating: false});
+          this.setErrorState("Sorry, we couldn't find that code");
         }
       }, (err) => {
-        this.setState({error: "Sorry, we experienced a network error. Please try again", animating: false});
+        this.setErrorState("Sorry, we experienced a network error. Please try again");
       });     
     }
+  }
+
+  setErrorState(errorText) {
+    this.props.setError(errorText);
+    this.props.toggleAnimation();
   }
 
   render(){
@@ -84,21 +89,34 @@ class ClaimSecret extends React.Component {
           <TextInput
             style={StylingGlobals.textInput}  
             autoFocus={true}
-            onChangeText={(text) => this.setState({code: text})}
-            value={this.state.code} />
+            onChangeText={(text) => this.props.updateFormInput(text)}
+            value={this.props.code} />
           <Text style={styles.paragraph}>Check the text you received for your code</Text>
           <BigButton do={() => this.verifyCode()}>
             Submit
           </BigButton>
           {
-            this.state.error ? <Text style={styles.error}>{this.state.error}</Text> : null
+            this.props.error ? <Text style={styles.error}>{this.props.error}</Text> : null
           }
-          <ActivityIndicator animationControl={this.state.animating} />
+          <ActivityIndicator animationControl={this.props.animating} />
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
     );
   }
+}
+
+const mapStateToProps = (state) => {
+  return {
+    animating: state.isAnimating,
+    error: state.error,
+    code: state.formInput,
+  };
+}
+
+const mapDispatchToProps = function(dispatch, ownProps) {
+  actions.dispatch = dispatch;
+  return actions;
 }
 
 var styles = StyleSheet.create({
@@ -115,4 +133,4 @@ var styles = StyleSheet.create({
   }
 });
 
-module.exports = ClaimSecret;
+export default connect(mapStateToProps, mapDispatchToProps)(ClaimSecret)
