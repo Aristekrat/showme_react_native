@@ -7,7 +7,8 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableHighlight
+  TouchableHighlight,
+  Image,
 } from 'react-native';
 
 const TitleBar = {

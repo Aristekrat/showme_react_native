@@ -5,6 +5,8 @@ import StylingGlobals from '../Globals/StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import Secret from '../Components/SelectableSecret.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
+import actions from '../State/Actions/Actions';
+import { connect } from 'react-redux';
 import {
   StyleSheet,
   Text,
@@ -20,17 +22,10 @@ class SelectSecret extends React.Component {
     super(props);
     this.state = {
       source: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
-      warning: false,
-      animating: true,
     }
     this.secrets = [];
     this.knownUser = false;
     this.publicSecrets = this.props.db.child('publicSecrets').child(this.props.route.category);
-  }
-
-  // Needs to be moved to common utils
-  toggleActivityIndicator() {
-    this.setState({animating: !this.state.animating});
   }
 
   postUsersVote(theVote, key) {
@@ -63,7 +58,7 @@ class SelectSecret extends React.Component {
         }
       }
     } else {
-      this.setState({warning: true});
+      this.props.setError("You must be logged in to vote");
     }
   }
 
@@ -86,18 +81,17 @@ class SelectSecret extends React.Component {
       this.secrets.push(secret);
       this.setState({
         source: this.state.source.cloneWithRows(this.secrets),
-        animating: false,
       });
-    }, function (errorObject) {
-      console.log("The read failed: " + errorObject.code); // TODO real error handling
+    }, (errorObject) => {
+      this.props.setError("Sorry, we experienced a network error");
     })
   }
   
   render() {
     return (
       <View style={StylingGlobals.container}>
-        <ActivityIndicator animationControl={this.state.animating}/>
-        {this.state.warning ? <Text style={styles.warning}>You must login to vote</Text> : null }
+        <ActivityIndicator animationControl={this.props.animating}/>
+        {this.props.error ? <Text style={styles.warning}>{this.props.error}</Text> : null }
         <ListView
           dataSource= {
             this.state.source
@@ -140,5 +134,18 @@ var styles = StyleSheet.create({
   },
 });
 
+const mapStateToProps = (state) => {
+  return {
+    animating: state.isAnimating,
+    error: state.error,
+  };
+}
 
-module.exports = SelectSecret;
+const mapDispatchToProps = function(dispatch, ownProps) {
+  actions.dispatch = dispatch;
+  return {
+    actions: actions
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SelectSecret);
