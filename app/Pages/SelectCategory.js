@@ -166,7 +166,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = function(dispatch, ownProps) {
-  actions.dispatch = dispatch;
+  //actions.dispatch = dispatch;
   return {
     actions: actions
   }

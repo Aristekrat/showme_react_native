@@ -1,6 +1,9 @@
 'use strict';
 
+import store from '../Store';
+
 const Actions = {
+  dispatch: store.dispatch,
 	toggleAnimation: function() {
 	  this.dispatch({type: 'toggleAnimating'});
 	},
@@ -22,11 +25,18 @@ const Actions = {
   updateSecretKey: function (value) {
     this.dispatch({type: 'secretKey', key: value});
   },
+  updateFirstName: function (value) {
+    this.dispatch({type: 'firstName', text: value});
+  },
 	intro: function (value) {
 		this.dispatch({type: 'intro', value: value});
 	},
   setModalText: function (text) {
     this.dispatch({type: 'modalText', text: text});
+  },
+  resetState: function () {
+    this.dispatch({type: 'removeError'});
+    this.dispatch({type: 'setAnimating', value: false});
   },
 }
 

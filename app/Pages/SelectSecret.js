@@ -142,7 +142,6 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = function(dispatch, ownProps) {
-  actions.dispatch = dispatch;
   return {
     actions: actions
   }

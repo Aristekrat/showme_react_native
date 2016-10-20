@@ -1,6 +1,6 @@
 'use strict';
 
-function secretKeyReducer(state = "", action) {
+function secretKeyReducer(state = null, action) {
 	switch(action.type) {
 		case "secretKey":
 			return action.key

@@ -39,6 +39,7 @@ const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 
 import { Provider } from 'react-redux';
 import store from './app/State/Store';
+import actions from './app/State/Actions/Actions';
 
 class ShowMe extends React.Component {
   constructor(props) {
@@ -179,6 +180,7 @@ class ShowMe extends React.Component {
   }
 
   renderScene (route, navigator) {
+    actions.resetState();
     switch (route.name) {
       case 'SelectCategory':
         return (

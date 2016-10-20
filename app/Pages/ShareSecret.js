@@ -28,10 +28,6 @@ import {
 class ShareSecret extends React.Component { 
   constructor(props){
     super(props);
-    this.state = {
-      ph: '',
-      key: '',
-    };
     uid: '';
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
@@ -94,11 +90,11 @@ class ShareSecret extends React.Component {
             : 
             <View>
               <Text style={styles.prompt}>Choose who you want to send to...</Text>
-              <UserContacts ref="userContacts" contacts={this.props.route.contacts}/>
+              <UserContacts contacts={this.props.route.contacts}/>
               <Text style={styles.label}>You'll have a chance to review before you send</Text>
               <BigButton do={() => { 
                   this.props.actions.toggleAnimation();
-                  SendSecret.saveArgs(this.refs.userContacts.state.ph, this.refs.userContacts.state.firstName, this.uid, this.props.secretKey, this.props); 
+                  SendSecret.saveArgs(this.props.phoneNumber, this.props.firstName, this.uid, this.props.secretKey, this.props); 
                 }}>
                 Continue
               </BigButton>
@@ -157,13 +153,12 @@ const mapStateToProps = (state) => {
     animating: state.isAnimating,
     error: state.error,
     phoneNumber: state.phoneNumber,
-    dummy: state.formInput, 
     secretKey: state.secretKey,
+    firstName: state.firstName,
   };
 }
 
 const mapDispatchToProps = function(dispatch, ownProps) {
-  actions.dispatch = dispatch;
   return {
     actions: actions
   }

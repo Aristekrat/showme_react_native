@@ -2,6 +2,8 @@
  
 import React from 'react';
 import StylingGlobals from '../Globals/StylingGlobals.js';
+import actions from '../State/Actions/Actions';
+import { connect } from 'react-redux';
 
 import {
   StyleSheet,
@@ -18,10 +20,8 @@ class UserContacts extends React.Component {
     super(props);
     this.state = {
       contact: 0,
-      contacts: this.props.contacts.filter(this.filterSecrets),
-      ph: this.props.contacts[0].phoneNumbers[0].number,
-      firstName: this.props.contacts[0].givenName
-    } 
+    }
+    this.contacts = this.props.contacts.filter(this.filterSecrets);
   }
 
   // Removes contacts without a phone number
@@ -46,10 +46,12 @@ class UserContacts extends React.Component {
           selectedValue={this.state.contact}
           onValueChange={
             (contactIndex) => {
-              this.setState({ph: this.state.contacts[contactIndex].phoneNumbers[0].number, contact: contactIndex, firstName: this.state.contacts[contactIndex].givenName});
+              this.setState({contact: contactIndex});
+              this.props.actions.updatePhoneNumber(this.contacts[contactIndex].phoneNumbers[0].number);
+              this.props.actions.updateFirstName(this.contacts[contactIndex].givenName);
             } 
           }>
-          {this.state.contacts.map((contact, index) => (
+          {this.contacts.map((contact, index) => (
             <PickerItemIOS
               key={contact}
               value={index}
@@ -67,4 +69,15 @@ var styles = StyleSheet.create({
   },
 });
 
-module.exports = UserContacts;
+const mapStateToProps = (state) => {
+  return {};
+}
+
+const mapDispatchToProps = function(dispatch, ownProps) {
+  actions.dispatch = dispatch;
+  return {
+    actions: actions
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserContacts);
