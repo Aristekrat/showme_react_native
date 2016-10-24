@@ -8,6 +8,7 @@ import ActivityIndicator from '../Components/ActivityIndicator.js';
 import ArrowLink from '../Components/ArrowLink.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
+import actions from '../State/Actions/Actions';
 import {
   StyleSheet,
   Text,
@@ -17,20 +18,28 @@ import {
   TouchableHighlight,
   AsyncStorage
 } from 'react-native';
+import { connect } from 'react-redux'
 
 class MySecrets extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       displaying: "",
-      animating: true,
       uid: "",
       updatedSecrets: [],
     };
     this.mySecrets = this.props.route.secret ? this.props.route.secret : [];
   }
+  /*  this.state = {
+      displaying: "",
+      animating: true,
+      uid: "",
+      updatedSecrets: [],
+    }; */
+
 
   componentWillMount() {
+    this.props.actions.toggleAnimation();
     AsyncStorage.getItem('userData').then((user_data_json) => { 
       if (user_data_json) {
         let user_data = JSON.parse(user_data_json);
@@ -45,23 +54,21 @@ class MySecrets extends React.Component {
     }
     // Gets the initial data that will help the system determine if a secret has been updated
     AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
-      console.log("UPDATEDSECRETSSTRING", updatedSecretsString);
       if (updatedSecretsString) {
         this.setState({updatedSecrets: Object.assign(this.state.updatedSecrets, JSON.parse(updatedSecretsString)) });
       };
     });
 
     AsyncStorage.getItem('secrets').then((secrets_data_string) => {
-      console.log(secrets_data_string);
       if (secrets_data_string) {
         let secrets_data = JSON.parse(secrets_data_string);
         this.mySecrets = this.mySecrets.concat(secrets_data);
         this.initalDisplay();
         this.listSecrets();
-        this.toggleActivityIndicator();
+        this.props.actions.toggleAnimation();
       } else if (!this.props.route.secret && !secrets_data_string) {
         this.setState({displaying: 'NR'});
-        this.toggleActivityIndicator();
+        this.props.actions.toggleAnimation();
       }
     });
 
@@ -139,11 +146,6 @@ class MySecrets extends React.Component {
     this.listSecrets();
   }
 
-  // Needs to be moved to common utils
-  toggleActivityIndicator() {
-    this.setState({animating: !this.state.animating});
-  }
-
   // Chooses which tab to display on first View load
   initalDisplay() {
     if (this.mySecrets.length === 0) { // User has no secrets
@@ -203,7 +205,7 @@ class MySecrets extends React.Component {
             </TouchableHighlight>
           </View>
           <View style={styles.contentContainer}>
-            <ActivityIndicator animationControl={this.state.animating}/>
+            <ActivityIndicator animationControl={this.props.animating}/>
             {helperText}
             {secretsList}
           </View>
@@ -252,4 +254,18 @@ var styles = StyleSheet.create({
   }
 });
 
-module.exports = MySecrets;
+const mapStateToProps = (state) => {
+  return {
+    animating: state.isAnimating,
+    answer: state.formInput,
+    error: state.error,
+  };
+}
+
+const mapDispatchToProps = function(dispatch, ownProps) {
+  return {
+    actions: actions
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MySecrets);

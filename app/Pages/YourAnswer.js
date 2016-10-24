@@ -6,6 +6,7 @@ import TabBar from '../Components/TabBar.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
+import actions from '../State/Actions/Actions';
 import {
   StyleSheet,
   Text,
@@ -15,14 +16,11 @@ import {
   TextInput,
   AsyncStorage,
 } from 'react-native';
+import { connect } from 'react-redux'
 
 class YourAnswer extends React.Component {
   constructor(props){
     super(props);
-    this.state = {
-      answer: '',
-      animating: false
-    }
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
     this.answers = this.props.db.child('answers');
@@ -40,28 +38,24 @@ class YourAnswer extends React.Component {
     }
   }
 
-  toggleActivityIndicator() { // Needs to be moved to common utils
-    this.setState({animating: !this.state.animating});
-  }
-
   notify(notificationText) {
-    this.toggleActivityIndicator();
-    this.setState({notificationText: notificationText});
+    this.props.actions.toggleAnimation();
+    this.props.actions.setError(notificationText); // Not actually an error here, a success notification instead
   }
 
   submitAnswer() {
-    if (this.state.answer.length > 5) {
-      this.toggleActivityIndicator()
+    if (this.props.answer.length > 5) {
+      this.props.actions.toggleAnimation();
       let secretID = this.currentSecret.key;
       AsyncStorage.getItem('userData').then((user_data_json) => {
         let user_data = JSON.parse(user_data_json); 
         let userStatus = this.responderOrAsker(user_data.uid, this.props.route.cookieData);
         let updatedAnswer = {};
-        updatedAnswer[userStatus] = this.state.answer;
+        updatedAnswer[userStatus] = this.props.answer;
         this.answers.child(secretID).update(updatedAnswer, this.updateUsersTable(userStatus, user_data.uid));
       })
     } else {
-      this.setState({notificationText: 'Please provide an answer'});
+      this.props.actions.setError('Please provide an answer');
     }
   }
 
@@ -89,7 +83,7 @@ class YourAnswer extends React.Component {
     this.notify("Success! We'll notify you when you both answer");
     this.setTimeout (
       () => { this.props.navigator.pop(); }, 
-      1000    
+      3000    
     );
   }
 
@@ -102,16 +96,16 @@ class YourAnswer extends React.Component {
             <TextInput
                 style={styles.textInput}  
                 autoFocus={true}
-                onChangeText={(answer) => this.setState({answer})}
-                value={this.state.answer} />
+                onChangeText={(answer) => this.props.actions.updateFormInput(answer)}
+                value={this.props.answer} />
           </View>
-          <ActivityIndicator animationControl={this.state.animating}/>
+          <ActivityIndicator animationControl={this.props.animating}/>
           <TouchableHighlight style={[styles.button, StylingGlobals.horizontalCenter]} 
               onPress={() => this.submitAnswer()}
               underlayColor={StylingGlobals.colors.pressDown}>
             <Text style={styles.buttonText}>Update</Text>
           </TouchableHighlight>
-          {this.state.notificationText ? <Text style={styles.notificationText}>{this.state.notificationText}</Text> : null}
+          { this.props.error ? <Text style={styles.notificationText}>{this.props.error}</Text> : null}
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
@@ -121,7 +115,7 @@ class YourAnswer extends React.Component {
 
 ReactMixin(YourAnswer.prototype, ReactTimer);
 
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   form: {
     padding: 20
   },
@@ -151,5 +145,18 @@ var styles = StyleSheet.create({
   },
 });
 
+const mapStateToProps = (state) => {
+  return {
+    animating: state.isAnimating,
+    answer: state.formInput,
+    error: state.error,
+  };
+}
 
-module.exports = YourAnswer;
+const mapDispatchToProps = function(dispatch, ownProps) {
+  return {
+    actions: actions
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(YourAnswer);

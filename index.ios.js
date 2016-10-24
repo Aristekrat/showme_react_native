@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import SelectCategory from './app/Pages/SelectCategory.js';
 import SelectSecret from './app/Pages/SelectSecret.js';
 import ShareSecret from './app/Pages/ShareSecret.js';
-import AskNumber from './app/Pages/AskNumber.js';
 import SecretCode from './app/Pages/SecretCode.js';
 import MySecrets from './app/Pages/MySecrets.js';
 import YourAnswer from './app/Pages/YourAnswer.js';
@@ -256,7 +255,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "SelectCategory"
+          name: "MySecrets"
         }} />
       </Provider>
     );

@@ -28,6 +28,9 @@ const Actions = {
   updateFirstName: function (value) {
     this.dispatch({type: 'firstName', text: value});
   },
+  updateUserId: function (value) {
+    this.dispatch({type: 'userId', uid: value});
+  },
 	intro: function (value) {
 		this.dispatch({type: 'intro', value: value});
 	},

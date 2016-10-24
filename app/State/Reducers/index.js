@@ -10,6 +10,7 @@ import introReducer from './IntroReducer';
 import modalTextReducer from './ModalTextReducer';
 import secretKeyReducer from './SecretKeyReducer';
 import nameReducer from './NameReducer';
+import userIdReducer from './UserIdReducer';
 
 const reducers = combineReducers({
   isAnimating: animationReducer,
@@ -21,6 +22,7 @@ const reducers = combineReducers({
   secretKey: secretKeyReducer,
   selectCategoryIntro: introReducer,
   modalText: modalTextReducer,
+  userId: userIdReducer,
 });
 
 export default reducers;
