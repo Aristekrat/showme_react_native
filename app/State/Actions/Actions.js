@@ -31,6 +31,9 @@ const Actions = {
   updateUserId: function (value) {
     this.dispatch({type: 'userId', uid: value});
   },
+  setMSDisplayType: function (value) {
+    this.dispatch({type: 'mst', value: value});
+  },
 	intro: function (value) {
 		this.dispatch({type: 'intro', value: value});
 	},

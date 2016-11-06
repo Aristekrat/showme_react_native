@@ -24,8 +24,6 @@ class MySecrets extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      displaying: "",
-      uid: "",
       updatedSecrets: [],
     };
     this.mySecrets = this.props.route.secret ? this.props.route.secret : [];
@@ -40,12 +38,14 @@ class MySecrets extends React.Component {
 
   componentWillMount() {
     this.props.actions.toggleAnimation();
-    AsyncStorage.getItem('userData').then((user_data_json) => { 
-      if (user_data_json) {
-        let user_data = JSON.parse(user_data_json);
-        this.setState({uid: user_data.uid});
-      };
-    });
+    if (!this.props.userId) {
+      AsyncStorage.getItem('userData').then((user_data_json) => { 
+        if (user_data_json) {
+          let user_data = JSON.parse(user_data_json);
+          this.props.actions.updateUserId(user_data.uid);
+        };
+      });
+    }
     
     if (this.mySecrets.length > 0) {
       var updated = {}
@@ -67,7 +67,8 @@ class MySecrets extends React.Component {
         this.listSecrets();
         this.props.actions.toggleAnimation();
       } else if (!this.props.route.secret && !secrets_data_string) {
-        this.setState({displaying: 'NR'});
+        //this.setState({displaying: 'NR'});
+        this.props.actions.setMSDisplayType('NR');
         this.props.actions.toggleAnimation();
       }
     });
@@ -100,7 +101,7 @@ class MySecrets extends React.Component {
 
   // Sets the 'Asker' field in an individual secret, called in listSecrets
   setAskerName(askerID, askerName) {
-    if (this.state.uid && this.state.uid === askerID) {
+    if (this.props.userId && this.props.userId === askerID) {
       return "You";
     } else if (!askerName) {
       return "Anonymous";
@@ -120,7 +121,7 @@ class MySecrets extends React.Component {
 
   // The main implementation function to actually wire secrets in the view
   listSecrets (arrayOfSecrets = this.mySecrets) { 
-    let currentState = this.state.displaying;
+    let currentState = this.props.displaying;
     return arrayOfSecrets.map((item, index) => {
       if (item.state.sentState === currentState) {
         let answerNotification = this.setAnswerNotifiction(item.state);
@@ -142,23 +143,26 @@ class MySecrets extends React.Component {
   }
 
   setTab(state) {
-    this.setState({displaying: state});
+    //this.setState({displaying: state});
+    this.props.actions.setMSDisplayType(state);
     this.listSecrets();
   }
 
   // Chooses which tab to display on first View load
   initalDisplay() {
     if (this.mySecrets.length === 0) { // User has no secrets
-      this.setState({displaying: "NR"})
+      //this.setState({displaying: "NR"});
+      this.props.actions.setMSDisplayType('NR');
     } else {
-      this.setState({displaying: this.mySecrets[0].state.sentState}); // Probably want to refine this function to load the last / most updated, OK for now
+      this.props.actions.setMSDisplayType(this.mySecrets[0].state.sentState);
+      //this.setState({displaying: this.mySecrets[0].state.sentState}); // Probably want to refine this function to load the last / most updated, OK for now
     }
   }
 
   render() {
     let helperText;
     let secretsList = this.listSecrets();
-    switch(this.state.displaying) {
+    switch(this.props.displaying) {
       case "SO":
         helperText = null;
         break;
@@ -180,25 +184,25 @@ class MySecrets extends React.Component {
         <ScrollView>
           <View style={styles.header}>
             <TouchableHighlight 
-                style={[styles.headerButton, styles.firstHeaderButton, this.state.displaying === "SO" ? styles.active : null]} 
+                style={[styles.headerButton, styles.firstHeaderButton, this.props.displaying === "SO" ? styles.active : null]} 
                 underlayColor={StylingGlobals.colors.accentColor} 
                 onPress={() => this.setTab('SO')} >
               <Text style={styles.headerButtonText}>Answered</Text>
             </TouchableHighlight>
             <TouchableHighlight 
-                style={[styles.headerButton, this.state.displaying === "QS" ? styles.active : null]} 
+                style={[styles.headerButton, this.props.displaying === "QS" ? styles.active : null]} 
                 underlayColor={StylingGlobals.colors.accentColor}
                 onPress={() => this.setTab('QS')}>
               <Text style={styles.headerButtonText}>Sent</Text>
             </TouchableHighlight>
             <TouchableHighlight 
-                style={[styles.headerButton, this.state.displaying === "RR" ? styles.active : null]} 
+                style={[styles.headerButton, this.props.displaying === "RR" ? styles.active : null]} 
                 underlayColor={StylingGlobals.colors.accentColor}
                 onPress={() => this.setTab('RR')}>
               <Text style={styles.headerButtonText}>Requested</Text>
             </TouchableHighlight>
             <TouchableHighlight 
-                style={[styles.headerButton, this.state.displaying === "CR" ? styles.active : null]} 
+                style={[styles.headerButton, this.props.displaying === "CR" ? styles.active : null]} 
                 underlayColor={StylingGlobals.colors.accentColor}
                 onPress={() => this.setTab('CR')}>
               <Text style={styles.headerButtonText}>Not Sent</Text>
@@ -257,8 +261,8 @@ var styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     animating: state.isAnimating,
-    answer: state.formInput,
-    error: state.error,
+    userId: state.userId,
+    displaying: state.mySecretsType,
   };
 }
 

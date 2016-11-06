@@ -11,6 +11,7 @@ import modalTextReducer from './ModalTextReducer';
 import secretKeyReducer from './SecretKeyReducer';
 import nameReducer from './NameReducer';
 import userIdReducer from './UserIdReducer';
+import mySecretsTypeReducer from './MySecretsTypeReducer';
 
 const reducers = combineReducers({
   isAnimating: animationReducer,
@@ -23,6 +24,7 @@ const reducers = combineReducers({
   selectCategoryIntro: introReducer,
   modalText: modalTextReducer,
   userId: userIdReducer,
+  mySecretsType: mySecretsTypeReducer,
 });
 
 export default reducers;
