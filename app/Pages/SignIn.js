@@ -10,6 +10,8 @@ import MySecrets from './MySecrets.js';
 import MyAccount from './MyAccount.js';
 import Utility from '../Globals/UtilityFunctions.js';
 import GetSecrets from '../Globals/GetSecrets.js';
+import { connect } from 'react-redux';
+import actions from '../State/Actions/Actions';
 
 import {
   StyleSheet,
@@ -26,46 +28,42 @@ import {
 class SignIn extends React.Component {
   constructor(props){
     super(props);
-    this.state = {
-      animating: false,
-      username: this.props.route.cookieData,
-      password: '',
-      response: ''
-    }
     this.usersIndex = this.props.db.child('indexes').child('userIndex');
     this.users = this.props.db.child('users');
   }
 
-  toggleActivityIndicator() {
-    this.setState({animating: !this.state.animating});
-  }
-
   errorHandler(error) {
-    this.toggleActivityIndicator();
+    //this.toggleActivityIndicator();
+    this.props.actions.toggleAnimation();
     switch (error.code) {
       case 'INVALID_EMAIL':
-        this.setState({response: 'Invalid email.'}); // Enter correct email
+        this.props.actions.setError('Invalid email.');
+        //this.setState({response: 'Invalid email.'}); // Enter correct email
         break;
       case 'INVALID_USER':
-        this.setState({response: 'Invalid user.'}); // Display forgot
+        this.props.actions.setError('Invalid user.');
+        //this.setState({response: 'Invalid user.'}); // Display forgot
         break;
       case 'INVALID_PASSWORD':
-        this.setState({response: 'Invalid password.'}); // Display forgot
+        this.props.actions.setError('Invalid password.');
+        //this.setState({response: 'Invalid password.'}); // Display forgot
         break;
       default:
-        this.setState({response: 'Unknown error.'}); // Display skip 
+        this.props.actions.setError('Unknown error.');
+        //this.setState({response: 'Unknown error.'}); // Display skip 
         break;
     }
   }
 
   registerUser() {
-    this.toggleActivityIndicator();
-    this.setState({response: ''});
-    let email = this.state.username.trim();
+    this.props.actions.toggleAnimation();
+    //this.setState({response: ''});
+    this.props.actions.removeError();
+    let email = this.props.username.trim();
 
     this.props.db.createUser({
       email: email,
-      password: this.state.password
+      password: this.props.password
     }, (error, userData) => {
       if (error) {
         this.errorHandler(error);
@@ -79,19 +77,23 @@ class SignIn extends React.Component {
   }
 
   loginUser(registrationFlag) {
-    let email = this.state.username.trim();
-    this.toggleActivityIndicator();
-    this.setState({response: ''});
-    
+    let email = this.props.username.trim();
+    //this.toggleActivityIndicator();
+    this.props.actions.toggleAnimation();
+    //this.setState({response: ''});
+    this.props.actions.removeError();
+
     this.props.db.authWithPassword({
       email: email, 
-      password: this.state.password
+      password: this.props.password
     }, (error, userData) => {
       if (error) {
         this.errorHandler(error);
       } else {
-        this.setState({response: 'Success.'});
-        this.toggleActivityIndicator();
+        this.props.actions.setError('Success.');
+        //this.setState({response: 'Success.'});
+        //this.toggleActivityIndicator();
+        this.props.actions.toggleAnimation();
         AsyncStorage.setItem('userData', JSON.stringify(userData));
         Utility.setLocalAuth(true);
         GetSecrets.getRemoteSecrets();
@@ -105,63 +107,73 @@ class SignIn extends React.Component {
   }
 
   submitUser() {
-    if (this.state.username !== '' && this.state.password !== '') {
+    if (this.props.username !== '' && this.props.password !== '') {
       if (this.props.route.name === 'Register') {
         this.registerUser()
       } else if (this.props.route.name === 'SignIn') {
         this.loginUser()
       }
     } else {
-      this.setState({response: 'Empty email or password.'}); // Enter all fields
+      this.props.actions.setError('Empty email or password.');
+      //this.setState({response: 'Empty email or password.'}); // Enter all fields
     }
   }
 
   forgotPassword() {
     this.props.db.resetPassword({
-      email: this.state.username
+      email: this.props.username
     }, function (error) {
         if (error) {
           switch (error.code) {
             case "INVALID_USER":
-              this.setState({response: 'User not found.'}); // Probably want to display registration query
+              this.props.actions.setError('User not found.');
+              //this.setState({response: 'User not found.'}); // Probably want to display registration query
               break;
             default:
-              this.setState({response: 'Unknown error.'}); // Display skip
+              this.props.actions.setError('Unknown error.');
+              //this.setState({response: 'Unknown error.'}); // Display skip
               break; 
           }
         } else {
-          this.setState({response: 'Forgot password success.'}); // Display success notification
+          this.props.actions.setError('Forgot password success.');
+          //this.setState({response: 'Forgot password success.'}); // Display success notification
         }
     });
   }
 
   switchToRegister() {
-    this.setState({response: ''});
+    this.props.actions.removeError();
+    //this.setState({response: ''});
     this.props.navigator.push({name: 'Register'})
     this.initialLink();
   }
 
   switchToLogin() {
-    this.setState({response: ''});
+    this.props.actions.removeError();
     this.props.navigator.push({name: 'SignIn'})
     this.initialLink();
   }
 
   initialLink() {
     if (this.props.route.name === "Register" && !this.props.route.cookieData) {
-      this.setState({response: 'Empty register.'})
+      this.props.actions.setError('Empty register.');
+      //this.setState({response: 'Empty register.'})
     } else if (this.props.route.name === "SignIn" && !this.props.route.cookieData) {
-      this.setState({response: 'Empty sign in.'})
+      this.props.actions.setError('Empty sign in.');
+      //this.setState({response: 'Empty sign in.'})
     }
   }
 
   componentWillMount() {
     this.initialLink();
+    if (this.props.route.cookieData) {
+      this.props.actions.updateUserId(this.props.route.cookieData);
+    }
   }
 
   render() {
     let responseBlock;
-    switch (this.state.response) { // TODO - make this consistent and add unit tests
+    switch (this.props.response) { // TODO - make this consistent and add unit tests
       case "":
         responseBlock = null;
         break;
@@ -209,7 +221,7 @@ class SignIn extends React.Component {
     return (
       <View style={styles.container}>
         <ActivityIndicatorIOS
-            animating={this.state.animating}
+            animating={this.props.animating}
             style={[styles.centering, {height: 80}]}
             size="large"
         />
@@ -221,9 +233,9 @@ class SignIn extends React.Component {
                 ref="username"
                 autoFocus={true}
                 keyboardType={'email-address'}
-                value={this.state.username}
+                value={this.props.username}
                 onEndEditing={(text) => {this.refs.password.focus()}}
-                onChangeText={(username) => this.setState({username})}
+                onChangeText={(username) => this.props.actions.updateUserId(username) }
                 selectionColor={StylingGlobals.colors.mainColor} />
           </View>
           <View style={styles.row}>
@@ -231,7 +243,7 @@ class SignIn extends React.Component {
             <TextInput 
               style={styles.textInput}
               ref="password"
-              onChangeText={(password) => this.setState({password})}
+              onChangeText={(password) => this.props.actions.updatePassword(password) }
               secureTextEntry={true}
               selectionColor={StylingGlobals.colors.navColor} />
           </View>
@@ -372,4 +384,19 @@ var styles = StyleSheet.create({
   }
 });
 
-module.exports = SignIn;
+const mapStateToProps = (state) => {
+  return {
+    animating: state.isAnimating,
+    username: state.userId,
+    password: state.password,
+    response: state.error,
+  };
+}
+
+const mapDispatchToProps = function(dispatch, ownProps) {
+  return {
+    actions: actions
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignIn);

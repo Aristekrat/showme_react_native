@@ -31,6 +31,12 @@ const Actions = {
   updateUserId: function (value) {
     this.dispatch({type: 'userId', uid: value});
   },
+  updateSecretCode: function (value) {
+    this.dispatch({type: 'secretCode', value: value});
+  },
+  updatePassword: function (value) {
+    this.dispatch({type: 'password', value: value});
+  },
   setMSDisplayType: function (value) {
     this.dispatch({type: 'mst', value: value});
   },

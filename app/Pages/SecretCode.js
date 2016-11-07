@@ -7,6 +7,8 @@ import StylingGlobals from '../Globals/StylingGlobals.js';
 import BigButton from '../Components/BigButton.js';
 import SendSecret from '../Globals/SendSecret.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
+import { connect } from 'react-redux';
+import actions from '../State/Actions/Actions';
 import {
   StyleSheet,
   Text,
@@ -23,10 +25,10 @@ class SecretCode extends React.Component {
     this.state = {
       code: '',
       generated: false,
-      animating: false,
     }
     this.verificationIndex = this.props.db.child('indexes').child('verificationCodes');
   }
+  // error, secret state
 
   capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -41,19 +43,22 @@ class SecretCode extends React.Component {
     for (var i = 0; secretCode.length > i; i++) {
       secretCode[i] = this.capitalizeFirstLetter(secretCode[i]);
     }
-    this.setState({code: secretCode.join('')});
+    //this.setState({code: secretCode.join('')});
+    this.props.actions.updateSecretCode(secretCode.join(''));
   }
 
   createCode() {
     let psKey = this.props.route.key;
     //let ph = this.props.route.receiverPH;
     //let filteredPH = ph.replace(/[^0-9 ]/g, "").split(' ').join('');
-    if (this.state.code) {
-      this.setState({animating: true});
-      this.verificationIndex.child(psKey).set(this.state.code);
+    if (this.props.code) {
+      //this.setState({animating: true});
+      this.props.actions.setAnimation(true);
+      this.verificationIndex.child(psKey).set(this.props.code);
       SendSecret.router(this.state.code);
     } else {
-      this.setState({error: "Please enter a secret pass code"});
+      this.props.actions.setError("Please enter a secret pass code");
+      //this.setState({error: "Please enter a secret pass code"});
     }
   }
 
@@ -67,15 +72,15 @@ class SecretCode extends React.Component {
           <TextInput
             style={styles.codeInput}  
             autoFocus={true}
-            onChangeText={(text) => this.setState({code})}
-            value={this.state.code} />
+            onChangeText={(text) => this.props.actions.updateSecretCode(text) }
+            value={this.props.code} />
           <Text style={styles.paragraph}>We'll use this to securely identify your friend</Text>
           <BigButton do={() => this.createCode()}>
             Submit
           </BigButton> 
           {
-            this.state.error ?
-            <Text style={styles.error}>{this.state.error}</Text> :
+            this.props.error ?
+            <Text style={styles.error}>{this.props.error}</Text> :
             null 
           }
           <Text style={styles.or}>- or -</Text>
@@ -83,7 +88,7 @@ class SecretCode extends React.Component {
           <BigButton do={() => this.generate()}>
             {this.state.generated ? "Make Another" : "Make one for Me"}
           </BigButton>
-           <ActivityIndicator animationControl={this.state.animating} />        
+           <ActivityIndicator animationControl={this.props.animating} />        
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
@@ -126,4 +131,20 @@ var styles = StyleSheet.create({
   }
 });
 
-module.exports = SecretCode;
+const mapStateToProps = (state) => {
+  return {
+    animating: state.isAnimating,
+    code: state.secretCode,
+    generated: state.mySecretsType,
+    error: state.error, 
+  };
+}
+
+const mapDispatchToProps = function(dispatch, ownProps) {
+  return {
+    actions: actions
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SecretCode);
+//module.exports = SecretCode;
