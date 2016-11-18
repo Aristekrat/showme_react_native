@@ -1,7 +1,6 @@
 'use strict';
 
 import React, { Component } from 'react';
-import StylingGlobals from '../Globals/StylingGlobals.js';
 import {
   StyleSheet,
   Text,
@@ -17,7 +16,7 @@ class MyAccount extends React.Component {
 
   render() {
     return (
-      <View style={StylingGlobals.container}>
+      <View>
 
         <View style={styles.container}>
           <Text style={styles.welcome}>
