@@ -5,6 +5,7 @@ import StylingGlobals from '../Globals/StylingGlobals';
 import ArrowLink from '../Components/ArrowLink';
 import Utility from '../Globals/UtilityFunctions';
 import actions from '../State/Actions/Actions';
+import User from '../Globals/User';
 import { connect } from 'react-redux';
 import {
   StyleSheet,
@@ -30,6 +31,7 @@ class Gateway extends React.Component {
     super(props);
     this.userIndex = this.props.db.child('indexes').child('userIndex');
     this.users = this.props.db.child('users');
+    this.userFunctions = new User(this.props.db, this.users, this.props.navigator);
   }
 
   validateEmail(email) {
@@ -55,6 +57,7 @@ class Gateway extends React.Component {
     }
   }
 
+  /*
   anonAuth() {
     this.props.db.authAnonymously((err, authData) => {
       if (err) {
@@ -66,6 +69,7 @@ class Gateway extends React.Component {
       };
     });
   };
+  */
 
   componentWillMount() {
     // AsyncStorage.removeItem('userData');
@@ -143,7 +147,7 @@ class Gateway extends React.Component {
                 onLogoutFinished={() => console.log("logout.")}
             />
           </View>
-          <ArrowLink skipTo={() => this.anonAuth() }>Skip for Now</ArrowLink>
+          <ArrowLink skipTo={() => this.userFunctions.anonAuth() }>Skip for Now</ArrowLink>
         </ScrollView>
       </View>
     );

@@ -4,6 +4,9 @@ import store from '../Store';
 
 const Actions = {
   dispatch: store.dispatch,
+  displaySkip: function (bool) {
+    this.dispatch({type: 'displaySkip', value: bool});
+  },
 	toggleAnimation: function() {
 	  this.dispatch({type: 'toggleAnimating'});
 	},

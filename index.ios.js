@@ -10,6 +10,7 @@ import YourAnswer from './app/Pages/YourAnswer.js';
 import MyAccount from './app/Pages/MyAccount.js';
 import CreateYourOwn from './app/Pages/CreateYourOwn.js';
 import SignIn from './app/Pages/SignIn.js';
+import Register from './app/Pages/Register.js';
 import StylingGlobals from './app/Globals/StylingGlobals.js';
 import Gateway from './app/Pages/Gateway.js';
 import ClaimSecret from './app/Pages/ClaimSecret.js';
@@ -226,9 +227,12 @@ class ShowMe extends React.Component {
           <ClaimSecret navigator={navigator} route={route} db={this.db} store={store} />
         );
       case 'SignIn':
-      case 'Register':
         return (
           <SignIn navigator={navigator} route={route} db={this.db} />
+        );
+      case 'Register':
+        return (
+          <Register navigator={navigator} route={route} db={this.db} />
         );
       case 'RegistrationInterim':
         return (
@@ -255,7 +259,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "SelectCategory"
+          name: "Register"
         }} />
       </Provider>
     );

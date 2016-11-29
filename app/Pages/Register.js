@@ -21,7 +21,7 @@ import {
   AsyncStorage
 } from 'react-native';
 
-class SignIn extends Component {
+class Register extends Component {
   constructor(props){
     super(props);
     this.usersIndex = this.props.db.child('indexes').child('userIndex');
@@ -39,7 +39,7 @@ class SignIn extends Component {
       password: this.props.password
     }, (error, userData) => {
       if (error) {
-        this.errorHandler(error);
+        this.userFunctions.errorHandler(error);
       } else {
         var t = Utility.escapeEmail(email)
         this.users.child(userData.uid).set({email: email, secrets: {} });
@@ -51,7 +51,7 @@ class SignIn extends Component {
 
   submitUser() {
     if (this.props.username !== '' && this.props.password !== '') {
-      this.userFunctions.login(this.props.username, this.props.password);
+      this.registerUser();
     } else {
       this.props.actions.setError('Please enter an email and password');
     }
@@ -65,9 +65,9 @@ class SignIn extends Component {
     }
   }
 
-  switchToRegister() {
+  switchToLogin() {
     this.props.actions.removeError();
-    this.props.navigator.push({name: 'Register'});
+    this.props.navigator.push({name: 'SignIn'});
   }
 
   componentWillMount() {
@@ -131,7 +131,7 @@ class SignIn extends Component {
             null
             :
             <View style={styles.switchBlock}>
-              <ArrowLink skipTo={()=> this.switchToRegister()}>Register Instead</ArrowLink>
+              <ArrowLink skipTo={()=> this.switchToRegister()}>Login Instead</ArrowLink>
             </View>
           }
         </ScrollView>
@@ -208,4 +208,4 @@ const mapDispatchToProps = function(dispatch, ownProps) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SignIn);
+export default connect(mapStateToProps, mapDispatchToProps)(Register);

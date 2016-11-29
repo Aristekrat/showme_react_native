@@ -17,13 +17,15 @@ import passwordReducer from './PasswordReducer';
 import publicSecretReducer from './PublicSecretReducer';
 import submitSuccessReducer from './SubmitSuccessReducer';
 import submittedSecretReducer from './SubmittedSecretReducer';
+import displaySkipReducer from './DisplaySkipReducer';
 
 const reducers = combineReducers({
-  isAnimating: animationReducer,
+  displaySkip: displaySkipReducer,
   error: errorReducer,
+  emailAddress: formInputReducer,
   formInput: formInputReducer,
   firstName: nameReducer,
-  emailAddress: formInputReducer,
+  isAnimating: animationReducer,
   phoneNumber: phoneNumberReducer,
   password: passwordReducer,
   secretCode: secretCodeReducer,
