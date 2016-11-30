@@ -8,7 +8,7 @@ const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 var Utility = {
 	dbURL: FirebaseURL,
 	authStatus: false,
-	verified: false, 
+	verified: false,
 	ref: new Firebase(FirebaseURL),
 
 	getRef: function () {
@@ -43,7 +43,7 @@ var Utility = {
 	escapeEmail(email) {
 		return (email || '').replace('.', ',');
 	},
-	
+
 	logout: function() {
 		this.unAuth();
 		this.setLocalAuth(false);

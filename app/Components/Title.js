@@ -31,10 +31,10 @@ const TitleBar = {
         case 'RegistrationInterim':
         case 'ClaimSecret':
           return (
-            <TouchableHighlight 
-              onPress={() => navigator.pop()} 
+            <TouchableHighlight
+              onPress={() => navigator.pop()}
               underlayColor={'transparent'}>
-              <Image 
+              <Image
                 source={require("../img/arrow-left.png")}
                 style={styles.navBarLeftImage} />
             </TouchableHighlight>
@@ -51,8 +51,9 @@ const TitleBar = {
     return (
       <View>
       { Utility.authStatus ?
-        <TouchableHighlight 
+        <TouchableHighlight
           style={styles.navBarRightButton}
+          underlayColor={'transparent'}>
           onPress={() => { Utility.logout(); navigator.replace({name: route.name}); } } >
           <Text style={styles.navBarButtonText}>Logout</Text>
         </TouchableHighlight>
@@ -88,7 +89,7 @@ const TitleBar = {
       case 'AskNumber':
         return (
           <Text style={styles.navBarTitleText}>Your Number</Text>
-        );  
+        );
       case 'SecretCode':
         return (
           <Text style={styles.navBarTitleText}>Create Secret Code</Text>
@@ -96,7 +97,7 @@ const TitleBar = {
       case 'CreateSecret':
         return (
           <Text style={styles.navBarTitleText}>Create Secret</Text>
-        );     
+        );
       case 'MyAccount':
         return (
           <Text style={styles.navBarTitleText}>My Account</Text>
@@ -104,21 +105,21 @@ const TitleBar = {
       case 'Gateway':
         return (
           <Text style={styles.navBarTitleText}>Register or Sign In</Text>
-        );    
+        );
       case 'SignIn':
         return (
           <Text style={styles.navBarTitleText}>Sign In</Text>
-        );      
+        );
       case 'Register':
-      case 'RegistrationInterim':  
+      case 'RegistrationInterim':
         return (
           <Text style={styles.navBarTitleText}>Register</Text>
-        ); 
+        );
       case 'ClaimSecret':
         return (
           <Text style={styles.navBarTitleText}>Claim Secret</Text>
         );
-      default: 
+      default:
         return (
           <Text style={styles.navBarTitleText}>Select Secret Type</Text>
         );

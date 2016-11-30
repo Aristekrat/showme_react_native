@@ -15,7 +15,8 @@ import {
   Image,
   TextInput,
   AsyncStorage,
-  TouchableHighlight
+  TouchableHighlight,
+  NetInfo,
 } from 'react-native';
 
 const FBSDK = require('react-native-fbsdk');
@@ -44,7 +45,12 @@ class Gateway extends React.Component {
   }
 
   checkEmail() {
-    if (this.validateEmail(this.props.emailAddress)) {
+    this.props.actions.toggleAnimation();
+    if (!this.props.isConnected) {
+      this.props.actions.toggleAnimation();
+      this.props.actions.setError("Sorry, you're not connected to the internet");
+    } else if (this.validateEmail(this.props.emailAddress)) {
+      this.props.actions.toggleAnimation();
       this.userIndex.once('value', (snapshot) => {
         if (snapshot.hasChild(this.escapeEmail(this.props.emailAddress))) {
           this.props.navigator.push({name: 'SignIn', cookieData: this.props.emailAddress}); // Go to login
@@ -53,29 +59,28 @@ class Gateway extends React.Component {
         }
       });
     } else {
-      this.props.setError("Please enter a valid email");
+      this.props.actions.toggleAnimation();
+      this.props.actions.setError("Please enter a valid email");
     }
   }
-
-  /*
-  anonAuth() {
-    this.props.db.authAnonymously((err, authData) => {
-      if (err) {
-        // handle failure
-        console.log("ERROR", err);
-      } else {
-        this.users.child(authData.uid).set({email: ""});
-        this.props.navigator.push({name: 'RegistrationInterim'});
-      };
-    });
-  };
-  */
 
   componentWillMount() {
     // AsyncStorage.removeItem('userData');
     //AsyncStorage.removeItem('notificationCount');
-    //FBLoginManager.logOut();
+    FBLoginManager.logOut();
+
+    const dispatchConnected = isConnected => this.props.actions.setIsConnected(isConnected);
+    NetInfo.isConnected.fetch().then().done(() => {
+      NetInfo.isConnected.addEventListener('change', dispatchConnected);
+    });
+
     AsyncStorage.removeItem('hasBeenIntroduced');
+  }
+
+  componentDidMount() {
+    NetInfo.isConnected.fetch().then(isConnected => {
+      this.props.actions.setIsConnected(isConnected);
+    });
   }
 
   render() {
@@ -97,7 +102,7 @@ class Gateway extends React.Component {
                   ref="emailAddress"
                   autoCapitalize="none"
                   keyboardType={'email-address'}
-                  onChangeText={(emailAddress) => this.props.updateFormInput(emailAddress)} />
+                  onChangeText={(emailAddress) => this.props.actions.updateFormInput(emailAddress)} />
               <TouchableHighlight
                   style={styles.emailButton}
                   underlayColor={StylingGlobals.colors.pressDown}
@@ -106,7 +111,7 @@ class Gateway extends React.Component {
               </TouchableHighlight>
             </View>
             { this.props.error ?
-                <Text style={styles.errorText}>Please use a valid email</Text>
+                <Text style={styles.errorText}>{this.props.error}</Text>
                 :
                 null
             }
@@ -120,9 +125,7 @@ class Gateway extends React.Component {
                   (error, result) => {
                     if (error) {
                       // Error handling
-                      alert("login has error: " + result.error);
-                    } else if (result.isCancelled) {
-                      //alert("login is cancelled.");
+                      console.log(error);
                     } else {
                       AccessToken.getCurrentAccessToken().then(
                         (data) => {
@@ -233,11 +236,12 @@ const mapStateToProps = (state) => {
     animating: state.isAnimating,
     error: state.error,
     emailAddress: state.emailAddress,
+    isConnected: state.isConnected,
   };
 }
 
 const mapDispatchToProps = function(dispatch, ownProps) {
-  return actions;
+  return { actions : actions }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Gateway)

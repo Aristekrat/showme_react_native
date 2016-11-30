@@ -7,6 +7,7 @@ import errorReducer from './ErrorReducer';
 import formInputReducer from './FormInputReducer';
 import phoneNumberReducer from './PhoneNumberReducer';
 import introReducer from './IntroReducer';
+import isConnectedReducer from './IsConnectedReducer';
 import modalTextReducer from './ModalTextReducer';
 import secretKeyReducer from './SecretKeyReducer';
 import nameReducer from './NameReducer';
@@ -26,6 +27,7 @@ const reducers = combineReducers({
   formInput: formInputReducer,
   firstName: nameReducer,
   isAnimating: animationReducer,
+  isConnected: isConnectedReducer,
   phoneNumber: phoneNumberReducer,
   password: passwordReducer,
   secretCode: secretCodeReducer,

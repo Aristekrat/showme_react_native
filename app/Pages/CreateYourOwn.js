@@ -34,6 +34,7 @@ class CreateYourOwn extends React.Component {
 
   // Adds a secret to the asyncstore after it is created, so it's visible in MySecrets
   // TODO Refactor to use the utility func
+  /*
   addLocalSecret(localSecret) {
     localSecret.state = { answerState: 'NA', sentState: 'CR' },
     localSecret.answer = null;
@@ -47,6 +48,7 @@ class CreateYourOwn extends React.Component {
       }
     });
   };
+  */
 
   // sets success state after secret submission
   success(secretData) {
@@ -191,7 +193,7 @@ class CreateYourOwn extends React.Component {
       </View>
     );
   }
-} // original img name: game67
+}
 
 var styles = StyleSheet.create({
   pageContainer: StylingGlobals.container,
@@ -203,7 +205,7 @@ var styles = StyleSheet.create({
   },
   textInput: {
     backgroundColor: '#fff',
-    height: 40,
+    height: 50,
     borderWidth: 1,
     borderColor: '#eee',
     paddingLeft: 5,

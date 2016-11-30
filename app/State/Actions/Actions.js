@@ -7,6 +7,9 @@ const Actions = {
   displaySkip: function (bool) {
     this.dispatch({type: 'displaySkip', value: bool});
   },
+  setIsConnected: function(bool) {
+    this.dispatch({type: 'isConnected', value: bool});
+  },
 	toggleAnimation: function() {
 	  this.dispatch({type: 'toggleAnimating'});
 	},

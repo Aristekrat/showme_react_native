@@ -1,6 +1,10 @@
 'use strict'
 
+import {
+  AsyncStorage
+} from 'react-native';
 import Utility from './UtilityFunctions.js';
+import GetSecrets from '../Globals/GetSecrets.js';
 import actions from '../State/Actions/Actions';
 
 function User(db, usersTable, navigator) {
@@ -33,10 +37,10 @@ User.prototype.login = function (username, password) {
       } else {
         actions.setError('Success!');
         actions.toggleAnimation();
-        this.navigator.push({name: 'SelectCategory', refresh: true});
-        // AsyncStorage.setItem('userData', JSON.stringify(userData));
-        // Utility.setLocalAuth(true);
-        // GetSecrets.getRemoteSecrets();
+        AsyncStorage.setItem('userData', JSON.stringify(userData));
+        Utility.setLocalAuth(true);
+        GetSecrets.getRemoteSecrets();
+        this.navigator.push({name: 'SelectCategory'});
       }
     })
 }
