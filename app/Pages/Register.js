@@ -32,7 +32,7 @@ class Register extends Component {
   registerUser() {
     this.props.actions.toggleAnimation();
     this.props.actions.removeError();
-    let email = this.props.username.trim();
+    let email = this.props.email.trim();
 
     this.props.db.createUser({
       email: email,
@@ -44,13 +44,14 @@ class Register extends Component {
         var t = Utility.escapeEmail(email)
         this.users.child(userData.uid).set({email: email, secrets: {} });
         this.usersIndex.child(t).set(true);
-        this.userFunctions.login(email, this.props.password);
+        this.props.actions.toggleAnimation();
+        this.userFunctions.login(email, this.props.password, true);
       }
     }) // End parent function
   }
 
   submitUser() {
-    if (this.props.username !== '' && this.props.password !== '') {
+    if (this.props.email !== '' && this.props.password !== '') {
       this.registerUser();
     } else {
       this.props.actions.setError('Please enter an email and password');
@@ -58,10 +59,10 @@ class Register extends Component {
   }
 
   forgot() {
-    if (!this.props.username) {
+    if (!this.props.email) {
       this.props.actions.setError('Please enter your email address');
     } else {
-      this.userFunctions.forgotPassword(this.props.username);
+      this.userFunctions.forgotPassword(this.props.email);
     }
   }
 
@@ -72,7 +73,7 @@ class Register extends Component {
 
   componentWillMount() {
     if (this.props.route.cookieData) {
-      this.props.actions.updateUserId(this.props.route.cookieData);
+      this.props.actions.updateFormInput(this.props.route.cookieData);
     }
   }
 
@@ -85,12 +86,12 @@ class Register extends Component {
             <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.textInput}
-                ref="username"
+                ref="email"
                 autoFocus={true}
                 keyboardType={'email-address'}
-                value={this.props.username}
+                value={this.props.email}
                 onEndEditing={(text) => {this.refs.password.focus()}}
-                onChangeText={(username) => this.props.actions.updateUserId(username) }
+                onChangeText={(email) => this.props.actions.updateFormInput(email) }
                 selectionColor={StylingGlobals.colors.mainColor} />
           </View>
           <View style={styles.row}>
@@ -106,7 +107,7 @@ class Register extends Component {
               style={styles.button}
               underlayColor={StylingGlobals.colors.pressDown}
               onPress={() => this.submitUser()}>
-            <Text style={styles.buttonText}>{this.props.route.name === 'Register' ? 'Sign Up' : 'Sign In'}</Text>
+            <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableHighlight>
           {
             this.props.errorMessage ?
@@ -131,7 +132,7 @@ class Register extends Component {
             null
             :
             <View style={styles.switchBlock}>
-              <ArrowLink skipTo={()=> this.switchToRegister()}>Login Instead</ArrowLink>
+              <ArrowLink skipTo={()=> this.switchToLogin()}>Login Instead</ArrowLink>
             </View>
           }
         </ScrollView>
@@ -195,7 +196,7 @@ var styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     animating: state.isAnimating,
-    username: state.userId,
+    email: state.emailAddress,
     password: state.password,
     errorMessage: state.error,
     displaySkip: state.displaySkip,

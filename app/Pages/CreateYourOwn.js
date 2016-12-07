@@ -6,6 +6,7 @@ import TabBar from '../Components/TabBar.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import CategoryPicker from '../Components/CategoryPicker.js';
 import GetSecrets from '../Globals/GetSecrets.js';
+import Utility from '../Globals/UtilityFunctions.js';
 import Contacts from 'react-native-contacts';
 import actions from '../State/Actions/Actions';
 import {
@@ -32,24 +33,6 @@ class CreateYourOwn extends React.Component {
     this.answers = this.props.db.child('answers');
   }
 
-  // Adds a secret to the asyncstore after it is created, so it's visible in MySecrets
-  // TODO Refactor to use the utility func
-  /*
-  addLocalSecret(localSecret) {
-    localSecret.state = { answerState: 'NA', sentState: 'CR' },
-    localSecret.answer = null;
-    AsyncStorage.getItem('secrets').then((secrets_data_string) => {
-      if (secrets_data_string) {
-        let secrets_data = JSON.parse(secrets_data_string);
-        secrets_data.push(localSecret);
-        AsyncStorage.setItem('secrets', JSON.stringify(secrets_data));
-      } else {
-        AsyncStorage.setItem('secrets', localSecret);
-      }
-    });
-  };
-  */
-
   // sets success state after secret submission
   success(secretData) {
     this.props.actions.setAnimation(false);
@@ -64,7 +47,6 @@ class CreateYourOwn extends React.Component {
       this.success(psData);
     }, () => {
       this.props.actions.setError("We're sorry, there was an error connecting to the server");
-      //this.setState({errorMessage: "We're sorry, there was an error connecting to the server"});
     })
   }
 
@@ -76,7 +58,6 @@ class CreateYourOwn extends React.Component {
     var publicSecret = this.publicSecrets.child(this.refs.catPicker.state.category).push(secretData, (err) => {
       if (err) {
         this.props.actions.setError("We're sorry, there was an error connecting to the server");
-        //this.setState({errorMessage: "We're sorry, there was an error connecting to the server"})
       } else {
         notYet ? this.pushToPrivateSecrets() : this.success();
       }
@@ -87,7 +68,6 @@ class CreateYourOwn extends React.Component {
   submitSecret() {
     if (this.props.text !== '') {
       this.props.actions.setAnimation(true);
-      //this.setState({animating: !this.state.animating});
       if (!this.props.public) {
         this.pushToPrivateSecrets();
       } else {
@@ -95,11 +75,11 @@ class CreateYourOwn extends React.Component {
       }
     } else {
       this.props.actions.setError("Please enter your question");
-      // this.setState({errorMessage: 'Please enter your question'})
     }
   }
 
   componentWillMount() {
+    Utility.resetState(this.props.animating, this.props.error, this.props.text);
     if (!this.props.userId) {
       AsyncStorage.getItem('userData').then((user_data_string) => {
         if (user_data_string) {
@@ -271,5 +251,4 @@ const mapDispatchToProps = function(dispatch, ownProps) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateYourOwn)
-//module.exports = CreateYourOwn;
+export default connect(mapStateToProps, mapDispatchToProps)(CreateYourOwn);

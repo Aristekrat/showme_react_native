@@ -6,6 +6,7 @@ import TabBar from '../Components/TabBar.js';
 import Secret from '../Components/SelectableSecret.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import actions from '../State/Actions/Actions';
+import Utility from '../Globals/UtilityFunctions';
 import { connect } from 'react-redux';
 import {
   StyleSheet,
@@ -63,6 +64,8 @@ class SelectSecret extends React.Component {
   }
 
   componentWillMount() {
+    Utility.resetState(this.props.animating, this.props.error);
+
     AsyncStorage.getItem('userData').then((user_data_string) => { // What to do if the system can't find any user data?
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);

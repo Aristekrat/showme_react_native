@@ -1,5 +1,5 @@
 'use strict';
- 
+
 import React from 'react';
 import StylingGlobals from '../Globals/StylingGlobals.js';
 import BigButton from '../Components/BigButton.js';
@@ -10,6 +10,7 @@ import GetSecrets from '../Globals/GetSecrets.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import actions from '../State/Actions/Actions';
 import { connect } from 'react-redux';
+import Utility from '../Globals/UtilityFunctions.js';
 // import Contacts from 'react-native-contacts';
 
 import {
@@ -22,10 +23,10 @@ import {
   PickerIOS,
   AsyncStorage,
 } from 'react-native';
- 
+
 // var Composer = require('NativeModules').RNMessageComposer;
 
-class ShareSecret extends React.Component { 
+class ShareSecret extends React.Component {
   constructor(props){
     super(props);
     uid: '';
@@ -35,6 +36,8 @@ class ShareSecret extends React.Component {
   }
 
   componentWillMount() {
+    Utility.resetState(this.props.animating, this.props.error);
+    
     if (this.props.route.cookieData.key) {
       this.props.actions.updateSecretKey(this.props.route.cookieData.key);
     };
@@ -67,13 +70,13 @@ class ShareSecret extends React.Component {
             <View>
               <Text style={styles.prompt}>Enter Phone Number</Text>
               <Text style={styles.label}>Enter the phone number of who you want to send this secret to</Text>
-              <TextInput style={styles.textInput} 
+              <TextInput style={styles.textInput}
                 autoFocus={true}
-                onChangeText={(phoneNumber) => { 
+                onChangeText={(phoneNumber) => {
                   this.props.actions.updatePhoneNumber(phoneNumber);
                 } }/>
               <Text style={styles.label}>If you let ShowMe access contacts we can find it for you</Text>
-              <BigButton do={() => { 
+              <BigButton do={() => {
                   var filteredString = this.state.ph.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(' ').join('');
                   if (isNaN(parseInt(filteredString))) {
                     this.props.actions.setError("Please enter a number");
@@ -87,14 +90,14 @@ class ShareSecret extends React.Component {
                 Continue
               </BigButton>
             </View>
-            : 
+            :
             <View>
               <Text style={styles.prompt}>Choose who you want to send to...</Text>
               <UserContacts contacts={this.props.route.contacts}/>
               <Text style={styles.label}>You'll have a chance to review before you send</Text>
-              <BigButton do={() => { 
+              <BigButton do={() => {
                   this.props.actions.toggleAnimation();
-                  SendSecret.saveArgs(this.props.phoneNumber, this.props.firstName, this.uid, this.props.secretKey, this.props); 
+                  SendSecret.saveArgs(this.props.phoneNumber, this.props.firstName, this.uid, this.props.secretKey, this.props);
                 }}>
                 Continue
               </BigButton>
@@ -106,7 +109,7 @@ class ShareSecret extends React.Component {
             this.props.error == "" ? null :
             <Text style={styles.error}>{this.props.error}</Text>
           }
-          
+
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>

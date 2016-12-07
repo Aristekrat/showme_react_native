@@ -53,7 +53,7 @@ const TitleBar = {
       { Utility.authStatus ?
         <TouchableHighlight
           style={styles.navBarRightButton}
-          underlayColor={'transparent'}>
+          underlayColor={'transparent'}
           onPress={() => { Utility.logout(); navigator.replace({name: route.name}); } } >
           <Text style={styles.navBarButtonText}>Logout</Text>
         </TouchableHighlight>

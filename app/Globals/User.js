@@ -24,7 +24,7 @@ User.prototype.anonAuth = function () {
   })
 };
 
-User.prototype.login = function (username, password) {
+User.prototype.login = function (username, password, registrationFlag = false) {
     let email = username.trim();
     actions.toggleAnimation();
     actions.removeError();
@@ -40,7 +40,11 @@ User.prototype.login = function (username, password) {
         AsyncStorage.setItem('userData', JSON.stringify(userData));
         Utility.setLocalAuth(true);
         GetSecrets.getRemoteSecrets();
-        this.navigator.push({name: 'SelectCategory'});
+        if (registrationFlag) {
+          this.navigator.push({name: 'RegistrationInterim'});
+        } else {
+          this.navigator.push({name: 'SelectCategory'});
+        }
       }
     })
 }

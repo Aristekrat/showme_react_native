@@ -10,6 +10,7 @@ import GetSecrets from '../Globals/GetSecrets.js';
 import { connect } from 'react-redux';
 import actions from '../State/Actions/Actions';
 import User from '../Globals/User';
+
 import {
   StyleSheet,
   Text,
@@ -32,7 +33,7 @@ class SignIn extends Component {
   registerUser() {
     this.props.actions.toggleAnimation();
     this.props.actions.removeError();
-    let email = this.props.username.trim();
+    let email = this.props.email.trim();
 
     this.props.db.createUser({
       email: email,
@@ -50,30 +51,24 @@ class SignIn extends Component {
   }
 
   submitUser() {
-    if (this.props.username !== '' && this.props.password !== '') {
-      this.userFunctions.login(this.props.username, this.props.password);
+    if (this.props.email !== '' && this.props.password !== '') {
+      this.userFunctions.login(this.props.email, this.props.password);
     } else {
       this.props.actions.setError('Please enter an email and password');
     }
   }
 
   forgot() {
-    if (!this.props.username) {
+    if (!this.props.email) {
       this.props.actions.setError('Please enter your email address');
     } else {
-      this.userFunctions.forgotPassword(this.props.username);
+      this.userFunctions.forgotPassword(this.props.email);
     }
   }
 
   switchToRegister() {
     this.props.actions.removeError();
     this.props.navigator.push({name: 'Register'});
-  }
-
-  componentWillMount() {
-    if (this.props.route.cookieData) {
-      this.props.actions.updateUserId(this.props.route.cookieData);
-    }
   }
 
   render() {
@@ -85,12 +80,12 @@ class SignIn extends Component {
             <Text style={styles.label}>Email</Text>
             <TextInput
               style={styles.textInput}
-                ref="username"
+                ref="email"
                 autoFocus={true}
                 keyboardType={'email-address'}
-                value={this.props.username}
+                value={this.props.email}
                 onEndEditing={(text) => {this.refs.password.focus()}}
-                onChangeText={(username) => this.props.actions.updateUserId(username) }
+                onChangeText={(email) => this.props.actions.updateFormInput(email) }
                 selectionColor={StylingGlobals.colors.mainColor} />
           </View>
           <View style={styles.row}>
@@ -106,7 +101,7 @@ class SignIn extends Component {
               style={styles.button}
               underlayColor={StylingGlobals.colors.pressDown}
               onPress={() => this.submitUser()}>
-            <Text style={styles.buttonText}>{this.props.route.name === 'Register' ? 'Sign Up' : 'Sign In'}</Text>
+            <Text style={styles.buttonText}>Sign In</Text>
           </TouchableHighlight>
           {
             this.props.errorMessage ?
@@ -195,7 +190,7 @@ var styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     animating: state.isAnimating,
-    username: state.userId,
+    email: state.emailAddress,
     password: state.password,
     errorMessage: state.error,
     displaySkip: state.displaySkip,

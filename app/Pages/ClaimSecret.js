@@ -7,6 +7,7 @@ import StylingGlobals from '../Globals/StylingGlobals.js';
 import BigButton from '../Components/BigButton.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import actions from '../State/Actions/Actions';
+import Utility from '../Globals/UtilityFunctions.js';
 import {
   StyleSheet,
   Text,
@@ -52,6 +53,7 @@ class ClaimSecret extends React.Component {
                       "sentState": "RR",
                       "answerState": "NA",
                     };
+                    ps.key = codeKey;
                     let secret = [ps];
                     GetSecrets.pushLocalSecret(ps);
                     this.props.navigator.push({name: 'MySecrets', secret: secret});
@@ -77,6 +79,10 @@ class ClaimSecret extends React.Component {
   setErrorState(errorText) {
     this.props.setError(errorText);
     this.props.toggleAnimation();
+  }
+
+  componentWillMount() {
+    Utility.resetState(this.props.animating, this.props.error, this.props.code);
   }
 
   render(){

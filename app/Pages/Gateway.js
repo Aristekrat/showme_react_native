@@ -65,10 +65,6 @@ class Gateway extends React.Component {
   }
 
   componentWillMount() {
-    // AsyncStorage.removeItem('userData');
-    //AsyncStorage.removeItem('notificationCount');
-    FBLoginManager.logOut();
-
     const dispatchConnected = isConnected => this.props.actions.setIsConnected(isConnected);
     NetInfo.isConnected.fetch().then().done(() => {
       NetInfo.isConnected.addEventListener('change', dispatchConnected);
@@ -124,15 +120,13 @@ class Gateway extends React.Component {
                 onLoginFinished={
                   (error, result) => {
                     if (error) {
-                      // Error handling
-                      console.log(error);
+                      this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
                     } else {
                       AccessToken.getCurrentAccessToken().then(
                         (data) => {
                           this.props.db.authWithOAuthToken('facebook', data.accessToken.toString(), (error, authData) => {
                             if (error) {
-                              // Error handling
-                              console.log('Firebase login failed!', error);
+                              this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
                             } else {
                               AsyncStorage.setItem('userData', JSON.stringify(authData));
                               Utility.setLocalAuth();

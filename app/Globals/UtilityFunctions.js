@@ -2,6 +2,7 @@ import {
   AsyncStorage
 } from 'react-native';
 
+import actions from '../State/Actions/Actions';
 import Firebase from 'firebase';
 const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 
@@ -48,6 +49,21 @@ var Utility = {
 		this.unAuth();
 		this.setLocalAuth(false);
 	},
+
+  resetState(animating = false, errorMessage = "", formInput = "") {
+    if (animating !== false) {
+      actions.setAnimation(false);
+    }
+
+    if (errorMessage !== "") {
+      actions.removeError();
+    }
+
+    if (formInput !== "") {
+      actions.updateFormInput("");
+    }
+  },
+
 }
 
 module.exports = Utility;

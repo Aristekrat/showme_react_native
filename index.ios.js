@@ -180,7 +180,6 @@ class ShowMe extends React.Component {
   }
 
   renderScene (route, navigator) {
-    actions.resetState();
     switch (route.name) {
       case 'SelectCategory':
         return (
@@ -259,7 +258,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "SignIn"
+          name: "Gateway"
         }} />
       </Provider>
     );

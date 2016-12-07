@@ -9,6 +9,7 @@ import ArrowLink from '../Components/ArrowLink.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 import actions from '../State/Actions/Actions';
+import Utility from '../Globals/UtilityFunctions.js';
 import {
   StyleSheet,
   Text,
@@ -29,12 +30,9 @@ class MySecrets extends React.Component {
     this.mySecrets = this.props.route.secret ? this.props.route.secret : [];
   }
 
-  foo() {
-    return 'bar'
-  }
-
   componentWillMount() {
-    this.props.actions.toggleAnimation();
+    this.props.actions.setAnimation(true);
+
     if (!this.props.userId) {
       AsyncStorage.getItem('userData').then((user_data_json) => {
         if (user_data_json) {
@@ -62,11 +60,10 @@ class MySecrets extends React.Component {
         this.mySecrets = this.mySecrets.concat(secrets_data);
         this.initalDisplay();
         this.listSecrets();
-        this.props.actions.toggleAnimation();
+        this.props.actions.setAnimation(false);
       } else if (!this.props.route.secret && !secrets_data_string) {
-        //this.setState({displaying: 'NR'});
         this.props.actions.setMSDisplayType('NR');
-        this.props.actions.toggleAnimation();
+        this.props.actions.setAnimation(false);
       }
     });
 
@@ -140,7 +137,6 @@ class MySecrets extends React.Component {
   }
 
   setTab(state) {
-    //this.setState({displaying: state});
     this.props.actions.setMSDisplayType(state);
     this.listSecrets();
   }
@@ -148,11 +144,9 @@ class MySecrets extends React.Component {
   // Chooses which tab to display on first View load
   initalDisplay() {
     if (this.mySecrets.length === 0) { // User has no secrets
-      //this.setState({displaying: "NR"});
       this.props.actions.setMSDisplayType('NR');
     } else {
       this.props.actions.setMSDisplayType(this.mySecrets[0].state.sentState);
-      //this.setState({displaying: this.mySecrets[0].state.sentState}); // Probably want to refine this function to load the last / most updated, OK for now
     }
   }
 

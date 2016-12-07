@@ -7,6 +7,7 @@ import ActivityIndicator from '../Components/ActivityIndicator.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 import actions from '../State/Actions/Actions';
+import Utility from '../Globals/UtilityFunctions';
 import {
   StyleSheet,
   Text,
@@ -26,7 +27,7 @@ class YourAnswer extends React.Component {
     this.answers = this.props.db.child('answers');
     this.currentSecret = this.props.route.cookieData;
   }
-  
+
   responderOrAsker(localID, secret) {
     if (localID === secret.askerID) {
       return "askerAnswer";
@@ -48,7 +49,7 @@ class YourAnswer extends React.Component {
       this.props.actions.toggleAnimation();
       let secretID = this.currentSecret.key;
       AsyncStorage.getItem('userData').then((user_data_json) => {
-        let user_data = JSON.parse(user_data_json); 
+        let user_data = JSON.parse(user_data_json);
         let userStatus = this.responderOrAsker(user_data.uid, this.props.route.cookieData);
         let updatedAnswer = {};
         updatedAnswer[userStatus] = this.props.answer;
@@ -82,9 +83,17 @@ class YourAnswer extends React.Component {
     }
     this.notify("Success! We'll notify you when you both answer");
     this.setTimeout (
-      () => { this.props.navigator.pop(); }, 
-      3000    
+      () => { this.props.navigator.pop(); },
+      2000
     );
+  }
+
+  componentWillMount() {
+    Utility.resetState(this.props.animating, this.props.error, this.props.answer);
+
+    if(this.props.answer !== "") {
+      this.props.actions.updateFormInput("");
+    }
   }
 
   render() {
@@ -94,13 +103,13 @@ class YourAnswer extends React.Component {
           <View>
             <Text>Q: {this.props.route.cookieData.question}</Text>
             <TextInput
-                style={styles.textInput}  
+                style={styles.textInput}
                 autoFocus={true}
                 onChangeText={(answer) => this.props.actions.updateFormInput(answer)}
                 value={this.props.answer} />
           </View>
           <ActivityIndicator animationControl={this.props.animating}/>
-          <TouchableHighlight style={[styles.button, StylingGlobals.horizontalCenter]} 
+          <TouchableHighlight style={[styles.button, StylingGlobals.horizontalCenter]}
               onPress={() => this.submitAnswer()}
               underlayColor={StylingGlobals.colors.pressDown}>
             <Text style={styles.buttonText}>Update</Text>
