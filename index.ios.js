@@ -121,8 +121,6 @@ class ShowMe extends React.Component {
           });
           this.setUpdatedSecrets(childSnapshot.key())
         })
-      } else {
-        // What to do if the system can't find any user data?
       }
     });
   }
@@ -209,7 +207,7 @@ class ShowMe extends React.Component {
         return (
           <SecretCode navigator={navigator} route={route} db={this.db} store={store} />
         );
-      case 'CreateSecret':
+      case 'CreateYourOwn':
         return (
           <CreateYourOwn navigator={navigator} route={route} db={this.db} store={store} />
         );
@@ -258,7 +256,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "Gateway"
+          name: "SelectCategory"
         }} />
       </Provider>
     );

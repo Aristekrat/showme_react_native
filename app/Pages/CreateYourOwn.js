@@ -80,12 +80,15 @@ class CreateYourOwn extends React.Component {
 
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error, this.props.text);
+
     if (!this.props.userId) {
       AsyncStorage.getItem('userData').then((user_data_string) => {
         if (user_data_string) {
           let user_data = JSON.parse(user_data_string);
           this.props.actions.updateUserId(user_data.uid);
-        } // else Oh crap! Need err handling
+        } else {
+          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+        }
       });
     }
   }

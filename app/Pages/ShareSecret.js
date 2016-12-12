@@ -29,7 +29,6 @@ import {
 class ShareSecret extends React.Component {
   constructor(props){
     super(props);
-    uid: '';
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
     this.answers = this.props.db.child('answers');
@@ -37,27 +36,25 @@ class ShareSecret extends React.Component {
 
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error);
-    
+
     if (this.props.route.cookieData.key) {
       this.props.actions.updateSecretKey(this.props.route.cookieData.key);
     };
 
     AsyncStorage.getItem('userData')
-      .then((user_data_json) => {
-        if (!user_data_json) {
-          console.log("ERR - NO DATA");
-        } else {
-          let user_data = JSON.parse(user_data_json);
-          this.uid = user_data.uid;
+      .then((user_data_string) => {
+        if (user_data_string) {
+          let user_data = JSON.parse(user_data_string);
           if (this.props.route.publicSecret) {
-            //this.pushPrivateSecret(user_data.uid);
-            GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, user_data.uid, (psData)=> {
+            GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, this.props.userId, (psData)=> {
               this.props.actions.updateSecretKey(psData.key);
             }, () => {
               this.props.actions.setError("We're sorry, there was an error connecting to the server");
             })
           }
           SendSecret.lookUpSenderPH(user_data.uid);
+        } else {
+          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
         }
     });
   }
@@ -84,7 +81,7 @@ class ShareSecret extends React.Component {
                     this.props.actions.setError("Please enter a 10 digit number");
                   } else {
                     this.props.actions.toggleAnimation();
-                    SendSecret.saveArgs(filteredString, "Anonymous", this.uid, this.props.secretKey, this.props);
+                    SendSecret.saveArgs(filteredString, "Anonymous", this.props.userId, this.props.secretKey, this.props);
                   }
                 }}>
                 Continue
@@ -97,7 +94,7 @@ class ShareSecret extends React.Component {
               <Text style={styles.label}>You'll have a chance to review before you send</Text>
               <BigButton do={() => {
                   this.props.actions.toggleAnimation();
-                  SendSecret.saveArgs(this.props.phoneNumber, this.props.firstName, this.uid, this.props.secretKey, this.props);
+                  SendSecret.saveArgs(this.props.phoneNumber, this.props.firstName, this.props.userId, this.props.secretKey, this.props);
                 }}>
                 Continue
               </BigButton>
@@ -158,6 +155,7 @@ const mapStateToProps = (state) => {
     phoneNumber: state.phoneNumber,
     secretKey: state.secretKey,
     firstName: state.firstName,
+    userId: state.userId,
   };
 }
 

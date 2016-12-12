@@ -55,9 +55,7 @@ const GetSecrets = {
             })
           }
         })
-      } else {
-        // What to do if the system can't find any user data?
-      }
+      } 
     });
   },
 

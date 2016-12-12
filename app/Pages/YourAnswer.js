@@ -48,13 +48,17 @@ class YourAnswer extends React.Component {
     if (this.props.answer.length > 5) {
       this.props.actions.toggleAnimation();
       let secretID = this.currentSecret.key;
-      AsyncStorage.getItem('userData').then((user_data_json) => {
-        let user_data = JSON.parse(user_data_json);
-        let userStatus = this.responderOrAsker(user_data.uid, this.props.route.cookieData);
-        let updatedAnswer = {};
-        updatedAnswer[userStatus] = this.props.answer;
-        this.answers.child(secretID).update(updatedAnswer, this.updateUsersTable(userStatus, user_data.uid));
-      })
+      AsyncStorage.getItem('userData').then((user_data_string) => {
+        if (user_data_string) {
+          let user_data = JSON.parse(user_data_string);
+          let userStatus = this.responderOrAsker(user_data.uid, this.props.route.cookieData);
+          let updatedAnswer = {};
+          updatedAnswer[userStatus] = this.props.answer;
+          this.answers.child(secretID).update(updatedAnswer, this.updateUsersTable(userStatus, user_data.uid));
+        } else {
+          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+        }
+      });
     } else {
       this.props.actions.setError('Please provide an answer');
     }

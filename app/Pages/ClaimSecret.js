@@ -61,10 +61,9 @@ class ClaimSecret extends React.Component {
                 }
               )
               this.verifiedIndex.child(user_data.uid).set(true);
-              //this.verificationCodes.child(codeKey).remove();
               this.users.child(user_data.uid).child('secrets').child(codeKey).set({answerState: 'NA', sentState: 'RR'}); // answerState is hard code atm, might be AA, need to check in the future
             } else {
-              this.setErrorState("Sorry, we can't find your user id. Please log in");
+              this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
             }
           });
         } else {

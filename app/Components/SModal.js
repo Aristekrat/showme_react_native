@@ -22,7 +22,7 @@ class SModal extends React.Component {
 
   render() {
     return (
-      <Modal 
+      <Modal
         animationType={'slide'}
         transparent={true}
         visible={this.state.modalVisible}>
@@ -32,6 +32,7 @@ class SModal extends React.Component {
           style={styles.modalContainer}
           underlayColor={StylingGlobals.colors.pressDown} >
           <View>
+            <Text></Text>
             <Text style={styles.modalText}>{this.props.modalText}</Text>
             <Text style={styles.tapToClose}>Tap to close</Text>
           </View>
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 50,
     backgroundColor: StylingGlobals.colors.mainColor,
-    paddingTop: 40,
+    paddingTop: 30,
     paddingBottom: 40,
     paddingLeft: 10,
     paddingRight: 10,

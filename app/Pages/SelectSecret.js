@@ -59,14 +59,14 @@ class SelectSecret extends React.Component {
         }
       }
     } else {
-      this.props.setError("You must be logged in to vote");
+      this.props.actions.setError("You must be logged in to vote");
     }
   }
 
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error);
 
-    AsyncStorage.getItem('userData').then((user_data_string) => { // What to do if the system can't find any user data?
+    AsyncStorage.getItem('userData').then((user_data_string) => {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
         if (user_data.uid) {
@@ -86,7 +86,7 @@ class SelectSecret extends React.Component {
         source: this.state.source.cloneWithRows(this.secrets),
       });
     }, (errorObject) => {
-      this.props.setError("Sorry, we experienced a network error");
+      this.props.actions.setError("Sorry, we experienced a network error");
     })
   }
 

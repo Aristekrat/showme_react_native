@@ -10,6 +10,13 @@ import GetSecrets from '../Globals/GetSecrets.js';
 import { connect } from 'react-redux';
 import actions from '../State/Actions/Actions';
 import User from '../Globals/User';
+const FBSDK = require('react-native-fbsdk');
+const FBLoginManager = require('NativeModules').FBLoginManager;
+const {
+  LoginManager,
+  LoginButton,
+  AccessToken
+} = FBSDK;
 
 import {
   StyleSheet,
@@ -30,29 +37,9 @@ class SignIn extends Component {
     this.userFunctions = new User(this.props.db, this.users, this.props.navigator);
   }
 
-  registerUser() {
-    this.props.actions.toggleAnimation();
-    this.props.actions.removeError();
-    let email = this.props.email.trim();
-
-    this.props.db.createUser({
-      email: email,
-      password: this.props.password
-    }, (error, userData) => {
-      if (error) {
-        this.errorHandler(error);
-      } else {
-        var t = Utility.escapeEmail(email)
-        this.users.child(userData.uid).set({email: email, secrets: {} });
-        this.usersIndex.child(t).set(true);
-        this.userFunctions.login(email, this.props.password);
-      }
-    }) // End parent function
-  }
-
   submitUser() {
     if (this.props.email !== '' && this.props.password !== '') {
-      this.userFunctions.login(this.props.email, this.props.password);
+      this.userFunctions.login(this.props.email, this.props.password, false, this.props.route.message);
     } else {
       this.props.actions.setError('Please enter an email and password');
     }
@@ -70,6 +57,14 @@ class SignIn extends Component {
     this.props.actions.removeError();
     this.props.navigator.push({name: 'Register'});
   }
+
+  /*
+  componentWillMount() {
+    if (this.props.route.message) {
+      this.props.actions.setError(this.props.route.message);
+    }
+  }
+  */
 
   render() {
     return (
@@ -107,6 +102,38 @@ class SignIn extends Component {
             this.props.errorMessage ?
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>{this.props.errorMessage}</Text>
+            </View>
+            :
+            null
+          }
+          {
+            this.props.route.message ?
+            <View style={styles.fbContainer}>
+              <LoginButton
+                  style={styles.fbutton}
+                  onLoginFinished={
+                    (error, result) => {
+                      if (error) {
+                        this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
+                      } else {
+                        AccessToken.getCurrentAccessToken().then(
+                          (data) => {
+                            this.props.db.authWithOAuthToken('facebook', data.accessToken.toString(), (error, authData) => {
+                              if (error) {
+                                this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
+                              } else {
+                                AsyncStorage.setItem('userData', JSON.stringify(authData));
+                                Utility.setLocalAuth();
+                                this.props.navigator.pop();
+                              }
+                            })
+                          }
+                        )
+                      }
+                    }
+                  }
+                  onLogoutFinished={() => console.log("logout.")}
+              />
             </View>
             :
             null
@@ -175,6 +202,16 @@ var styles = StyleSheet.create({
   },
   forgotPasswordBlock: {
     marginTop: 15,
+  },
+  fbContainer: {
+    marginTop: 25,
+    marginBottom: 0,
+    width: 250,
+    marginLeft: 90,
+  },
+  fbutton: {
+    height: 45,
+    width: 250,
   },
   errorContainer: {
     marginLeft: 15,

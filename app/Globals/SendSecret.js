@@ -9,7 +9,7 @@ const SendSecret = {
   DB: Utility.getRef(),
   senderPH: "",
 
-  // Needs the uid, but it's the only one. Can call it as an arg. 
+  // Needs the uid, but it's the only one. Can call it as an arg.
   saveArgs: function (receiverPH, receiverName, senderUID, key, props) {
     this.receiverPH = receiverPH.replace(/[^0-9 ]/g, "").split(' ').join('');
     this.receiverName = receiverName;
@@ -47,12 +47,12 @@ const SendSecret = {
       if (snapshot.hasChild(uid)) {
         let phIndex = snapshot.val();
         this.senderPH = phIndex[uid].replace(/[^0-9 ]/g, "").split(' ').join('');
-      } 
-    }); 
+      }
+    });
   },
 
   lookUpIdWithPH: function (ph, assignVal, routeAfter) {
-    this.DB.child('indexes').child('phoneNumberIndex').orderByValue().equalTo(ph).once('value', (snapshot) => { 
+    this.DB.child('indexes').child('phoneNumberIndex').orderByValue().equalTo(ph).once('value', (snapshot) => {
       let valReturned = snapshot.val();
       if (valReturned) {
         this[assignVal] = Object.keys(valReturned)[0];
@@ -66,7 +66,7 @@ const SendSecret = {
     });
   },
 
-  sendText: function(phoneNumber, secretCode) {   
+  sendText: function(phoneNumber, secretCode) {
     Composer.composeMessageWithArgs({
         'messageText': 'I want to share a secret with you: <url> Your secret code is "' + secretCode + '"',
         'subject':'My Sample Subject',
@@ -96,6 +96,7 @@ const SendSecret = {
   },
 
   updateSentStatus: function(updatedSecret) {
+    console.log("HERE", this.key, this.senderUID);
     this.DB.child('privateSecrets').child(this.key).update(updatedSecret); //DB Dependency
     this.DB.child('users').child(this.senderUID).child('secrets').child(this.key).update({sentState: 'QS'});
     if (updatedSecret.responderID) {

@@ -21,7 +21,7 @@ const TitleBar = {
         case 'ShareSecret':
         case 'AskNumber':
         case 'SecretCode':
-        case 'CreateSecret':
+        case 'CreateYourOwn':
         case 'MySecrets':
         case 'MyAccount':
         case 'SignIn':
@@ -94,7 +94,7 @@ const TitleBar = {
         return (
           <Text style={styles.navBarTitleText}>Create Secret Code</Text>
         );
-      case 'CreateSecret':
+      case 'CreateYourOwn':
         return (
           <Text style={styles.navBarTitleText}>Create Secret</Text>
         );

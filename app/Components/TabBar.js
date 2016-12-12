@@ -29,7 +29,7 @@ class TabBar extends React.Component {
         this.state.selectedTab = 'tabOne';
         break;
       case "SelectCategory":
-      case "CreateSecret":
+      case "CreateYourOwn":
       case "SelectSecret":
       case "ShareSecret":
         this.state.selectedTab = 'tabTwo';

@@ -71,12 +71,18 @@ class SelectCategory extends React.Component {
   }
 
   componentWillMount() {
-    AsyncStorage.getItem('selectCategoryIntro').then((hasBeenIntroducedString) => {
-      if (!hasBeenIntroducedString) {
-        this.props.actions.intro(false);
-        this.props.actions.setModalText('Use this menu to create a new secret or select a premade secret')
-      }
-    });
+    AsyncStorage.removeItem('userData');
+
+    if (this.props.route.modalText) {
+      this.props.actions.setModalText(this.props.route.modalText);
+    } else {
+      AsyncStorage.getItem('selectCategoryIntro').then((hasBeenIntroducedString) => {
+        if (!hasBeenIntroducedString) {
+          this.props.actions.intro(false);
+          this.props.actions.setModalText('Use this menu to create a new secret or select a premade secret')
+        }
+      });
+    }
 
     if (this.props.route.refresh) {
       this.checkIfRemoteSecretsReceived();
@@ -86,8 +92,8 @@ class SelectCategory extends React.Component {
   componentDidMount() {
     if (this.props.route.modalText) {
       this.refs.smodal.setModalVisible(true);
-      this.props.actions.setModalText(this.props.route.modalText);
     }
+
     // Check if this is in AsyncStorage. If not, make a call. If so, don't bother.
     Contacts.getAll((err, contacts) => {
       if(err && err.type === 'permissionDenied'){
@@ -107,7 +113,7 @@ class SelectCategory extends React.Component {
           <Category
             categoryName={this.categories[0].title}
             imgSource={require("../img/caticon-create-your-own.png")} // 'emails9'
-            elsewhere={() => {this.props.navigator.push({name: 'CreateSecret'})}} />
+            elsewhere={() => {this.props.navigator.push({name: 'CreateYourOwn'})}} />
           <Category
             categoryName={this.categories[1].title}
             imgSource={require("../img/caticon-love.png")} // 'heart296'
