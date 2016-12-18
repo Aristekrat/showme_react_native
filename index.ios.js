@@ -256,7 +256,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "SelectCategory"
+          name: "SecretCode"
         }} />
       </Provider>
     );

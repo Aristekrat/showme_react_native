@@ -22,31 +22,31 @@ class Secret extends React.Component {
     let key = this.props.id;
     if (!this.state[key] || this.state[key] !== action) {
       this.setState({count: newNumber, [key]: action});
-    } 
+    }
   }
 
   render() {
     return (
       <View style={styles.secretContainer}>
-        <TouchableHighlight 
+        <TouchableHighlight
           underlayColor={StylingGlobals.colors.accentPressDown} onPress={this.props.selectSecret}>
-          <View style={styles.contentContainer}> 
-            <Text style={styles.secretText}>{this.props.secretText}</Text> 
-            <Image 
+          <View style={styles.contentContainer}>
+            <Text style={styles.secretText}>{this.props.secretText}</Text>
+            <Image
               source={require("../img/arrow-right.png")}
-              style={[StylingGlobals.rightArrow, styles.secretArrow]} />      
+              style={[StylingGlobals.rightArrow, styles.secretArrow]} />
           </View>
         </TouchableHighlight>
         <View style={styles.voteContainer}>
           <TouchableHighlight style={styles.upVote} onPress={() => { this.props.upvote(); this.updateCount(this.state.count + 1, 'upvote') } } underlayColor={StylingGlobals.colors.accentPressDown}>
-            <Image 
+            <Image
               source={require("../img/arrow-up.png")}
-              style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'upvote' ? styles.active : null]} />   
+              style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'upvote' ? styles.active : null]} />
           </TouchableHighlight>
           <TouchableHighlight style={styles.downVote} onPress={() => { this.props.downvote(); this.updateCount(this.state.count - 1, 'downvote') } } underlayColor={StylingGlobals.colors.accentPressDown}>
-            <Image 
+            <Image
               source={require("../img/arrow-down.png")}
-              style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'downvote' ? styles.active : null]} />   
+              style={[styles.voteImg, styles.upvoteImg, this.props.vote === 'downvote' ? styles.active : null]} />
           </TouchableHighlight>
           <Text style={styles.count}>{this.state.count}</Text>
         </View>
@@ -63,17 +63,18 @@ var styles = StyleSheet.create({
     },
     contentContainer: {
       flexDirection: 'row',
-      paddingTop: 15,
       padding: 10,
+      paddingTop: 15,
+      paddingBottom: 15,
     },
     secretText: {
-      fontSize: 12,
+      fontSize: 15,
       color: '#444',
       paddingTop: 5,
       flex: 4,
     },
     secretArrow: {
-    
+
     },
     voteContainer: {
       flexDirection: 'row',

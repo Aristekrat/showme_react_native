@@ -11,6 +11,7 @@ import ActivityIndicator from '../Components/ActivityIndicator.js';
 import actions from '../State/Actions/Actions';
 import { connect } from 'react-redux';
 import Utility from '../Globals/UtilityFunctions.js';
+import Perf from 'react-addons-perf';
 // import Contacts from 'react-native-contacts';
 
 import {
@@ -41,22 +42,32 @@ class ShareSecret extends React.Component {
       this.props.actions.updateSecretKey(this.props.route.cookieData.key);
     };
 
-    AsyncStorage.getItem('userData')
-      .then((user_data_string) => {
+    if (this.props.userId) {
+      SendSecret.lookUpSenderPH(this.props.userId);
+      if (this.props.route.publicSecret) {
+         GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, this.props.userId, (psData)=> {
+          this.props.actions.updateSecretKey(psData.key);
+        }, () => {
+          this.props.actions.setError("We're sorry, there was an error connecting to the server");
+        })
+      }
+    } else {
+      AsyncStorage.getItem('userData').then((user_data_string) => {
         if (user_data_string) {
           let user_data = JSON.parse(user_data_string);
+          SendSecret.lookUpSenderPH(user_data.uid);
           if (this.props.route.publicSecret) {
-            GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, this.props.userId, (psData)=> {
+             GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, this.props.userId, (psData) => {
               this.props.actions.updateSecretKey(psData.key);
             }, () => {
               this.props.actions.setError("We're sorry, there was an error connecting to the server");
             })
           }
-          SendSecret.lookUpSenderPH(user_data.uid);
         } else {
           this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
         }
-    });
+      });
+    }
   }
 
   render() {
@@ -89,7 +100,7 @@ class ShareSecret extends React.Component {
             </View>
             :
             <View>
-              <Text style={styles.prompt}>Choose who you want to send to...</Text>
+              <Text style={StylingGlobals.header}>Choose who you want to send to...</Text>
               <UserContacts contacts={this.props.route.contacts}/>
               <Text style={styles.label}>You'll have a chance to review before you send</Text>
               <BigButton do={() => {
@@ -115,12 +126,6 @@ class ShareSecret extends React.Component {
 };
 
 var styles = StyleSheet.create({
-  prompt: {
-    marginLeft: 30,
-    marginTop: 20,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   textInput: {
     height: 50,
     padding: 2,

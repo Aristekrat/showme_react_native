@@ -105,7 +105,7 @@ class YourAnswer extends React.Component {
       <View style={StylingGlobals.container}>
         <ScrollView style={styles.form}>
           <View>
-            <Text>Q: {this.props.route.cookieData.question}</Text>
+            <Text style={styles.question}>Q: {this.props.route.cookieData.question}</Text>
             <TextInput
                 style={styles.textInput}
                 autoFocus={true}
@@ -132,11 +132,14 @@ const styles = StyleSheet.create({
   form: {
     padding: 20
   },
+  question: {
+    fontSize: 16,
+  },
   textInput: {
     backgroundColor: '#fff',
-    height: 40,
+    height: 55,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: StylingGlobals.colors.textInputBorder,
     paddingLeft: 5,
     marginTop: 12,
     marginBottom: 12
@@ -149,7 +152,8 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: StylingGlobals.colors.mainColor,
-    height: 45,
+    height: 55,
+    marginTop: 15,
   },
   buttonText: {
     textAlign: 'center',

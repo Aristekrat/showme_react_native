@@ -10,9 +10,9 @@ import {
 class BigButton extends React.Component {
   render() {
     return (
-      <TouchableHighlight 
-          style={styles.bigButtonContainer} 
-          underlayColor={StylingGlobals.colors.pressDown} 
+      <TouchableHighlight
+          style={styles.bigButtonContainer}
+          underlayColor={StylingGlobals.colors.pressDown}
           onPress={this.props.do} >
           <Text style={styles.buttonText}>{this.props.children}</Text>
       </TouchableHighlight>
@@ -28,6 +28,8 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 15,
   	padding: 15,
+    paddingTop: 17,
+    height: 55,
   },
   buttonText: {
     color: '#fff',

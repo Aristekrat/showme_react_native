@@ -20,7 +20,7 @@ function xkcd_pw_gen_create_hash()
 {
     // Entropy string built in a manner inspired by David Finch:
     var entropy = xkcd_pw_gen_time_ent();
-    	entropy += sha1(xkcd_pw_gen_wordlist[Math.floor(Math.random() * (xkcd_pw_gen_wordlist.length - 0) + 0)]); 
+    	entropy += sha1(xkcd_pw_gen_wordlist[Math.floor(Math.random() * (xkcd_pw_gen_wordlist.length - 0) + 0)]);
     /*
     entropy += navigator.userAgent + Math.random() + Math.random() + screen.width + screen.height;
     if (document.all)
@@ -30,7 +30,7 @@ function xkcd_pw_gen_create_hash()
     */
 
     entropy += xkcd_pw_gen_time_ent();
-        
+
     // Hash and convert to 32-bit integers:
     var hexString = sha1(entropy); // from sha1-min.js
     var result = [];
@@ -41,12 +41,22 @@ function xkcd_pw_gen_create_hash()
     return result;
 }
 
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 // Generate a new passphrase and update the document:
-function xkcd_pw_gen(numAdjs, numWords)
+function xkcd_pw_gen(numAdjs, numWords, minLength)
 {
     var hash = xkcd_pw_gen_create_hash();
     var choices = [];
-    for (var a = 0; a < numAdjs; a++) 
+    for (var a = 0; a < numAdjs; a++)
     {
     	var jsRandom = Math.floor(Math.random() * 0x100000000);
         var index = ((jsRandom ^ hash[w]) + 0x100000000) % adjectives.length;
@@ -57,6 +67,15 @@ function xkcd_pw_gen(numAdjs, numWords)
         var jsRandom = Math.floor(Math.random() * 0x100000000);
         var index = ((jsRandom ^ hash[w]) + 0x100000000) % nouns.length;
         choices.push(nouns[index]);
+    }
+
+    for (var i = 0; choices.length > i; i++)
+    {
+      choices[i] = capitalizeFirstLetter(choices[i]);
+    }
+
+    if (choices.join('').length < minLength) {
+      choices.push(getRandomInt(0, 1000));
     }
     //var resultSpan = document.getElementById("xkcd_pw_gen_result");
     //resultSpan.innerText = resultSpan.textContent = choices.join(" ");

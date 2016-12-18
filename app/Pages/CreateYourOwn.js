@@ -190,7 +190,7 @@ var styles = StyleSheet.create({
     backgroundColor: '#fff',
     height: 50,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: StylingGlobals.colors.textInputBorder,
     paddingLeft: 5,
   },
   label: {
@@ -202,7 +202,7 @@ var styles = StyleSheet.create({
   },
   button: {
     backgroundColor: StylingGlobals.colors.mainColor,
-    height: 45,
+    height: 55,
   },
   buttonText: {
     textAlign: 'center',

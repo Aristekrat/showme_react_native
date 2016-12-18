@@ -17,6 +17,7 @@ const {
   LoginButton,
   AccessToken
 } = FBSDK;
+import Perf from 'react-addons-perf';
 
 import {
   StyleSheet,
@@ -58,13 +59,16 @@ class SignIn extends Component {
     this.props.navigator.push({name: 'Register'});
   }
 
-  /*
+
   componentWillMount() {
     if (this.props.route.message) {
       this.props.actions.setError(this.props.route.message);
     }
   }
-  */
+
+  componentDidMount() {
+    Perf.printWasted();
+  }
 
   render() {
     return (
@@ -176,15 +180,16 @@ var styles = StyleSheet.create({
   label: {
     fontSize: 12,
     textAlign: 'left',
-    margin: 15,
+    margin: 10,
+    marginTop: 22,
     width: 60,
   },
   textInput: {
-    height: 40,
+    height: 55,
     padding: 2,
     marginTop: 4,
     marginBottom: 8,
-    borderColor: '#eee',
+    borderColor: StylingGlobals.colors.textInputBorder,
     borderWidth: 1,
     width: 250,
     backgroundColor: '#fff'
@@ -194,11 +199,17 @@ var styles = StyleSheet.create({
   	backgroundColor: StylingGlobals.colors.mainColor,
     marginTop: 14,
     width: 250,
-    marginLeft: 90,
+    marginLeft: 80,
+    height: 55,
   },
   buttonText: {
     textAlign: 'center',
     color: StylingGlobals.colors.textColorOne,
+    marginTop: 6,
+    fontSize: 16,
+  },
+  switchBlock: {
+
   },
   forgotPasswordBlock: {
     marginTop: 15,

@@ -139,12 +139,9 @@ ReactMixin(TabBar.prototype, ReactTimer);
 
 var styles = StyleSheet.create({
   tabContainer: {
-    height: 70, // Not possible to click on the nav bar items without this.
-    marginTop: 20,
+    height: 50, // Not possible to click on the nav bar items without this.
+    marginTop: 0,
     borderTopColor: StylingGlobals.colors.navColor,
-  },
-  tabItem: {
-    height: 70,
   },
   viewItem: {
     backgroundColor: '#fff'

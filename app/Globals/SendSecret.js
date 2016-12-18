@@ -96,7 +96,6 @@ const SendSecret = {
   },
 
   updateSentStatus: function(updatedSecret) {
-    console.log("HERE", this.key, this.senderUID);
     this.DB.child('privateSecrets').child(this.key).update(updatedSecret); //DB Dependency
     this.DB.child('users').child(this.senderUID).child('secrets').child(this.key).update({sentState: 'QS'});
     if (updatedSecret.responderID) {

@@ -71,8 +71,6 @@ class SelectCategory extends React.Component {
   }
 
   componentWillMount() {
-    AsyncStorage.removeItem('userData');
-
     if (this.props.route.modalText) {
       this.props.actions.setModalText(this.props.route.modalText);
     } else {

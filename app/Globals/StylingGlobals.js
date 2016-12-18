@@ -10,14 +10,15 @@ var globalStyling = {
 		'accentPressDown': '#FFEDED',
 		'navColor': '#E67A7A',
 		'textColorOne': '#ffffff',
-		'textColorTwo': '#555555',	
-		'border': '#ccc'	
+		'textColorTwo': '#555555',
+		'border': '#ccc',
+		'textInputBorder': '#ccc',
 	},
-	container: {    
+	container: {
     	flex: 1,
     	marginTop: 65,
     	backgroundColor: '#fff8f8',
-  	},
+  },
 	rightArrow: {
 	    marginLeft: 20,
 	    width: 25,
@@ -38,7 +39,6 @@ var globalStyling = {
 	    marginTop: 20,
 	    fontSize: 16,
 	    marginBottom: 5,
-	    fontWeight: 'bold',
 	},
 	paragraph: {
 	    marginLeft: 30,
@@ -46,10 +46,10 @@ var globalStyling = {
 	    marginTop: 5,
 	},
 	horizontalCenter: {
-	    flex: 1, 
-	    flexDirection: 'row', 
-	    justifyContent: 'center', 
-	    alignItems: 'center'		
+	    flex: 1,
+	    flexDirection: 'row',
+	    justifyContent: 'center',
+	    alignItems: 'center'
 	}
 }
 

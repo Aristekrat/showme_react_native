@@ -44,8 +44,6 @@ class SelectSecret extends React.Component {
     });
   }
 
-  // problems: voteState doesn't update without an app refresh, probably need to save secrets locally and check that
-  // Need to streamline all the checks, perhaps split it up or figure out a system that can do it all once.
   vote(action, voteState, key, voteAmt) {
     if (this.knownUser) {
       if (!this.state[key] || this.state[key] !== action) { // Checks the local record of voting history, if no vote or diff vote...
@@ -71,6 +69,7 @@ class SelectSecret extends React.Component {
         let user_data = JSON.parse(user_data_string);
         if (user_data.uid) {
           this.knownUser = user_data.uid;
+          this.props.actions.updateUserId(user_data.uid);
         }
       }
     });

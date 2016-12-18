@@ -15,13 +15,13 @@ class Category extends React.Component {
     return (
       <TouchableHighlight onPress={this.props.elsewhere} underlayColor={StylingGlobals.colors.accentPressDown}>
       	<View style={styles.category}>
-	        <Image 
+	        <Image
 	          source={this.props.imgSource}
 	          style={styles.icon} />
 	        <Text style={styles.text}>
 	          {this.props.categoryName}
 	        </Text>
-          <Image 
+          <Image
             source={require("../img/arrow-right.png")}
             style={[StylingGlobals.rightArrow, styles.catArrow]} />
         </View>
@@ -40,7 +40,7 @@ var styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     flexDirection: 'row',
-    height: 60,
+    height: 80,
   },
   text: {
     fontSize: 20,
