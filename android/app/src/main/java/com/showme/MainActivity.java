@@ -1,7 +1,6 @@
 package com.showme;
 
 import com.facebook.react.ReactActivity;
-import com.rnfs.RNFSPackage;
 
 public class MainActivity extends ReactActivity {
 
