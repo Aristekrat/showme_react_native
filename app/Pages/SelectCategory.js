@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import StylingGlobals from '../Globals/StylingGlobals.js';
 import TabBar from '../Components/TabBar.js';
 import Category from '../Components/Category.js';
+import ActivityIndicator from '../Components/ActivityIndicator.js';
 import SModal from '../Components/SModal.js';
 import CreateYourOwn from './CreateYourOwn.js';
 import SelectSecret from './SelectSecret.js';
@@ -45,6 +46,7 @@ class SelectCategory extends React.Component {
   }
 
   selectCategory (categoryName) {
+    this.props.actions.toggleAnimation();
     this.props.navigator.push({
       name: 'SelectSecret',
       category: categoryName,
@@ -107,6 +109,7 @@ class SelectCategory extends React.Component {
   render(){
     return (
       <View style={StylingGlobals.container}>
+        <ActivityIndicator animationControl={this.props.animating}/>
         <ScrollView style={styles.content}>
           <Category
             categoryName={this.categories[0].title}
@@ -165,7 +168,8 @@ ReactMixin(SelectCategory.prototype, ReactTimer);
 const mapStateToProps = (state) => {
   return {
     hasBeenIntroduced: state.selectCategoryIntro,
-    modalText: state.modalText
+    modalText: state.modalText,
+    animating: state.isAnimating,
   };
 }
 

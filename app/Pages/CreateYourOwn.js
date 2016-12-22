@@ -121,7 +121,7 @@ class CreateYourOwn extends React.Component {
               { this.props.error ? <Text style={styles.errorText}>{this.props.error}</Text> : null }
           </View>
           <View style={styles.row}>
-            <Text style={styles.publicExplanatory}>Allow other people to use this question?
+            <Text style={styles.publicExplanatory}>Let other people to use this question?
             { this.props.public ?
               ' Yes' :
               ' No'
@@ -191,13 +191,13 @@ var styles = StyleSheet.create({
     height: 50,
     borderWidth: 1,
     borderColor: StylingGlobals.colors.textInputBorder,
-    paddingLeft: 5,
+    padding: 5,
   },
   label: {
     marginBottom: 3
   },
   publicExplanatory: {
-    fontSize: 11,
+    fontSize: 12,
     marginBottom: 4,
   },
   button: {
@@ -217,6 +217,8 @@ var styles = StyleSheet.create({
   },
   errorText: {
     color: StylingGlobals.colors.mainColor,
+    fontSize: 15,
+    marginTop: 4,
   },
   positiveNotification: {
     textAlign: 'center',

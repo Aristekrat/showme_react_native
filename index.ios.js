@@ -164,9 +164,9 @@ class ShowMe extends React.Component {
   }
 
   componentWillMount() {
-    /*if (Utility.getAuthStatus()) {
+    if (Utility.getAuthStatus()) {
       Utility.setLocalAuth(true);
-    }*/
+    }
     GetSecrets.getLocalSecrets();
     GetSecrets.getRemoteSecrets();
     this.anonAuthHandler();
@@ -256,7 +256,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "SecretCode"
+          name: "RegistrationInterim"
         }} />
       </Provider>
     );

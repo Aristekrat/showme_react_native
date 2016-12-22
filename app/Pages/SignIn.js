@@ -64,10 +64,8 @@ class SignIn extends Component {
     if (this.props.route.message) {
       this.props.actions.setError(this.props.route.message);
     }
-  }
 
-  componentDidMount() {
-    Perf.printWasted();
+    Utility.resetState(this.props.animating, this.props.error);
   }
 
   render() {
@@ -182,7 +180,7 @@ var styles = StyleSheet.create({
     textAlign: 'left',
     margin: 10,
     marginTop: 22,
-    width: 60,
+    width: 55,
   },
   textInput: {
     height: 55,
@@ -199,7 +197,7 @@ var styles = StyleSheet.create({
   	backgroundColor: StylingGlobals.colors.mainColor,
     marginTop: 14,
     width: 250,
-    marginLeft: 80,
+    marginLeft: 75,
     height: 55,
   },
   buttonText: {
@@ -209,10 +207,11 @@ var styles = StyleSheet.create({
     fontSize: 16,
   },
   switchBlock: {
-
+    width: 400,
   },
   forgotPasswordBlock: {
     marginTop: 15,
+    width: 400,
   },
   fbContainer: {
     marginTop: 25,

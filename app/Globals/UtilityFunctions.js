@@ -26,19 +26,19 @@ var Utility = {
 	  }
 	},
 
+  unAuth: function() {
+    var ref = this.getRef();
+    ref.unauth();
+  },
+
+  setLocalAuth: function (setTo) {
+    this.authStatus = setTo;
+  },
+
 	getVerificationStatus: function(uid) {
 		this.ref.child('indexes').child('verified').child(uid).once('value', (snapshot)=> {
 			this.verified = snapshot.val();
 		});
-	},
-
-	unAuth: function() {
-	  var ref = this.getRef();
-	  ref.unauth();
-	},
-
-	setLocalAuth: function (setTo) {
-		this.authStatus = setTo;
 	},
 
 	escapeEmail(email) {

@@ -203,7 +203,7 @@ class MySecrets extends React.Component {
           </View>
           <View style={styles.contentContainer}>
             <ActivityIndicator animationControl={this.props.animating}/>
-            {helperText}
+            {secretsList[0] || this.props.animating ? helperText : <Text style={styles.helperText}>No secrets of this type yet</Text> }
             {secretsList}
           </View>
         </ScrollView>
@@ -212,9 +212,6 @@ class MySecrets extends React.Component {
     );
   }
 }
-
-// This conditional stopped working
-// {secretsList[0] || this.state.animating ? helperText : <Text style={styles.helperText}>No secrets of this type yet</Text> }
 
 ReactMixin(MySecrets.prototype, ReactTimer);
 
@@ -246,7 +243,7 @@ var styles = StyleSheet.create({
   },
   helperText: {
     textAlign: 'center',
-    marginTop: 5,
+    marginTop: 15,
     marginBottom: 5
   }
 });

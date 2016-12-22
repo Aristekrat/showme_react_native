@@ -46,6 +46,7 @@ class Register extends Component {
         this.usersIndex.child(t).set(true);
         this.props.actions.toggleAnimation();
         this.userFunctions.login(email, this.props.password, true);
+        //AsyncStorage.removeItem('secrets');
       }
     }) // End parent function
   }
@@ -75,6 +76,8 @@ class Register extends Component {
     if (this.props.route.cookieData) {
       this.props.actions.updateFormInput(this.props.route.cookieData);
     }
+
+    Utility.resetState(this.props.animating, this.props.error);
   }
 
   render() {

@@ -67,8 +67,9 @@ const SendSecret = {
   },
 
   sendText: function(phoneNumber, secretCode) {
+    let link = 'https://itunes.apple.com/us/app/hintsy-send-the-perfect-gifts/id1030972401?mt=8'
     Composer.composeMessageWithArgs({
-        'messageText': 'I want to share a secret with you: <url> Your secret code is "' + secretCode + '"',
+        'messageText': 'I want to share a secret with you: '+ link +' Your secret code is "' + secretCode + '"',
         'subject':'My Sample Subject',
         'recipients': [phoneNumber]
     }, (result) => {

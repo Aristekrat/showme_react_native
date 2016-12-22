@@ -47,7 +47,7 @@ class SelectSecret extends React.Component {
   vote(action, voteState, key, voteAmt) {
     if (this.knownUser) {
       if (!this.state[key] || this.state[key] !== action) { // Checks the local record of voting history, if no vote or diff vote...
-        this.setState({[key]: action})
+        this.setState({[key]: action}) // questionable whether this should still be here.
         if (!voteState) { // First vote
           this.postUsersVote(action, key);
           this.postVoteAmt(voteAmt, key);
@@ -105,7 +105,10 @@ class SelectSecret extends React.Component {
                 count={rowData.score}
                 key={rowData.key}
                 id={rowData.key}
-                selectSecret={() => {this.props.navigator.push({name: 'ShareSecret', cookieData: rowData, publicSecret: true, contacts: this.props.route.contacts})}}
+                selectSecret={() => {
+                  this.props.actions.toggleAnimation();
+                  this.props.navigator.push({name: 'ShareSecret', cookieData: rowData, publicSecret: true, contacts: this.props.route.contacts})}
+                }
                 vote={rowData.vote}
                 upvote={() => {
                     this.vote('upvote', rowData.vote, rowData.key, 1);

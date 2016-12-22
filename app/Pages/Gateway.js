@@ -6,6 +6,7 @@ import ArrowLink from '../Components/ArrowLink';
 import Utility from '../Globals/UtilityFunctions';
 import actions from '../State/Actions/Actions';
 import User from '../Globals/User';
+import ActivityIndicator from '../Components/ActivityIndicator.js';
 import { connect } from 'react-redux';
 import {
   StyleSheet,
@@ -50,7 +51,6 @@ class Gateway extends React.Component {
       this.props.actions.toggleAnimation();
       this.props.actions.setError("Sorry, you're not connected to the internet");
     } else if (this.validateEmail(this.props.emailAddress)) {
-      this.props.actions.toggleAnimation();
       this.userIndex.once('value', (snapshot) => {
         if (snapshot.hasChild(this.escapeEmail(this.props.emailAddress))) {
           this.props.navigator.push({name: 'SignIn', cookieData: this.props.emailAddress}); // Go to login
@@ -112,6 +112,8 @@ class Gateway extends React.Component {
                 null
             }
           </View>
+
+          <ActivityIndicator animationControl={this.props.animating}/>
 
           <View style={styles.fbContainer}>
             <LoginButton
