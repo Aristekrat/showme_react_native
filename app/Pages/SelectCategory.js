@@ -14,6 +14,7 @@ import GetSecrets from '../Globals/GetSecrets.js';
 import actions from '../State/Actions/Actions';
 import { connect } from 'react-redux';
 import Contacts from 'react-native-contacts';
+import Utility from '../Globals/UtilityFunctions';
 
 import {
   StyleSheet,
@@ -23,6 +24,7 @@ import {
   Image,
   AsyncStorage,
   TouchableHighlight,
+  NetInfo,
 } from 'react-native';
 
 class SelectCategory extends React.Component {
@@ -46,12 +48,16 @@ class SelectCategory extends React.Component {
   }
 
   selectCategory (categoryName) {
-    this.props.actions.toggleAnimation();
-    this.props.navigator.push({
-      name: 'SelectSecret',
-      category: categoryName,
-      contacts: this.contacts,
-    });
+    if (this.props.isConnected) {
+      this.props.actions.toggleAnimation();
+      this.props.navigator.push({
+        name: 'SelectSecret',
+        category: categoryName,
+        contacts: this.contacts,
+      });
+    } else {
+      this.props.actions.setError("Sorry, you are not connected to the internet.")
+    }
   }
 
   sawIntro() {
@@ -73,6 +79,8 @@ class SelectCategory extends React.Component {
   }
 
   componentWillMount() {
+    Utility.resetState(this.props.animating, this.props.error);
+
     if (this.props.route.modalText) {
       this.props.actions.setModalText(this.props.route.modalText);
     } else {
@@ -87,6 +95,11 @@ class SelectCategory extends React.Component {
     if (this.props.route.refresh) {
       this.checkIfRemoteSecretsReceived();
     }
+
+    const dispatchConnected = isConnected => this.props.actions.setIsConnected(isConnected);
+    NetInfo.isConnected.fetch().then().done(() => {
+      NetInfo.isConnected.addEventListener('change', dispatchConnected);
+    });
   }
 
   componentDidMount() {
@@ -104,12 +117,21 @@ class SelectCategory extends React.Component {
         AsyncStorage.setItem('contacts', JSON.stringify(contacts));
       }
     });
+
+    NetInfo.isConnected.fetch().then(isConnected => {
+      this.props.actions.setIsConnected(isConnected);
+    });
   }
 
   render(){
     return (
       <View style={StylingGlobals.container}>
         <ActivityIndicator animationControl={this.props.animating}/>
+        {
+          this.props.errorMessage ?
+          <Text style={styles.error}>{this.props.errorMessage}</Text> :
+          null
+        }
         <ScrollView style={styles.content}>
           <Category
             categoryName={this.categories[0].title}
@@ -160,7 +182,13 @@ class SelectCategory extends React.Component {
 }
 
 var styles = StyleSheet.create({
-
+  error: {
+    color: StylingGlobals.colors.mainColor,
+    fontSize: 16,
+    marginTop: 5,
+    marginLeft: 15,
+    marginBottom: 0,
+  }
 });
 
 ReactMixin(SelectCategory.prototype, ReactTimer);
@@ -170,6 +198,8 @@ const mapStateToProps = (state) => {
     hasBeenIntroduced: state.selectCategoryIntro,
     modalText: state.modalText,
     animating: state.isAnimating,
+    errorMessage: state.error,
+    isConnected: state.isConnected,
   };
 }
 

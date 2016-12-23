@@ -8,6 +8,7 @@ import actions from '../State/Actions/Actions';
 import User from '../Globals/User';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import { connect } from 'react-redux';
+import FButton from '../Components/FButton.js';
 import {
   StyleSheet,
   Text,
@@ -20,6 +21,7 @@ import {
   NetInfo,
 } from 'react-native';
 
+/*
 const FBSDK = require('react-native-fbsdk');
 const FBLoginManager = require('NativeModules').FBLoginManager;
 const {
@@ -27,6 +29,7 @@ const {
   LoginButton,
   AccessToken
 } = FBSDK;
+*/
 
 class Gateway extends React.Component {
   constructor(props) {
@@ -62,6 +65,15 @@ class Gateway extends React.Component {
       this.props.actions.toggleAnimation();
       this.props.actions.setError("Please enter a valid email");
     }
+  }
+
+  fbSuccessCB(authData, props) {
+    AsyncStorage.setItem('userData', JSON.stringify(authData));
+    Utility.setLocalAuth();
+    var email = Utility.escapeEmail(authData.auth.token.email); // These four lines are different in Gateway & SignIn
+    props.db.child('indexes').child('userIndex').child(email).set(true);
+    props.db.child('users').child(authData.uid).set({email: email, secrets: {} });
+    props.navigator.push({name: 'SelectCategory'});
   }
 
   componentWillMount() {
@@ -115,43 +127,47 @@ class Gateway extends React.Component {
 
           <ActivityIndicator animationControl={this.props.animating}/>
 
-          <View style={styles.fbContainer}>
-            <LoginButton
-                style={styles.fbutton}
-                readPermissions={["public_profile", "email"]}
-                onLoginFinished={
-                  (error, result) => {
-                    if (error) {
-                      this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
-                    } else {
-                      AccessToken.getCurrentAccessToken().then(
-                        (data) => {
-                          this.props.db.authWithOAuthToken('facebook', data.accessToken.toString(), (error, authData) => {
-                            if (error) {
-                              this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
-                            } else {
-                              AsyncStorage.setItem('userData', JSON.stringify(authData));
-                              Utility.setLocalAuth();
-                              var email = Utility.escapeEmail(authData.auth.token.email);
-                              this.userIndex.child(email).set(true);
-                              this.users.child(authData.uid).set({email: email, secrets: {} });
-                              this.props.navigator.push({name: 'SelectCategory'})
-                            }
-                          })
-                        }
-                      )
-                    }
-                  }
-                }
-                onLogoutFinished={() => console.log("logout.")}
-            />
-          </View>
+          <FButton successCB={this.fbSuccessCB} db={this.props.db} navigator={this.props.navigator} />
+
           <ArrowLink skipTo={() => this.userFunctions.anonAuth() }>Skip for Now</ArrowLink>
         </ScrollView>
       </View>
     );
   }
 }
+
+/* <View style={styles.fbContainer}>
+  <LoginButton
+      style={styles.fbutton}
+      readPermissions={["public_profile", "email"]}
+      onLoginFinished={
+        (error, result) => {
+          if (error) {
+            this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
+          } else {
+            AccessToken.getCurrentAccessToken().then(
+              (data) => {
+                this.props.db.authWithOAuthToken('facebook', data.accessToken.toString(), (error, authData) => {
+                  if (error) {
+                    this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
+                  } else {
+                    AsyncStorage.setItem('userData', JSON.stringify(authData));
+                    Utility.setLocalAuth();
+                    var email = Utility.escapeEmail(authData.auth.token.email);
+                    this.userIndex.child(email).set(true);
+                    this.users.child(authData.uid).set({email: email, secrets: {} });
+                    this.props.navigator.push({name: 'SelectCategory'})
+                  }
+                })
+              }
+            )
+          }
+        }
+      }
+      onLogoutFinished={() => console.log("logout.")}
+  />
+</View>
+*/
 
 const styles = StyleSheet.create({
   heroImage: {
@@ -167,17 +183,6 @@ const styles = StyleSheet.create({
   heroText: {
     textAlign: 'center',
     marginBottom: 7,
-  },
-  fbContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 15,
-    marginTop: 15,
-  },
-  fbutton: {
-    width: 295,
-    flex: 1,
-    height: 55,
   },
   emailContainer: {
     flex: 1,
@@ -240,4 +245,4 @@ const mapDispatchToProps = function(dispatch, ownProps) {
   return { actions : actions }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Gateway)
+export default connect(mapStateToProps, mapDispatchToProps)(Gateway);

@@ -26,7 +26,8 @@ class SelectSecret extends React.Component {
     }
     this.secrets = [];
     this.knownUser = false;
-    this.publicSecrets = this.props.db.child('publicSecrets').child(this.props.route.category);
+    this.category = this.props.route.category ? this.props.route.category : "Social";
+    this.publicSecrets = this.props.db.child('publicSecrets').child(this.category);
   }
 
   postUsersVote(theVote, key) {

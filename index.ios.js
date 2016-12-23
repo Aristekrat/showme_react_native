@@ -256,7 +256,7 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "RegistrationInterim"
+          name: "CreateYourOwn"
         }} />
       </Provider>
     );

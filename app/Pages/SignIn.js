@@ -10,13 +10,7 @@ import GetSecrets from '../Globals/GetSecrets.js';
 import { connect } from 'react-redux';
 import actions from '../State/Actions/Actions';
 import User from '../Globals/User';
-const FBSDK = require('react-native-fbsdk');
-const FBLoginManager = require('NativeModules').FBLoginManager;
-const {
-  LoginManager,
-  LoginButton,
-  AccessToken
-} = FBSDK;
+import FButton from '../Components/FButton.js';
 import Perf from 'react-addons-perf';
 
 import {
@@ -46,6 +40,13 @@ class SignIn extends Component {
     }
   }
 
+  fbSuccessCB(authData, props) {
+    AsyncStorage.setItem('userData', JSON.stringify(authData));
+    Utility.setLocalAuth();
+    props.actions.removeError();
+    props.navigator.pop();
+  }
+
   forgot() {
     if (!this.props.email) {
       this.props.actions.setError('Please enter your email address');
@@ -58,7 +59,6 @@ class SignIn extends Component {
     this.props.actions.removeError();
     this.props.navigator.push({name: 'Register'});
   }
-
 
   componentWillMount() {
     if (this.props.route.message) {
@@ -110,33 +110,7 @@ class SignIn extends Component {
           }
           {
             this.props.route.message ?
-            <View style={styles.fbContainer}>
-              <LoginButton
-                  style={styles.fbutton}
-                  onLoginFinished={
-                    (error, result) => {
-                      if (error) {
-                        this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
-                      } else {
-                        AccessToken.getCurrentAccessToken().then(
-                          (data) => {
-                            this.props.db.authWithOAuthToken('facebook', data.accessToken.toString(), (error, authData) => {
-                              if (error) {
-                                this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
-                              } else {
-                                AsyncStorage.setItem('userData', JSON.stringify(authData));
-                                Utility.setLocalAuth();
-                                this.props.navigator.pop();
-                              }
-                            })
-                          }
-                        )
-                      }
-                    }
-                  }
-                  onLogoutFinished={() => console.log("logout.")}
-              />
-            </View>
+            <FButton successCB={this.fbSuccessCB} db={this.props.db} navigator={this.props.navigator} />
             :
             null
           }
