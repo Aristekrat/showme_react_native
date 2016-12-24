@@ -27,7 +27,7 @@ var globalStyling = {
 	},
 	textInput: {
 	    backgroundColor: '#fff',
-	    height: 45,
+	    height: 55,
 	    borderWidth: 1,
 	    borderColor: '#cdcdcd',
 	    paddingLeft: 5,

@@ -34,8 +34,8 @@ class YourAnswer extends React.Component {
     } else if (localID === secret.responderID) {
       return "responderAnswer";
     } else {
-      // the user is seeing a secret they shouldn't, serious error
-      return null;
+      this.props.actions.setError("Sorry, the app has experienced an error");
+      this.props.navigator.pop();
     }
   }
 
@@ -50,6 +50,7 @@ class YourAnswer extends React.Component {
       let secretID = this.currentSecret.key;
       AsyncStorage.getItem('userData').then((user_data_string) => {
         if (user_data_string) {
+          Utility.checkConnection()
           let user_data = JSON.parse(user_data_string);
           let userStatus = this.responderOrAsker(user_data.uid, this.props.route.cookieData);
           let updatedAnswer = {};

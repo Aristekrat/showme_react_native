@@ -24,7 +24,6 @@ import {
   Image,
   AsyncStorage,
   TouchableHighlight,
-  NetInfo,
 } from 'react-native';
 
 class SelectCategory extends React.Component {
@@ -48,16 +47,13 @@ class SelectCategory extends React.Component {
   }
 
   selectCategory (categoryName) {
-    if (this.props.isConnected) {
-      this.props.actions.toggleAnimation();
-      this.props.navigator.push({
-        name: 'SelectSecret',
-        category: categoryName,
-        contacts: this.contacts,
-      });
-    } else {
-      this.props.actions.setError("Sorry, you are not connected to the internet.")
-    }
+    Utility.checkConnection();
+    this.props.actions.toggleAnimation();
+    this.props.navigator.push({
+      name: 'SelectSecret',
+      category: categoryName,
+      contacts: this.contacts,
+    });
   }
 
   sawIntro() {
@@ -96,10 +92,6 @@ class SelectCategory extends React.Component {
       this.checkIfRemoteSecretsReceived();
     }
 
-    const dispatchConnected = isConnected => this.props.actions.setIsConnected(isConnected);
-    NetInfo.isConnected.fetch().then().done(() => {
-      NetInfo.isConnected.addEventListener('change', dispatchConnected);
-    });
   }
 
   componentDidMount() {
@@ -118,9 +110,6 @@ class SelectCategory extends React.Component {
       }
     });
 
-    NetInfo.isConnected.fetch().then(isConnected => {
-      this.props.actions.setIsConnected(isConnected);
-    });
   }
 
   render(){

@@ -21,7 +21,8 @@ import {
   Image,
   ScrollView,
   TextInput,
-  AsyncStorage
+  AsyncStorage,
+  NetInfo
 } from 'react-native';
 
 class SignIn extends Component {
@@ -109,12 +110,6 @@ class SignIn extends Component {
             null
           }
           {
-            this.props.route.message ?
-            <FButton successCB={this.fbSuccessCB} db={this.props.db} navigator={this.props.navigator} />
-            :
-            null
-          }
-          {
             this.props.displaySkip ?
             <View style={styles.forgotPasswordBlock}>
               <ArrowLink skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} >Skip</ArrowLink>
@@ -131,6 +126,16 @@ class SignIn extends Component {
             <View style={styles.switchBlock}>
               <ArrowLink skipTo={()=> this.switchToRegister()}>Register Instead</ArrowLink>
             </View>
+          }
+          {
+            true ?
+            <FButton
+              successCB={this.fbSuccessCB}
+              db={this.props.db}
+              navigator={this.props.navigator}
+              width={{width: 260, marginLeft: 35}}/>
+            :
+            null
           }
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
@@ -163,14 +168,14 @@ var styles = StyleSheet.create({
     marginBottom: 8,
     borderColor: StylingGlobals.colors.textInputBorder,
     borderWidth: 1,
-    width: 250,
+    width: 260,
     backgroundColor: '#fff'
   },
   button: {
   	padding: 10,
   	backgroundColor: StylingGlobals.colors.mainColor,
     marginTop: 14,
-    width: 250,
+    width: 260,
     marginLeft: 75,
     height: 55,
   },
@@ -181,11 +186,11 @@ var styles = StyleSheet.create({
     fontSize: 16,
   },
   switchBlock: {
-    width: 400,
+    width: 410,
   },
   forgotPasswordBlock: {
     marginTop: 15,
-    width: 400,
+    width: 410,
   },
   fbContainer: {
     marginTop: 25,

@@ -21,16 +21,6 @@ import {
   NetInfo,
 } from 'react-native';
 
-/*
-const FBSDK = require('react-native-fbsdk');
-const FBLoginManager = require('NativeModules').FBLoginManager;
-const {
-  LoginManager,
-  LoginButton,
-  AccessToken
-} = FBSDK;
-*/
-
 class Gateway extends React.Component {
   constructor(props) {
     super(props);
@@ -49,11 +39,9 @@ class Gateway extends React.Component {
   }
 
   checkEmail() {
+    Utility.checkConnection();
     this.props.actions.toggleAnimation();
-    if (!this.props.isConnected) {
-      this.props.actions.toggleAnimation();
-      this.props.actions.setError("Sorry, you're not connected to the internet");
-    } else if (this.validateEmail(this.props.emailAddress)) {
+    if (this.validateEmail(this.props.emailAddress)) {
       this.userIndex.once('value', (snapshot) => {
         if (snapshot.hasChild(this.escapeEmail(this.props.emailAddress))) {
           this.props.navigator.push({name: 'SignIn', cookieData: this.props.emailAddress}); // Go to login
@@ -77,18 +65,11 @@ class Gateway extends React.Component {
   }
 
   componentWillMount() {
-    const dispatchConnected = isConnected => this.props.actions.setIsConnected(isConnected);
-    NetInfo.isConnected.fetch().then().done(() => {
-      NetInfo.isConnected.addEventListener('change', dispatchConnected);
-    });
-
     AsyncStorage.removeItem('hasBeenIntroduced');
   }
 
   componentDidMount() {
-    NetInfo.isConnected.fetch().then(isConnected => {
-      this.props.actions.setIsConnected(isConnected);
-    });
+
   }
 
   render() {
@@ -135,39 +116,6 @@ class Gateway extends React.Component {
     );
   }
 }
-
-/* <View style={styles.fbContainer}>
-  <LoginButton
-      style={styles.fbutton}
-      readPermissions={["public_profile", "email"]}
-      onLoginFinished={
-        (error, result) => {
-          if (error) {
-            this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
-          } else {
-            AccessToken.getCurrentAccessToken().then(
-              (data) => {
-                this.props.db.authWithOAuthToken('facebook', data.accessToken.toString(), (error, authData) => {
-                  if (error) {
-                    this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
-                  } else {
-                    AsyncStorage.setItem('userData', JSON.stringify(authData));
-                    Utility.setLocalAuth();
-                    var email = Utility.escapeEmail(authData.auth.token.email);
-                    this.userIndex.child(email).set(true);
-                    this.users.child(authData.uid).set({email: email, secrets: {} });
-                    this.props.navigator.push({name: 'SelectCategory'})
-                  }
-                })
-              }
-            )
-          }
-        }
-      }
-      onLogoutFinished={() => console.log("logout.")}
-  />
-</View>
-*/
 
 const styles = StyleSheet.create({
   heroImage: {

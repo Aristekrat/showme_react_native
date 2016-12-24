@@ -28,6 +28,7 @@ User.prototype.login = function (username, password, registrationFlag = false, r
     let email = username.trim();
     actions.toggleAnimation();
     actions.removeError();
+    Utility.checkConnection();
     this.db.authWithPassword({
       email: email,
       password: password

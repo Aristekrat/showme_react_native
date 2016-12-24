@@ -188,7 +188,7 @@ var styles = StyleSheet.create({
   },
   textInput: {
     backgroundColor: '#fff',
-    height: 50,
+    height: 55,
     borderWidth: 1,
     borderColor: StylingGlobals.colors.textInputBorder,
     padding: 5,

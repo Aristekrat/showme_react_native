@@ -1,5 +1,6 @@
 import {
-  AsyncStorage
+  AsyncStorage,
+  NetInfo
 } from 'react-native';
 
 import actions from '../State/Actions/Actions';
@@ -62,6 +63,14 @@ var Utility = {
     if (formInput !== "") {
       actions.updateFormInput("");
     }
+  },
+
+  checkConnection: function() {
+    NetInfo.isConnected.fetch().then().done((connStatus) => {
+      if (!connStatus) {
+        actions.setError("You don't seem to be connected to the internet");
+      }
+    });
   },
 
 }

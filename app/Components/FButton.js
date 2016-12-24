@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import StylingGlobals from '../Globals/StylingGlobals';
 import actions from '../State/Actions/Actions';
-//import Utility from '../Globals/UtilityFunctions';
+import Utility from '../Globals/UtilityFunctions';
 import { connect } from 'react-redux';
 import {
   StyleSheet,
@@ -28,7 +28,7 @@ class FButton extends React.Component {
     return (
       <View style={styles.fbContainer}>
         <LoginButton
-            style={styles.fbutton}
+            style={[styles.fbutton, this.props.width]}
             readPermissions={["public_profile", "email"]}
             onLoginFinished={
               (error, result) => {
@@ -42,12 +42,6 @@ class FButton extends React.Component {
                           this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
                         } else {
                           this.props.successCB(authData, this.props);
-                          /*AsyncStorage.setItem('userData', JSON.stringify(authData));
-                          Utility.setLocalAuth();
-                          var email = Utility.escapeEmail(authData.auth.token.email); // These four lines are different in Gateway & SignIn
-                          this.userIndex.child(email).set(true);
-                          this.users.child(authData.uid).set({email: email, secrets: {} });
-                          this.props.navigator.push({name: 'SelectCategory'});*/
                         }
                       })
                     }

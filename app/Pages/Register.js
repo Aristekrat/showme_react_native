@@ -32,6 +32,7 @@ class Register extends Component {
   registerUser() {
     this.props.actions.toggleAnimation();
     this.props.actions.removeError();
+    Utility.checkConnection();
     let email = this.props.email.trim();
 
     this.props.db.createUser({
@@ -122,13 +123,11 @@ class Register extends Component {
           }
           {
             this.props.displaySkip ?
-            <View style={styles.forgotPasswordBlock}>
-              <ArrowLink skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} >Skip</ArrowLink>
+            <View style={styles.skipBlock}>
+              <ArrowLink skipTo={() => this.props.navigator.push({name: 'SelectCategory'})} >Skip Registration</ArrowLink>
             </View>
             :
-            <View style={styles.forgotPasswordBlock}>
-              <ArrowLink skipTo={()=> this.forgot()}>Forgot Password</ArrowLink>
-            </View>
+            null
           }
           {
             this.props.route.cookieData ?
@@ -160,7 +159,7 @@ var styles = StyleSheet.create({
     textAlign: 'left',
     margin: 10,
     marginTop: 22,
-    width: 60,
+    width: 55,
   },
   textInput: {
     height: 55,
@@ -169,15 +168,15 @@ var styles = StyleSheet.create({
     marginBottom: 8,
     borderColor: StylingGlobals.colors.textInputBorder,
     borderWidth: 1,
-    width: 250,
+    width: 260,
     backgroundColor: '#fff'
   },
   button: {
   	padding: 10,
   	backgroundColor: StylingGlobals.colors.mainColor,
     marginTop: 14,
-    width: 250,
-    marginLeft: 80,
+    width: 260,
+    marginLeft: 75,
     height: 55,
   },
   buttonText: {
@@ -186,17 +185,23 @@ var styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 16,
   },
-  forgotPasswordBlock: {
-    marginTop: 15,
-  },
   errorContainer: {
     marginLeft: 15,
     marginRight: 15,
   },
   errorText: {
     flex: 1,
-    marginTop: 15,
+    marginTop: 12,
     textAlign: 'center',
+    color: StylingGlobals.colors.mainColor,
+  },
+  skipBlock: {
+    marginTop: 12,
+    width: 415,
+  },
+  switchBlock: {
+    marginTop: 5,
+    width: 415,
   }
 });
 
