@@ -32,7 +32,7 @@ class Register extends Component {
   registerUser() {
     this.props.actions.toggleAnimation();
     this.props.actions.removeError();
-    Utility.checkConnection();
+    // Utility.checkConnection();
     let email = this.props.email.trim();
 
     this.props.db.createUser({

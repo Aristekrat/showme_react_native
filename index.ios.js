@@ -40,6 +40,7 @@ const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 import { Provider } from 'react-redux';
 import store from './app/State/Store';
 import actions from './app/State/Actions/Actions';
+import { connect } from 'react-redux';
 
 class ShowMe extends React.Component {
   constructor(props) {
@@ -54,7 +55,7 @@ class ShowMe extends React.Component {
 
   // Processes data and sets up event listeners after all data is received from the remote
   allRemoteSecretsRetrieved() {
-    this.setNotificationCount();
+    this.compareLocalAndRemoteSecrets();
     this.listenForUpdatesToSecrets();
     GetSecrets.pushSecretsToAsyncStore();
   }
@@ -73,31 +74,51 @@ class ShowMe extends React.Component {
     )
   }
 
-  // Compares the local and remote secrets and then sets the notification count on detecting differences
-  setNotificationCount() {
-    AsyncStorage.getItem('notificationCount').then((notificationCount) => {
-      let count = (this.state.remoteSecrets.length - this.state.localSecrets.length) + Number(notificationCount);
-      let arrLength = this.state.localSecrets.length - 1;
-      let updatedSecrets = []
+  // Not sure if I want to use this or just count the number of objs in updatedSecrets
+  addNotificationsToAsyncStorage(notificationNum) {
+    AsyncStorage.getItem('notificationCount').then((notification_count_string) => {
+      if (notification_count_string) {
+        let totalNotifications = Number(notification_count_string) + notificationNum;
+        AsyncStorage.setItem(String(totalNotifications));
+      } else {
+        AsyncStorage.setItem(String(notificationNum));
+      }
+    })
+  }
 
-      this.state.localSecrets.forEach((item, index) => {
-        if (JSON.stringify(this.state.remoteSecrets[index]) !== JSON.stringify(this.state.localSecrets[index])) {
-          count = count + 1;
-          this.setUpdatedSecrets(this.state.remoteSecrets[index].key);
-        }
-        if (arrLength === index) {
-          AsyncStorage.setItem('notificationCount', String(count));
-          if (updatedSecrets.length > 0) {
-            AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
-          }
-        }
-      })
+  addUpdatedSecretsToAsyncStorage(updatedSecretsHash) {
+    AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
+      if (updated_secrets_string) {
+        let updated_secrets = JSON.parse(updated_secrets_string);
+        let combinedObj = Object.assign(updated_secrets, updatedSecretsHash);
+        AsyncStorage.setItem('updatedSecrets', JSON.stringify(combinedObj));
+      } else {
+        AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecretsHash));
+      }
+    });
+  }
+
+  // Compares the local and remote secrets and then sets the notification count & updated secrets hash on detecting differences
+  compareLocalAndRemoteSecrets() {
+    let count = (this.state.remoteSecrets.length - this.state.localSecrets.length) + Number(store.getState().notifications);
+    let arrLength = this.state.localSecrets.length - 1;
+
+    this.state.localSecrets.forEach((item, index) => { // Checks for differences between remote and local secrets
+      if (JSON.stringify(this.state.remoteSecrets[index]) !== JSON.stringify(this.state.localSecrets[index])) {
+        count = count + 1;
+        this.setUpdatedSecrets(this.state.remoteSecrets[index].key);
+      }
+      if (arrLength === index) { // the for loop is at an end
+        actions.incrementNotifications(count);
+        this.addUpdatedSecretsToAsyncStorage(store.getState().updatedSecrets);
+      }
     });
   }
 
   // Sets local key / value pair for the secrets that have been freshly updated; notification related
   setUpdatedSecrets(key) {
-    AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
+    actions.pushUpdatedSecret(key);
+    /*AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
       if (!updatedSecrets) {
         var updatedSecrets = {}
       } else {
@@ -105,7 +126,7 @@ class ShowMe extends React.Component {
       }
       updatedSecrets[key] = true;
       AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
-    });
+    });*/
   }
 
   listenForUpdatesToSecrets() { // All notification
@@ -113,13 +134,12 @@ class ShowMe extends React.Component {
       if (user_data_json) {
         let user_data = JSON.parse(user_data_json);
         this.DB.child('users').child(user_data.uid).child('secrets').on('child_changed', (childSnapshot) => {
-          var change = childSnapshot.val(); // TODO Try and filter out user initiated changes
-          AsyncStorage.getItem('notificationCount').then((notificationCount) => {
-            if (!notificationCount) { var notificationCount = 0 }
-            let count = Number(notificationCount) + 1;
-            AsyncStorage.setItem('notificationCount', String(count));
-          });
-          this.setUpdatedSecrets(childSnapshot.key())
+          let key = childSnapshot.key();
+          let newUpdate = {}
+          newUpdate[key] = true;
+          actions.incrementNotifications(1); // TODO Try and filter out user initiated changes
+          actions.pushUpdatedSecret(key);
+          this.addUpdatedSecretsToAsyncStorage(newUpdate);
         })
       }
     });
@@ -154,23 +174,30 @@ class ShowMe extends React.Component {
     })
   }
 
-  checkVerificationStatus() {
-    AsyncStorage.getItem('userData').then((user_data_string) => {
-      if (user_data_string) {
-        let user_data = JSON.parse(user_data_string);
-        Utility.getVerificationStatus(user_data.uid);
-      }
-    });
-  }
-
   componentWillMount() {
     if (Utility.getAuthStatus()) {
       Utility.setLocalAuth(true);
     }
+
+    AsyncStorage.getItem('userData').then((user_data_string) => {
+      if (user_data_string) {
+        let user_data = JSON.parse(user_data_string);
+        actions.updateUserId(user_data.uid);
+        Utility.getVerificationStatus(user_data.uid);
+      }
+    });
+
+    AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
+      if (updated_secrets_string) {
+        let updatedSecrets = JSON.parse(updated_secrets_string);
+        actions.pushMultipleUpdatedSecrets(updatedSecrets);
+        actions.setNotifications(Object.keys(updatedSecrets).length);
+      }
+    })
+
     GetSecrets.getLocalSecrets();
     GetSecrets.getRemoteSecrets();
     this.anonAuthHandler();
-    this.checkVerificationStatus();
   }
 
   componentDidMount() {
@@ -256,16 +283,14 @@ class ShowMe extends React.Component {
               style={styles.navBar} />
         }
         initialRoute={{
-          name: "Gateway"
+          name: "SelectCategory"
         }} />
       </Provider>
     );
   }
 };
 
-ReactMixin(ShowMe.prototype, ReactTimer);
-
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
     navBar: {
       backgroundColor: StylingGlobals.colors.navColor,
       borderBottomColor: StylingGlobals.colors.pressDown,
@@ -300,5 +325,7 @@ var styles = StyleSheet.create({
       position: 'absolute',
     }
 });
+
+ReactMixin(ShowMe.prototype, ReactTimer);
 
 AppRegistry.registerComponent('ShowMe', () => ShowMe);

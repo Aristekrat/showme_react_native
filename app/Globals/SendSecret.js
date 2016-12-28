@@ -21,7 +21,7 @@ const SendSecret = {
   },
 
   router: function (secretCode) {
-    Utility.checkConnection();
+    //Utility.checkConnection();
     if (secretCode) {
       this.success();
       this.sendText(this.receiverPH, secretCode);

@@ -64,6 +64,27 @@ const Actions = {
   },
   submittedSecret: function (value) {
     this.dispatch({type: 'submittedSecret', value: value});
+  },
+  pushUpdatedSecret: function (secretKey) {
+    this.dispatch({type: 'addUpdatedSecret', value: secretKey});
+  },
+  pushMultipleUpdatedSecrets: function (updatedSecretsHash) {
+    this.dispatch({type: 'multipleUpdatedSecrets', value: updatedSecretsHash});
+  },
+  removeUpdatedSecret: function (secretKey) {
+    this.dispatch({type: 'removeUpdatedSecret', value: secretKey});
+  },
+  incrementNotifications: function (incAmt) {
+    this.dispatch({type: 'incrementNotifications', value: incAmt});
+  },
+  decrementNotifications: function (decAmt) {
+    this.dispatch({type: 'decrementNotifications', value: decAmt});
+  },
+  removeNotifications: function () {
+    this.dispatch({type: 'removeNotifications'});
+  },
+  setNotifications: function (setAmt) {
+    this.dispatch({type: 'setNotifications', value: setAmt});
   }
 }
 

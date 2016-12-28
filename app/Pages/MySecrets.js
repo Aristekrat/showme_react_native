@@ -24,68 +24,25 @@ import { connect } from 'react-redux'
 class MySecrets extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      updatedSecrets: [],
-    };
     this.mySecrets = this.props.route.secret ? this.props.route.secret : [];
   }
 
-  componentWillMount() {
-    this.props.actions.setAnimation(true);
-
-    if (!this.props.userId) {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
-        if (user_data_string) {
-          let user_data = JSON.parse(user_data_string);
-          this.props.actions.updateUserId(user_data.uid);
-        } else {
-          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
-        }
+  // Clears both updated secrets and decrements the notifications num
+  removeNotification(key) {
+    if (this.props.updatedSecrets && this.props.updatedSecrets[key]) {
+      this.props.actions.removeUpdatedSecret(key);
+      this.props.actions.decrementNotifications(1);
+      AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
+        let updatedSecrets = JSON.parse(updated_secrets_string);
+        delete updatedSecrets[key];
+        AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
       });
-    }
-
-    if (this.mySecrets.length > 0) {
-      var updated = {}
-      updated[this.props.route.secret.key] = true;
-      this.setState({updatedSecrets: updated});
-    }
-    // Gets the initial data that will help the system determine if a secret has been updated
-    AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
-      if (updatedSecretsString) {
-        this.setState({updatedSecrets: Object.assign(this.state.updatedSecrets, JSON.parse(updatedSecretsString)) });
-      };
-    });
-
-    AsyncStorage.getItem('secrets').then((secrets_data_string) => {
-      if (secrets_data_string) {
-        let secrets_data = JSON.parse(secrets_data_string);
-        this.mySecrets = this.mySecrets.concat(secrets_data);
-        this.initalDisplay();
-        this.listSecrets();
-        this.props.actions.setAnimation(false);
-      } else if (!this.props.route.secret && !secrets_data_string) {
-        this.props.actions.setMSDisplayType('NR');
-        this.props.actions.setAnimation(false);
-      }
-    });
-
-    AsyncStorage.getItem('contacts').then((contacts_string) => {
-      this.contacts = JSON.parse(contacts_string);
-    });
-  }
-
-  // Removes notifications from AsyncStorage, the timing of the call is determined in listSecrets
-  removeNotifications(key) {
-    if (this.state.updatedSecrets && this.state.updatedSecrets[key]) {
-      var removeViewed = JSON.parse(JSON.stringify(this.state.updatedSecrets));
-      delete removeViewed[key];
-      AsyncStorage.setItem('updatedSecrets', JSON.stringify(removeViewed));
-      AsyncStorage.setItem('notificationCount', String(0));
     };
   }
 
   // Determines the correct route for a secret to link to in listSecrets
   setUpdateSecretFunc(currentState, item) {
+    this.removeNotification(item.key);
     if (currentState === 'CR') {
       return this.props.navigator.push({ name: 'ShareSecret', cookieData: item, contacts: this.contacts });
     } else if (currentState === 'QS' || currentState === 'RR') {
@@ -107,7 +64,7 @@ class MySecrets extends React.Component {
   }
 
   // Adds a special notification to a secret if the other person has answered
-  setAnswerNotifiction(itemState) {
+  setAnswerNotification(itemState) {
     if (itemState.sentState === 'QS' && itemState.answerState === 'RA' || itemState.sentState === 'RR' && itemState.answerState === 'AA') {
       return "They've answered! To see it, write your own answer now.";
     } else {
@@ -115,14 +72,15 @@ class MySecrets extends React.Component {
     }
   }
 
+  displaySecrets (item) {
+    return item.state.sentState === this.props.displaying;
+  }
+
   // The main implementation function to actually wire secrets in the view
   listSecrets (arrayOfSecrets = this.mySecrets) {
-    let currentState = this.props.displaying;
     return arrayOfSecrets.map((item, index) => {
-      if (item.state.sentState === currentState) {
-        let answerNotification = this.setAnswerNotifiction(item.state);
+        let answerNotification = this.setAnswerNotification(item.state);
         item.askerName = this.setAskerName(item.askerID, item.askerName);
-        this.removeNotifications(item.key);
         return (
           <Secret
             author={item.askerName}
@@ -130,31 +88,89 @@ class MySecrets extends React.Component {
             key={item.key}
             answer={item.answer ? 'A: ' + item.answer.responderAnswer : null}
             answerNotification={answerNotification}
-            updateSecret={() =>  this.setUpdateSecretFunc(currentState, item)}
-            updated={this.state.updatedSecrets ? this.state.updatedSecrets[item.key] : false}
+            updateSecret={() =>  this.setUpdateSecretFunc(this.props.displaying, item)}
+            updated={this.props.updatedSecrets[item.key]}
             />
         );
-      }
     });
   }
 
   setTab(state) {
     this.props.actions.setMSDisplayType(state);
-    this.listSecrets();
   }
 
   // Chooses which tab to display on first View load
-  initalDisplay() {
-    if (this.mySecrets.length === 0) { // User has no secrets
+  initialDisplay(secretsArr) {
+    if (secretsArr.length === 0) { // User has no secrets
       this.props.actions.setMSDisplayType('NR');
+    } else if (this.props.updatedSecrets) { // Display column with an updated secret if there is one
+      for (var i = 0; i <= secretsArr.length; i++) {
+        if (i === secretsArr.length) {
+          this.props.actions.setMSDisplayType(this.mySecrets[0].state.sentState);
+        } else if (this.props.updatedSecrets[secretsArr[i].key]) {
+          this.props.actions.setMSDisplayType(secretsArr[i].state.sentState);
+          break;
+        }
+      }
     } else {
       this.props.actions.setMSDisplayType(this.mySecrets[0].state.sentState);
     }
   }
 
+  componentWillMount() {
+    this.props.actions.setAnimation(true);
+
+    if (!this.props.userId) {
+      AsyncStorage.getItem('userData').then((user_data_string) => {
+        if (user_data_string) {
+          let user_data = JSON.parse(user_data_string);
+          this.props.actions.updateUserId(user_data.uid);
+        } else {
+          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+        }
+      });
+    }
+
+    if (this.props.route.secret && this.props.route.secret.key) {
+      this.props.actions.pushUpdatedSecret(this.props.route.secret.key);
+      this.secretsHash[this.props.route.secret.key] = true;
+    }
+
+    AsyncStorage.getItem('secrets').then((secrets_data_string) => {
+      if (secrets_data_string) {
+        let secrets_data = JSON.parse(secrets_data_string);
+        let allSecrets = this.mySecrets.concat(secrets_data);
+        let secretsHash = {}
+        let dupsFilteredOut = allSecrets.filter((item) => {
+            return secretsHash.hasOwnProperty(item.key) ? false : (secretsHash[item.key] = true);
+        });
+        this.mySecrets = dupsFilteredOut;
+        this.initialDisplay(dupsFilteredOut);
+        this.props.actions.setAnimation(false);
+      } else if (!this.props.route.secret && !secrets_data_string) {
+        this.props.actions.setMSDisplayType('NR');
+        this.props.actions.setAnimation(false);
+      }
+    });
+  }
+
+  componentDidMount() {
+    AsyncStorage.getItem('contacts').then((contacts_string) => {
+      if (contacts_string) {
+        this.contacts = JSON.parse(contacts_string);
+      } else {
+        this.contacts = [];
+      }
+    });
+  }
+
   render() {
     let helperText;
-    let secretsList = this.listSecrets();
+    let currentSecrets = this.mySecrets.filter((item) => {
+      return item.state.sentState === this.props.displaying;
+    });
+    let secretsList = this.listSecrets(currentSecrets);
+
     switch(this.props.displaying) {
       case "SO":
         helperText = null;
@@ -253,6 +269,7 @@ const mapStateToProps = (state) => {
     animating: state.isAnimating,
     userId: state.userId,
     displaying: state.mySecretsType,
+    updatedSecrets: state.updatedSecrets,
   };
 }
 

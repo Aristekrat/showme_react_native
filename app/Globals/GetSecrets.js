@@ -55,7 +55,7 @@ const GetSecrets = {
             })
           }
         })
-      } 
+      }
     });
   },
 
@@ -70,6 +70,18 @@ const GetSecrets = {
         AsyncStorage.setItem('secrets', JSON.stringify(newSecret));
       }
     });
+  },
+
+  pushToUpdatedSecrets: function (updatedSecret) {
+    /*let updatedSecrets ={}
+    AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
+      if (updated_secrets_string) {
+        updatedSecrets = JSON.parse(updated_secrets_string);
+      }
+      updatedSecrets[updatedSecret.key] = true;
+      console.log(updatedSecrets);
+      AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
+    })*/
   },
 
   pushPrivateSecret: function(text, uid, successCB, errCB) {

@@ -47,7 +47,7 @@ class SelectCategory extends React.Component {
   }
 
   selectCategory (categoryName) {
-    Utility.checkConnection();
+    //Utility.checkConnection();
     this.props.actions.toggleAnimation();
     this.props.navigator.push({
       name: 'SelectSecret',

@@ -39,7 +39,7 @@ class Gateway extends React.Component {
   }
 
   checkEmail() {
-    Utility.checkConnection();
+    // Utility.checkConnection();
     this.props.actions.toggleAnimation();
     if (this.validateEmail(this.props.emailAddress)) {
       this.userIndex.once('value', (snapshot) => {

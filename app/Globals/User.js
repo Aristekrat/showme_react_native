@@ -28,7 +28,7 @@ User.prototype.login = function (username, password, registrationFlag = false, r
     let email = username.trim();
     actions.toggleAnimation();
     actions.removeError();
-    Utility.checkConnection();
+    //Utility.checkConnection();
     this.db.authWithPassword({
       email: email,
       password: password
@@ -40,6 +40,7 @@ User.prototype.login = function (username, password, registrationFlag = false, r
         actions.toggleAnimation();
         actions.updateUserId(userData.uid);
         AsyncStorage.setItem('userData', JSON.stringify(userData));
+        AsyncStorage.removeItem('secrets');
         Utility.setLocalAuth(true);
         GetSecrets.getRemoteSecrets();
         if (referred) {
@@ -48,6 +49,7 @@ User.prototype.login = function (username, password, registrationFlag = false, r
         } else if (registrationFlag) {
           this.navigator.push({name: 'RegistrationInterim'});
         } else {
+          Utility.resetState(true, true);
           this.navigator.push({name: 'SelectCategory'});
         }
       }

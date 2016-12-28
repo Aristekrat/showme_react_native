@@ -55,6 +55,7 @@ class ClaimSecret extends React.Component {
                     };
                     ps.key = codeKey;
                     let secret = [ps];
+                    actions.pushUpdatedSecret(ps.key);
                     GetSecrets.pushLocalSecret(ps);
                     this.props.navigator.push({name: 'MySecrets', secret: secret});
                   })
@@ -116,6 +117,7 @@ const mapStateToProps = (state) => {
     animating: state.isAnimating,
     error: state.error,
     code: state.formInput,
+    updatedSecrets: state.updatedSecrets,
   };
 }
 

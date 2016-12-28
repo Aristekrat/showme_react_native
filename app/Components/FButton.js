@@ -35,17 +35,19 @@ class FButton extends React.Component {
                 if (error) {
                   this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
                 } else {
-                  AccessToken.getCurrentAccessToken().then(
-                    (data) => {
-                      this.props.db.authWithOAuthToken('facebook', data.accessToken.toString(), (error, authData) => {
-                        if (error) {
-                          this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
-                        } else {
-                          this.props.successCB(authData, this.props);
-                        }
-                      })
-                    }
-                  )
+                  if (!result.isCancelled) {
+                    AccessToken.getCurrentAccessToken().then(
+                      (data) => {
+                        this.props.db.authWithOAuthToken('facebook', data.accessToken.toString(), (error, authData) => {
+                          if (error) {
+                            this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
+                          } else {
+                            this.props.successCB(authData, this.props);
+                          }
+                        })
+                      }
+                    )
+                  }
                 }
               }
             }

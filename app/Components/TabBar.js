@@ -3,8 +3,8 @@
 import React, { Component } from 'react';
 import StylingGlobals from '../Globals/StylingGlobals.js';
 import Utility from '../Globals/UtilityFunctions.js';
-import ReactMixin from 'react-mixin';
-import ReactTimer from 'react-timer-mixin';
+import actions from '../State/Actions/Actions';
+import { connect } from 'react-redux';
 import {
   StyleSheet,
   Text,
@@ -16,10 +16,7 @@ import {
 class TabBar extends React.Component {
   constructor(props){
     super(props);
-    this.state = {
-      notifications: '0',
-    }
-    this.setActiveTab();
+    this.state = {} // selectedTab
   }
 
   setActiveTab() {
@@ -66,24 +63,8 @@ class TabBar extends React.Component {
     }
   }
 
-  setBadge() {
-    AsyncStorage.getItem('notificationCount').then((notificationCount) => {
-      if (notificationCount !== this.state.notifications) {
-        this.setState({notifications: notificationCount});
-      }
-    });
-  }
-
   componentWillMount() {
     this.setActiveTab();
-  }
-
-  componentDidMount() {
-    this.setBadge()
-    this.setTimeout (
-      () => { this.setBadge() },
-      3000
-    );
   }
 
   render() {
@@ -98,28 +79,28 @@ class TabBar extends React.Component {
               title={"My Secrets"}
               icon={require('../img/tabicon-mysecret.png')}
               style={styles.tabItem}
-              badge={this.state.notifications !== '0' ? this.state.notifications : null} >
+              badge={this.props.notifications !== 0 ? this.props.notifications : null} >
                 <View></View>
             </TabBarIOS.Item>
 
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabTwo'}
               onPress={() => this.props.introPopup ? this.props.introPopup() : this.setTab('tabTwo')}
-              title={"New"}
+              title={"New Secret"}
               icon={require('../img/tabicon-new.png')}
               style={styles.tabItem}
               badge={this.props.introBadge ? this.props.introBadge : null}>
                 <View></View>
             </TabBarIOS.Item>
 
-            {Utility.verified ? null : <TabBarIOS.Item
+            <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabThree'}
               onPress={() => this.setTab('tabThree')}
-              title={"Claim Secret"}
+              title={"Claim"}
               icon={require('../img/tabicon-claim.png')}
               style={styles.tabItem}>
                 <View></View>
-            </TabBarIOS.Item>}
+            </TabBarIOS.Item>
 
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabFour'}
@@ -135,8 +116,6 @@ class TabBar extends React.Component {
   }
 }
 
-ReactMixin(TabBar.prototype, ReactTimer);
-
 var styles = StyleSheet.create({
   tabContainer: {
     height: 50, // Not possible to click on the nav bar items without this.
@@ -151,4 +130,16 @@ var styles = StyleSheet.create({
   },
 });
 
-export default TabBar;
+const mapStateToProps = (state) => {
+  return {
+    notifications: state.notifications
+  };
+}
+
+const mapDispatchToProps = function(dispatch, ownProps) {
+  return {
+    actions: actions
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TabBar);

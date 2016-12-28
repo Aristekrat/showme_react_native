@@ -66,7 +66,7 @@ class SignIn extends Component {
       this.props.actions.setError(this.props.route.message);
     }
 
-    Utility.resetState(this.props.animating, this.props.error);
+    Utility.resetState(this.props.animating, this.props.error, this.props.email);
   }
 
   render() {
@@ -128,7 +128,7 @@ class SignIn extends Component {
             </View>
           }
           {
-            true ?
+            this.props.message ?
             <FButton
               successCB={this.fbSuccessCB}
               db={this.props.db}

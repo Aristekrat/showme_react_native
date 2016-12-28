@@ -19,6 +19,8 @@ import publicSecretReducer from './PublicSecretReducer';
 import submitSuccessReducer from './SubmitSuccessReducer';
 import submittedSecretReducer from './SubmittedSecretReducer';
 import displaySkipReducer from './DisplaySkipReducer';
+import updatedSecretsReducer from './UpdatedSecretsReducer';
+import notificationsReducer from './NotificationReducer';
 
 const reducers = combineReducers({
   displaySkip: displaySkipReducer,
@@ -39,6 +41,8 @@ const reducers = combineReducers({
   public: publicSecretReducer,
   submitSuccess: submitSuccessReducer,
   submittedSecret: submittedSecretReducer,
+  updatedSecrets: updatedSecretsReducer,
+  notifications: notificationsReducer,
 });
 
 export default reducers;
