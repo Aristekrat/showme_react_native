@@ -128,16 +128,11 @@ const TitleBar = {
 };
 
 var styles = StyleSheet.create({
-    navBar: {
-      backgroundColor: StylingGlobals.colors.navColor,
-      borderBottomColor: StylingGlobals.colors.pressDown,
-      borderBottomWidth: 1,
-    },
     navBarLeftImage: {
       tintColor: '#fff',
-      width: 22,
-      height: 22,
-      marginTop: 8,
+      width: 32,
+      height: 32,
+      marginTop: 5,
       marginRight: 5,
       marginLeft: 5,
     },
@@ -146,7 +141,7 @@ var styles = StyleSheet.create({
     },
     navBarTitleText: {
       color: 'white',
-      fontSize: 16,
+      fontSize: 17,
       fontWeight: '500',
       marginVertical: 9,
     },
@@ -158,9 +153,6 @@ var styles = StyleSheet.create({
       fontSize: 14,
       marginVertical: 10
     },
-    test: {
-      position: 'absolute',
-    }
 });
 
 export default TitleBar

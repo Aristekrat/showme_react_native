@@ -282,13 +282,22 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{
-          name: "SelectCategory"
-        }} />
+        initialRoute={{name: "SelectCategory"}}
+        />
       </Provider>
     );
   }
 };
+// onWillFocus={actions.setAnimation(true)}
+// configureScene={(route, routeStack) => Navigator.SceneConfigs.FloatFromRight }
+/*
+initialRouteStack={[
+{
+  name: "SelectSecret"
+}, {
+  name: "SelectCategory" },
+]}
+*/
 
 const styles = StyleSheet.create({
     navBar: {
@@ -296,34 +305,6 @@ const styles = StyleSheet.create({
       borderBottomColor: StylingGlobals.colors.pressDown,
       borderBottomWidth: 1,
     },
-    navBarLeftImage: {
-      tintColor: '#fff',
-      width: 22,
-      height: 22,
-      marginTop: 8,
-      marginRight: 5,
-      marginLeft: 5,
-    },
-    navBarLeftButton: {
-      paddingLeft: 10
-    },
-    navBarTitleText: {
-      color: 'white',
-      fontSize: 16,
-      fontWeight: '500',
-      marginVertical: 9,
-    },
-    navBarRightButton: {
-      paddingRight: 10,
-    },
-    navBarButtonText: {
-      color: '#EEE',
-      fontSize: 14,
-      marginVertical: 10
-    },
-    test: {
-      position: 'absolute',
-    }
 });
 
 ReactMixin(ShowMe.prototype, ReactTimer);

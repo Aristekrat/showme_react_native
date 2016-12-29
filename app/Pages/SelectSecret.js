@@ -63,7 +63,7 @@ class SelectSecret extends React.Component {
   }
 
   componentWillMount() {
-    Utility.resetState(this.props.animating, this.props.error);
+    Utility.resetState(false, this.props.error);
 
     AsyncStorage.getItem('userData').then((user_data_string) => {
       if (user_data_string) {
@@ -75,7 +75,33 @@ class SelectSecret extends React.Component {
       }
     });
 
+    /*
+    this.publicSecrets.on('value', (snapshot) => {
+      this.secrets = snapshot.val();
+      this.setState({
+        source: this.state.source.cloneWithRows(snapshot.val()),
+      });
+    })
+    */
+
     // Does some processing and then adds the secrets to the View.
+    /*
+    this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
+      var secret = snapshot.val();
+      secret.key = snapshot.key();
+      secret.vote = secret.votes[this.knownUser];
+      delete secret.votes;
+      this.secrets.push(secret);
+      this.setState({
+        source: this.state.source.cloneWithRows(this.secrets),
+      });
+    }, (errorObject) => {
+      this.props.actions.setError("Sorry, we experienced a network error");
+    })
+    */
+  }
+
+  componentDidMount() {
     this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
       var secret = snapshot.val();
       secret.key = snapshot.key();

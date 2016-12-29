@@ -26,7 +26,7 @@ import {
   TouchableHighlight,
 } from 'react-native';
 
-class SelectCategory extends React.Component {
+class SelectCategory extends React.PureComponent {
   constructor(props){
     super(props);
     this.categories = [{
@@ -48,7 +48,6 @@ class SelectCategory extends React.Component {
 
   selectCategory (categoryName) {
     //Utility.checkConnection();
-    this.props.actions.toggleAnimation();
     this.props.navigator.push({
       name: 'SelectSecret',
       category: categoryName,
@@ -113,6 +112,7 @@ class SelectCategory extends React.Component {
   }
 
   render(){
+    console.log("SELECT CATEGORY RENDERED");
     return (
       <View style={StylingGlobals.container}>
         <ActivityIndicator animationControl={this.props.animating}/>

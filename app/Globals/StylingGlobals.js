@@ -21,8 +21,8 @@ var globalStyling = {
   },
 	rightArrow: {
 	    marginLeft: 20,
-	    width: 25,
-	    height: 25,
+	    width: 35,
+	    height: 35,
 	    opacity: 0.5,
 	},
 	textInput: {

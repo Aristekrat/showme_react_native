@@ -55,6 +55,7 @@ var styles = StyleSheet.create({
   catArrow: {
     position: 'relative',
     right: 10,
+    tintColor: '#333',
   }
 });
 

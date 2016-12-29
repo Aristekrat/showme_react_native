@@ -107,6 +107,7 @@ class CreateYourOwn extends React.Component {
   }
 
   render(){
+    console.log("CREATEYOUROWN RENDERED");
     return (
       <View style={StylingGlobals.container}>
         <ScrollView style={styles.form}>

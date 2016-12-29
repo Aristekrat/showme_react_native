@@ -64,8 +64,8 @@ var styles = StyleSheet.create({
     contentContainer: {
       flexDirection: 'row',
       padding: 10,
-      paddingTop: 15,
-      paddingBottom: 15,
+      paddingTop: 25,
+      paddingBottom: 25,
     },
     secretText: {
       fontSize: 15,
@@ -74,7 +74,8 @@ var styles = StyleSheet.create({
       flex: 4,
     },
     secretArrow: {
-
+      marginTop: 8,
+      //tintColor: StylingGlobals.colors.navColor,
     },
     voteContainer: {
       flexDirection: 'row',
@@ -82,19 +83,21 @@ var styles = StyleSheet.create({
       paddingTop: 5,
     },
     voteImg: {
-      width: 20,
-      height: 20,
+      width: 25,
+      height: 25,
       tintColor: StylingGlobals.colors.navColor,
       opacity: 0.5,
     },
     upVote: {
       width: 70,
+      height: 30,
     },
     upvoteImg: {
       alignSelf: 'center'
     },
     downVote: {
       width: 70,
+      height: 30,
     },
     active: {
       opacity: 1.0,
