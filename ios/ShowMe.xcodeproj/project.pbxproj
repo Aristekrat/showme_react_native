@@ -27,6 +27,7 @@
 		436F557A1DE817A600F8C6BB /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 436F55771DE817A600F8C6BB /* FBSDKCoreKit.framework */; };
 		436F557B1DE817A600F8C6BB /* FBSDKLoginKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 436F55781DE817A600F8C6BB /* FBSDKLoginKit.framework */; };
 		436F557C1DE817A600F8C6BB /* FBSDKShareKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 436F55791DE817A600F8C6BB /* FBSDKShareKit.framework */; };
+		43F579011E16DF390009E047 /* Images-2.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43F579001E16DF390009E047 /* Images-2.xcassets */; };
 		6BAAD2329CA6470E86A3638B /* libRCTFBSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DEABC754D8145509FBCAE25 /* libRCTFBSDK.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 /* End PBXBuildFile section */
@@ -207,6 +208,7 @@
 		436F55781DE817A600F8C6BB /* FBSDKLoginKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKLoginKit.framework; path = ../../../../Documents/FacebookSDK/FBSDKLoginKit.framework; sourceTree = "<group>"; };
 		436F55791DE817A600F8C6BB /* FBSDKShareKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKShareKit.framework; path = ../../../../Documents/FacebookSDK/FBSDKShareKit.framework; sourceTree = "<group>"; };
 		436F55B81DEE6BEC00F8C6BB /* ShowMe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = ShowMe.entitlements; path = ShowMe/ShowMe.entitlements; sourceTree = "<group>"; };
+		43F579001E16DF390009E047 /* Images-2.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Images-2.xcassets"; path = "ShowMe/Images-2.xcassets"; sourceTree = "<group>"; };
 		5DEABC754D8145509FBCAE25 /* libRCTFBSDK.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRCTFBSDK.a; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		79FD42BD5C1E49DEAC87A495 /* libRNMessageComposer.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNMessageComposer.a; sourceTree = "<group>"; };
@@ -337,6 +339,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				43F579001E16DF390009E047 /* Images-2.xcassets */,
 			);
 			name = ShowMe;
 			sourceTree = "<group>";
@@ -734,6 +737,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43F579011E16DF390009E047 /* Images-2.xcassets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);
@@ -846,6 +850,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = ShowMe/ShowMe.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
@@ -874,6 +879,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = ShowMe/ShowMe.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 95NFJ89RPE;
