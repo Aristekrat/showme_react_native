@@ -72,20 +72,8 @@ const GetSecrets = {
     });
   },
 
-  pushToUpdatedSecrets: function (updatedSecret) {
-    /*let updatedSecrets ={}
-    AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
-      if (updated_secrets_string) {
-        updatedSecrets = JSON.parse(updated_secrets_string);
-      }
-      updatedSecrets[updatedSecret.key] = true;
-      console.log(updatedSecrets);
-      AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
-    })*/
-  },
-
-  pushPrivateSecret: function(text, uid, successCB, errCB) {
-    let psData = {question: text, askerID: uid, askerName: '', responderID: '', responderName: ''};
+  pushPrivateSecret: function(text, uid, profileName = "Anonymous", successCB, errCB) {
+    let psData = {question: text, askerID: uid, askerName: profileName, responderID: '', responderName: ''};
     let privateSecret = this.DB.child('privateSecrets').push(psData, (err, snapshot) => {
       if (err) {
         errCB();

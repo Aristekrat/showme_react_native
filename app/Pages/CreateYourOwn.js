@@ -43,7 +43,7 @@ class CreateYourOwn extends React.Component {
   }
 
   pushToPrivateSecrets() {
-    GetSecrets.pushPrivateSecret(this.props.text, this.props.userId, (psData) => {
+    GetSecrets.pushPrivateSecret(this.props.text, this.props.userId, this.askerName, (psData) => {
       this.success(psData);
     }, () => {
       this.props.actions.setError("We're sorry, there was an error connecting to the server");
@@ -94,20 +94,34 @@ class CreateYourOwn extends React.Component {
       }
     });
 
-    if (!this.props.userId) {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
-        if (user_data_string) {
-          let user_data = JSON.parse(user_data_string);
-          this.props.actions.updateUserId(user_data.uid);
+
+
+    AsyncStorage.getItem('userData').then((user_data_string) => {
+      if (user_data_string) {
+        let user_data = JSON.parse(user_data_string);
+        if (user_data.profileName) {
+          this.askerName = user_data.profileName
         } else {
-          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+          this.askerName = "Anonymous";
         }
-      });
-    }
+      } else if (this.props.userId) {
+        this.users.child(this.props.userId).once('value', (snapshot) => {
+          let userRecord = snapshot.val();
+          userRecord.uid = this.props.userId;
+          AsyncStorage.setItem('userData', userRecord);
+          if (userRecord.profileName) {
+            this.askerName = userRecord.profileName
+          } else {
+            this.askerName = "Anonymous";
+          }
+        });
+      } else {
+        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+      }
+    });
   }
 
   render(){
-    console.log("CREATEYOUROWN RENDERED");
     return (
       <View style={StylingGlobals.container}>
         <ScrollView style={styles.form}>

@@ -144,8 +144,8 @@ class MySecrets extends React.Component {
         let dupsFilteredOut = allSecrets.filter((item) => {
             return secretsHash.hasOwnProperty(item.key) ? false : (secretsHash[item.key] = true);
         });
-        this.mySecrets = dupsFilteredOut;
         this.initialDisplay(dupsFilteredOut);
+        this.mySecrets = dupsFilteredOut;
         this.props.actions.setAnimation(false);
       } else if (!this.props.route.secret && !secrets_data_string) {
         this.props.actions.setMSDisplayType('NR');

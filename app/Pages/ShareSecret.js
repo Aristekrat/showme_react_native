@@ -42,32 +42,24 @@ class ShareSecret extends React.Component {
       this.props.actions.updateSecretKey(this.props.route.cookieData.key);
     };
 
-    if (this.props.userId) {
-      SendSecret.lookUpSenderPH(this.props.userId);
-      if (this.props.route.publicSecret) {
-         GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, this.props.userId, (psData)=> {
-          this.props.actions.updateSecretKey(psData.key);
-        }, () => {
-          this.props.actions.setError("We're sorry, there was an error connecting to the server");
-        })
-      }
-    } else {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
-        if (user_data_string) {
-          let user_data = JSON.parse(user_data_string);
-          SendSecret.lookUpSenderPH(user_data.uid);
-          if (this.props.route.publicSecret) {
-             GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, this.props.userId, (psData) => {
-              this.props.actions.updateSecretKey(psData.key);
-            }, () => {
-              this.props.actions.setError("We're sorry, there was an error connecting to the server");
-            })
-          }
-        } else {
-          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+    AsyncStorage.getItem('userData').then((user_data_string) => {
+      if (user_data_string) {
+        let user_data = JSON.parse(user_data_string);
+        if (!user_data.profileName) {
+          user_data.profileName = "Anonymous";
         }
-      });
-    }
+        SendSecret.lookUpSenderPH(user_data.uid);
+        if (this.props.route.publicSecret) {
+           GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, user_data.uid, user_data.profileName, (psData) => {
+            this.props.actions.updateSecretKey(psData.key);
+          }, () => {
+            this.props.actions.setError("We're sorry, there was an error connecting to the server");
+          })
+        }
+      } else {
+        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+      }
+    });
   }
 
   render() {

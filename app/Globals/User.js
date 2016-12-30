@@ -24,6 +24,18 @@ User.prototype.anonAuth = function () {
   })
 };
 
+User.prototype.postLoginProcessing = function(uid) {
+  actions.updateUserId(uid);
+  this.db.child('users').child(uid).once('value', (snapshot) => {
+    let userRecord = snapshot.val();
+    userRecord.uid = uid;
+    AsyncStorage.setItem('userData', JSON.stringify(userRecord));
+  });
+  AsyncStorage.removeItem('secrets');
+  Utility.setLocalAuth(true);
+  GetSecrets.getRemoteSecrets();
+}
+
 User.prototype.login = function (username, password, registrationFlag = false, referred = false) {
     let email = username.trim();
     actions.toggleAnimation();
@@ -36,13 +48,8 @@ User.prototype.login = function (username, password, registrationFlag = false, r
       if (error) {
         this.errorHandler(error);
       } else {
-        actions.setError('Success!');
         actions.toggleAnimation();
-        actions.updateUserId(userData.uid);
-        AsyncStorage.setItem('userData', JSON.stringify(userData));
-        AsyncStorage.removeItem('secrets');
-        Utility.setLocalAuth(true);
-        GetSecrets.getRemoteSecrets();
+        this.postLoginProcessing(userData.uid);
         if (referred) {
           Utility.resetState(true, true, true);
           this.navigator.pop();
@@ -55,6 +62,8 @@ User.prototype.login = function (username, password, registrationFlag = false, r
       }
     })
 }
+
+
 
 User.prototype.forgotPassword = function (username) {
   this.db.resetPassword({

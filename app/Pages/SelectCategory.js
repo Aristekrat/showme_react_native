@@ -112,7 +112,6 @@ class SelectCategory extends React.PureComponent {
   }
 
   render(){
-    console.log("SELECT CATEGORY RENDERED");
     return (
       <View style={StylingGlobals.container}>
         <ActivityIndicator animationControl={this.props.animating}/>
