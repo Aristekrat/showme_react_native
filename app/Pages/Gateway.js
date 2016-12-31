@@ -68,10 +68,6 @@ class Gateway extends React.Component {
     AsyncStorage.removeItem('hasBeenIntroduced');
   }
 
-  componentDidMount() {
-
-  }
-
   render() {
     return (
       <View style={StylingGlobals.container}>

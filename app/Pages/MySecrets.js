@@ -25,6 +25,7 @@ class MySecrets extends React.Component {
   constructor(props) {
     super(props);
     this.mySecrets = this.props.route.secret ? this.props.route.secret : [];
+    this.contacts = [];
   }
 
   // Clears both updated secrets and decrements the notifications num
@@ -106,14 +107,14 @@ class MySecrets extends React.Component {
     } else if (this.props.updatedSecrets) { // Display column with an updated secret if there is one
       for (var i = 0; i <= secretsArr.length; i++) {
         if (i === secretsArr.length) {
-          this.props.actions.setMSDisplayType(this.mySecrets[0].state.sentState);
+          this.props.actions.setMSDisplayType(secretsArr[0].state.sentState);
         } else if (this.props.updatedSecrets[secretsArr[i].key]) {
           this.props.actions.setMSDisplayType(secretsArr[i].state.sentState);
           break;
         }
       }
     } else {
-      this.props.actions.setMSDisplayType(this.mySecrets[0].state.sentState);
+      this.props.actions.setMSDisplayType(secretsArr[0].state.sentState);
     }
   }
 
@@ -158,13 +159,12 @@ class MySecrets extends React.Component {
     AsyncStorage.getItem('contacts').then((contacts_string) => {
       if (contacts_string) {
         this.contacts = JSON.parse(contacts_string);
-      } else {
-        this.contacts = [];
       }
     });
   }
 
   render() {
+    console.log("MY SECRETS RENDERED");
     let helperText;
     let currentSecrets = this.mySecrets.filter((item) => {
       return item.state.sentState === this.props.displaying;

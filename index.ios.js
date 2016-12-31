@@ -282,22 +282,12 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "CreateYourOwn"}}
+        initialRoute={{name: "Gateway"}}
         />
       </Provider>
     );
   }
 };
-// onWillFocus={actions.setAnimation(true)}
-// configureScene={(route, routeStack) => Navigator.SceneConfigs.FloatFromRight }
-/*
-initialRouteStack={[
-{
-  name: "SelectSecret"
-}, {
-  name: "SelectCategory" },
-]}
-*/
 
 const styles = StyleSheet.create({
     navBar: {

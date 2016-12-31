@@ -66,7 +66,7 @@ class SignIn extends Component {
       this.props.actions.setError(this.props.route.message);
     }
 
-    Utility.resetState(this.props.animating, this.props.error, this.props.email);
+    Utility.resetState(this.props.animating, this.props.error);
   }
 
   render() {

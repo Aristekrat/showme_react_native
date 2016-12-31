@@ -25,7 +25,7 @@ class SelectSecret extends React.Component {
       source: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
     }
     this.secrets = [];
-    this.knownUser = false;
+    this.knownUser = this.props.userId ? this.props.userId : false;
     this.category = this.props.route.category ? this.props.route.category : "Social";
     this.publicSecrets = this.props.db.child('publicSecrets').child(this.category);
   }
@@ -65,47 +65,26 @@ class SelectSecret extends React.Component {
   componentWillMount() {
     Utility.resetState(false, this.props.error);
 
-    AsyncStorage.getItem('userData').then((user_data_string) => {
-      if (user_data_string) {
-        let user_data = JSON.parse(user_data_string);
-        if (user_data.uid) {
-          this.knownUser = user_data.uid;
-          this.props.actions.updateUserId(user_data.uid);
+    if (!this.props.userId) {
+      AsyncStorage.getItem('userData').then((user_data_string) => {
+        if (user_data_string) {
+          let user_data = JSON.parse(user_data_string);
+          if (user_data.uid) {
+            this.knownUser = user_data.uid;
+            this.props.actions.updateUserId(user_data.uid);
+          }
         }
-      }
-    });
-
-    /*
-    this.publicSecrets.on('value', (snapshot) => {
-      this.secrets = snapshot.val();
-      this.setState({
-        source: this.state.source.cloneWithRows(snapshot.val()),
       });
-    })
-    */
-
-    // Does some processing and then adds the secrets to the View.
-    /*
-    this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
-      var secret = snapshot.val();
-      secret.key = snapshot.key();
-      secret.vote = secret.votes[this.knownUser];
-      delete secret.votes;
-      this.secrets.push(secret);
-      this.setState({
-        source: this.state.source.cloneWithRows(this.secrets),
-      });
-    }, (errorObject) => {
-      this.props.actions.setError("Sorry, we experienced a network error");
-    })
-    */
+    }
   }
 
   componentDidMount() {
     this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
       var secret = snapshot.val();
       secret.key = snapshot.key();
-      secret.vote = secret.votes[this.knownUser];
+      if (this.knownUser) {
+        secret.vote = secret.votes[this.knownUser];
+      }
       delete secret.votes;
       this.secrets.push(secret);
       this.setState({
@@ -113,7 +92,7 @@ class SelectSecret extends React.Component {
       });
     }, (errorObject) => {
       this.props.actions.setError("Sorry, we experienced a network error");
-    })
+    });
   }
 
   render() {
@@ -125,6 +104,7 @@ class SelectSecret extends React.Component {
           dataSource= {
             this.state.source
           }
+          initialListSize={5}
           renderRow={(rowData) => {
             return (
               <Secret
@@ -170,6 +150,7 @@ const mapStateToProps = (state) => {
   return {
     animating: state.isAnimating,
     error: state.error,
+    userId: state.userId,
   };
 }
 
