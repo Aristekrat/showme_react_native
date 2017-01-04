@@ -85,6 +85,10 @@ const Actions = {
   },
   setNotifications: function (setAmt) {
     this.dispatch({type: 'setNotifications', value: setAmt});
+  },
+  updateContactsPermission: function (bool) {
+    console.log("HERE", bool)
+    this.dispatch({type: 'updateContactsPermission', value: bool});
   }
 }
 

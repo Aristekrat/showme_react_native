@@ -72,7 +72,7 @@ class TabBar extends React.Component {
       <View style={styles.tabContainer}>
         <TabBarIOS
           tintColor={StylingGlobals.colors.mainColor}
-          barTintColor={StylingGlobals.colors.accentPressDown}>
+          barTintColor={'#fffdfd'}>
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabOne'}
               onPress={() => this.setTab('tabOne')}
@@ -122,8 +122,8 @@ var styles = StyleSheet.create({
     marginTop: 0,
     borderTopColor: StylingGlobals.colors.navColor,
   },
-  viewItem: {
-    backgroundColor: '#fff'
+  tabItem: {
+
   },
   tabText: {
     color: '#fff',

@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import StylingGlobals from '../Globals/StylingGlobals.js';
+import GetSecrets from '../Globals/GetSecrets.js';
 import TabBar from '../Components/TabBar.js';
 import Secret from '../Components/SelectableSecret.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
@@ -16,6 +17,7 @@ import {
   TouchableHighlight,
   ListView,
   AsyncStorage,
+  InteractionManager,
 } from 'react-native';
 
 class SelectSecret extends React.Component {
@@ -23,6 +25,7 @@ class SelectSecret extends React.Component {
     super(props);
     this.state = {
       source: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+      isReady: false,
     }
     this.secrets = [];
     this.knownUser = this.props.userId ? this.props.userId : false;
@@ -79,6 +82,10 @@ class SelectSecret extends React.Component {
   }
 
   componentDidMount() {
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({isReady: true});
+    });
+
     this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
       var secret = snapshot.val();
       secret.key = snapshot.key();
@@ -98,8 +105,10 @@ class SelectSecret extends React.Component {
   render() {
     return (
       <View style={StylingGlobals.container}>
+        <ScrollView>
         <ActivityIndicator animationControl={this.props.animating}/>
         {this.props.error ? <Text style={styles.warning}>{this.props.error}</Text> : null }
+        {!this.state.isReady ? <ActivityIndicator animationControl={true}/> :
         <ListView
           dataSource= {
             this.state.source
@@ -128,6 +137,8 @@ class SelectSecret extends React.Component {
               />
             )
           }} />
+        }
+        </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
     );

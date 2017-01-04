@@ -90,7 +90,6 @@ class SelectCategory extends React.PureComponent {
     if (this.props.route.refresh) {
       this.checkIfRemoteSecretsReceived();
     }
-
   }
 
   componentDidMount() {
@@ -116,8 +115,8 @@ class SelectCategory extends React.PureComponent {
       <View style={StylingGlobals.container}>
         <ActivityIndicator animationControl={this.props.animating}/>
         {
-          this.props.errorMessage ?
-          <Text style={styles.error}>{this.props.errorMessage}</Text> :
+          this.props.error ?
+          <Text style={styles.error}>{this.props.error}</Text> :
           null
         }
         <ScrollView style={styles.content}>
@@ -186,7 +185,7 @@ const mapStateToProps = (state) => {
     hasBeenIntroduced: state.selectCategoryIntro,
     modalText: state.modalText,
     animating: state.isAnimating,
-    errorMessage: state.error,
+    error: state.error,
     isConnected: state.isConnected,
   };
 }

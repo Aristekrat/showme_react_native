@@ -1,9 +1,10 @@
 'use strict';
- 
+
 import React from 'react';
 import StylingGlobals from '../Globals/StylingGlobals.js';
 import actions from '../State/Actions/Actions';
 import { connect } from 'react-redux';
+import Contacts from 'react-native-contacts';
 
 import {
   StyleSheet,
@@ -15,13 +16,13 @@ import {
 
 const PickerItemIOS = PickerIOS.Item;
 
-class UserContacts extends React.Component { 
+class UserContacts extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       contact: 0,
+      contacts: []
     }
-    this.contacts = this.props.contacts.filter(this.filterSecrets);
   }
 
   // Removes contacts without a phone number
@@ -39,19 +40,42 @@ class UserContacts extends React.Component {
     }
   }
 
+  componentWillMount() {
+    // Handles no contacts props. This should rarely get triggered
+    if (!this.props.contacts || this.props.contacts == undefined) {
+      AsyncStorage.getItem('contacts').then((contacts_string) => {
+        if (contacts_string) {
+          let contacts_json = JSON.parse(contacts_string)
+          this.setState({contacts: contacts_json.filter(this.filterSecrets)})
+        } else {
+          Contacts.getAll((err, contacts) => {
+            if (err) {
+              actions.updateContactsPermission(false);
+            } else {
+              this.setState({contacts: contacts.filter(this.filterSecrets)})
+              AsyncStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+            }
+          });
+        }
+      })
+    } else {
+      this.state.contacts = this.props.contacts.filter(this.filterSecrets);
+    }
+  }
+
   render () {
     return (
       <View style={styles.userContacts}>
-        <PickerIOS 
+        <PickerIOS
           selectedValue={this.state.contact}
           onValueChange={
             (contactIndex) => {
               this.setState({contact: contactIndex});
-              this.props.actions.updatePhoneNumber(this.contacts[contactIndex].phoneNumbers[0].number);
-              this.props.actions.updateFirstName(this.contacts[contactIndex].givenName);
-            } 
+              this.props.actions.updatePhoneNumber(this.state.contacts[contactIndex].phoneNumbers[0].number);
+              this.props.actions.updateFirstName(this.state.contacts[contactIndex].givenName);
+            }
           }>
-          {this.contacts.map((contact, index) => (
+          {this.state.contacts.map((contact, index) => (
             <PickerItemIOS
               key={contact}
               value={index}

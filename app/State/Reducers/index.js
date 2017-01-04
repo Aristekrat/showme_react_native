@@ -21,6 +21,7 @@ import submittedSecretReducer from './SubmittedSecretReducer';
 import displaySkipReducer from './DisplaySkipReducer';
 import updatedSecretsReducer from './UpdatedSecretsReducer';
 import notificationsReducer from './NotificationReducer';
+import contactsPermissionReducer from './ContactsPermissionReducer';
 
 const reducers = combineReducers({
   displaySkip: displaySkipReducer,
@@ -43,6 +44,7 @@ const reducers = combineReducers({
   submittedSecret: submittedSecretReducer,
   updatedSecrets: updatedSecretsReducer,
   notifications: notificationsReducer,
+  contactsPermission: contactsPermissionReducer,
 });
 
 export default reducers;

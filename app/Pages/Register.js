@@ -115,9 +115,9 @@ class Register extends Component {
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableHighlight>
           {
-            this.props.errorMessage ?
+            this.props.error ?
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{this.props.errorMessage}</Text>
+              <Text style={styles.errorText}>{this.props.error}</Text>
             </View>
             :
             null
@@ -211,7 +211,7 @@ const mapStateToProps = (state) => {
     animating: state.isAnimating,
     email: state.emailAddress,
     password: state.password,
-    errorMessage: state.error,
+    error: state.error,
     displaySkip: state.displaySkip,
   };
 }

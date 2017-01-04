@@ -9,15 +9,14 @@ import ArrowLink from '../Components/ArrowLink.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 import actions from '../State/Actions/Actions';
-import Utility from '../Globals/UtilityFunctions.js';
 import {
   StyleSheet,
   Text,
   View,
   ScrollView,
-  Image,
   TouchableHighlight,
-  AsyncStorage
+  AsyncStorage,
+  InteractionManager
 } from 'react-native';
 import { connect } from 'react-redux'
 
@@ -26,6 +25,9 @@ class MySecrets extends React.Component {
     super(props);
     this.mySecrets = this.props.route.secret ? this.props.route.secret : [];
     this.contacts = [];
+    this.state = {
+      isReady: false,
+    }
   }
 
   // Clears both updated secrets and decrements the notifications num
@@ -53,26 +55,6 @@ class MySecrets extends React.Component {
     }
   }
 
-  // Sets the 'Asker' field in an individual secret, called in listSecrets
-  setAskerName(askerID, askerName) {
-    if (this.props.userId && this.props.userId === askerID) {
-      return "You";
-    } else if (!askerName) {
-      return "Anonymous";
-    } else {
-      return askerName;
-    }
-  }
-
-  // Adds a special notification to a secret if the other person has answered
-  setAnswerNotification(itemState) {
-    if (itemState.sentState === 'QS' && itemState.answerState === 'RA' || itemState.sentState === 'RR' && itemState.answerState === 'AA') {
-      return "They've answered! To see it, write your own answer now.";
-    } else {
-      return null;
-    }
-  }
-
   displaySecrets (item) {
     return item.state.sentState === this.props.displaying;
   }
@@ -80,15 +62,13 @@ class MySecrets extends React.Component {
   // The main implementation function to actually wire secrets in the view
   listSecrets (arrayOfSecrets = this.mySecrets) {
     return arrayOfSecrets.map((item, index) => {
-        let answerNotification = this.setAnswerNotification(item.state);
-        item.askerName = this.setAskerName(item.askerID, item.askerName);
         return (
           <Secret
             author={item.askerName}
             question={item.question}
             key={item.key}
             answer={item.answer ? 'A: ' + item.answer.responderAnswer : null}
-            answerNotification={answerNotification}
+            answerNotification={item.answerNotification ? "They've answered! To see it, write your own answer now." : null}
             updateSecret={() =>  this.setUpdateSecretFunc(this.props.displaying, item)}
             updated={this.props.updatedSecrets[item.key]}
             />
@@ -119,22 +99,8 @@ class MySecrets extends React.Component {
   }
 
   componentWillMount() {
-    this.props.actions.setAnimation(true);
-
-    if (!this.props.userId) {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
-        if (user_data_string) {
-          let user_data = JSON.parse(user_data_string);
-          this.props.actions.updateUserId(user_data.uid);
-        } else {
-          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
-        }
-      });
-    }
-
     if (this.props.route.secret && this.props.route.secret.key) {
       this.props.actions.pushUpdatedSecret(this.props.route.secret.key);
-      this.secretsHash[this.props.route.secret.key] = true;
     }
 
     AsyncStorage.getItem('secrets').then((secrets_data_string) => {
@@ -147,30 +113,46 @@ class MySecrets extends React.Component {
         });
         this.initialDisplay(dupsFilteredOut);
         this.mySecrets = dupsFilteredOut;
-        this.props.actions.setAnimation(false);
       } else if (!this.props.route.secret && !secrets_data_string) {
         this.props.actions.setMSDisplayType('NR');
-        this.props.actions.setAnimation(false);
       }
     });
   }
 
   componentDidMount() {
-    AsyncStorage.getItem('contacts').then((contacts_string) => {
-      if (contacts_string) {
-        this.contacts = JSON.parse(contacts_string);
-      }
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({isReady: true});
     });
+
+    this.setTimeout (
+      () => {
+        AsyncStorage.getItem('contacts').then((contacts_string) => {
+          if (contacts_string) {
+            this.contacts = JSON.parse(contacts_string);
+          }
+        });
+      },
+      1000
+    )
+
+    if (!this.props.userId) {
+      AsyncStorage.getItem('userData').then((user_data_string) => {
+        if (user_data_string) {
+          let user_data = JSON.parse(user_data_string);
+          this.props.actions.updateUserId(user_data.uid);
+        } else {
+          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+        }
+      });
+    }
   }
 
   render() {
-    console.log("MY SECRETS RENDERED");
     let helperText;
     let currentSecrets = this.mySecrets.filter((item) => {
       return item.state.sentState === this.props.displaying;
     });
     let secretsList = this.listSecrets(currentSecrets);
-
     switch(this.props.displaying) {
       case "SO":
         helperText = null;
@@ -219,8 +201,8 @@ class MySecrets extends React.Component {
           </View>
           <View style={styles.contentContainer}>
             <ActivityIndicator animationControl={this.props.animating}/>
-            {secretsList[0] || this.props.animating ? helperText : <Text style={styles.helperText}>No secrets of this type yet</Text> }
-            {secretsList}
+            {secretsList.length > 0 || this.props.displaying === 'NR' ? helperText : <Text style={styles.helperText}>No secrets of this type yet</Text> }
+            {!this.state.isReady ? <ActivityIndicator animationControl={true}/> : secretsList}
           </View>
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />

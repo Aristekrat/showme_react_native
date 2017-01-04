@@ -31,7 +31,7 @@ User.prototype.postLoginProcessing = function(uid) {
     userRecord.uid = uid;
     AsyncStorage.setItem('userData', JSON.stringify(userRecord));
   });
-  AsyncStorage.removeItem('secrets');
+  //AsyncStorage.removeItem('secrets');
   Utility.setLocalAuth(true);
   GetSecrets.getRemoteSecrets();
 }

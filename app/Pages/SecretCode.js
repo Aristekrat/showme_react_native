@@ -18,12 +18,16 @@ import {
   ScrollView,
   TextInput,
   TouchableHighlight,
-  AsyncStorage
+  AsyncStorage,
+  InteractionManager
 } from 'react-native';
 
 class SecretCode extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isReady: false,
+    }
     this.verificationIndex = this.props.db.child('indexes').child('verificationCodes');
   }
 
@@ -56,16 +60,23 @@ class SecretCode extends React.Component {
   }
 
   componentWillMount() {
-    //Perf.printWasted();
-    //Perf.stop();
     this.generate();
     Utility.resetState(this.props.animating, this.props.error);
+  }
+
+  componentDidMount() {
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({isReady: true});
+    });
   }
 
   render(){
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
+        {
+          !this.state.isReady ? <ActivityIndicator animationControl={true} /> :
+          <View>
           <Text style={StylingGlobals.header}>
             Create a secret pass code
           </Text>
@@ -78,11 +89,13 @@ class SecretCode extends React.Component {
           <BigButton do={() => this.createCode()}>
             Submit
           </BigButton>
-          {
-            this.props.error ?
-            <Text style={styles.error}>{this.props.error}</Text> :
-            null
-          }
+          </View>
+        }
+        {
+          this.props.error ?
+          <Text style={styles.error}>{this.props.error}</Text> :
+          null
+        }
            <ActivityIndicator animationControl={this.props.animating} />
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />

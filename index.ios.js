@@ -106,27 +106,13 @@ class ShowMe extends React.Component {
     this.state.localSecrets.forEach((item, index) => { // Checks for differences between remote and local secrets
       if (JSON.stringify(this.state.remoteSecrets[index]) !== JSON.stringify(this.state.localSecrets[index])) {
         count = count + 1;
-        this.setUpdatedSecrets(this.state.remoteSecrets[index].key);
+        actions.pushUpdatedSecret(this.state.remoteSecrets[index].key);
       }
       if (arrLength === index) { // the for loop is at an end
         actions.incrementNotifications(count);
         this.addUpdatedSecretsToAsyncStorage(store.getState().updatedSecrets);
       }
     });
-  }
-
-  // Sets local key / value pair for the secrets that have been freshly updated; notification related
-  setUpdatedSecrets(key) {
-    actions.pushUpdatedSecret(key);
-    /*AsyncStorage.getItem('updatedSecrets').then((updatedSecretsString) => {
-      if (!updatedSecrets) {
-        var updatedSecrets = {}
-      } else {
-        var updatedSecrets = JSON.parse(updatedSecretsString);
-      }
-      updatedSecrets[key] = true;
-      AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
-    });*/
   }
 
   listenForUpdatesToSecrets() { // All notification
@@ -282,7 +268,7 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "Gateway"}}
+        initialRoute={{name: "SignIn"}}
         />
       </Provider>
     );

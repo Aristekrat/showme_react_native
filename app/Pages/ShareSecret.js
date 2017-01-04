@@ -11,8 +11,7 @@ import ActivityIndicator from '../Components/ActivityIndicator.js';
 import actions from '../State/Actions/Actions';
 import { connect } from 'react-redux';
 import Utility from '../Globals/UtilityFunctions.js';
-import Perf from 'react-addons-perf';
-// import Contacts from 'react-native-contacts';
+import Contacts from 'react-native-contacts';
 
 import {
   StyleSheet,
@@ -23,13 +22,15 @@ import {
   TextInput,
   PickerIOS,
   AsyncStorage,
+  InteractionManager,
 } from 'react-native';
-
-// var Composer = require('NativeModules').RNMessageComposer;
 
 class ShareSecret extends React.Component {
   constructor(props){
     super(props);
+    this.state = {
+      isReady: false,
+    }
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
     this.answers = this.props.db.child('answers');
@@ -38,7 +39,7 @@ class ShareSecret extends React.Component {
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error);
 
-    if (this.props.route.cookieData.key) {
+    if (this.props.route.cookieData && this.props.route.cookieData.key) {
       this.props.actions.updateSecretKey(this.props.route.cookieData.key);
     };
 
@@ -62,14 +63,21 @@ class ShareSecret extends React.Component {
     });
   }
 
+  componentDidMount() {
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({isReady: true});
+    });
+  }
+
   render() {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
-          { this.props.route.contacts === "PermissionDenied" ?
+          {!this.state.isReady ? <ActivityIndicator animationControl={true}/> :
+          <View>
+          { this.props.route.contacts === "PermissionDenied" || !this.props.contactsPermission ?
             <View>
-              <Text style={styles.prompt}>Enter Phone Number</Text>
-              <Text style={styles.label}>Enter the phone number of who you want to send this secret to</Text>
+              <Text style={styles.prompt}>Enter your friends Phone Number</Text>
               <TextInput style={styles.textInput}
                 autoFocus={true}
                 onChangeText={(phoneNumber) => {
@@ -94,7 +102,7 @@ class ShareSecret extends React.Component {
             <View>
               <Text style={StylingGlobals.header}>Choose who you want to send to...</Text>
               <UserContacts contacts={this.props.route.contacts}/>
-              <Text style={styles.label}>You'll have a chance to review before you send</Text>
+              <Text style={styles.label}>You will have a chance to review before you send</Text>
               <BigButton do={() => {
                   this.props.actions.toggleAnimation();
                   SendSecret.saveArgs(this.props.phoneNumber, this.props.firstName, this.props.userId, this.props.secretKey, this.props);
@@ -103,13 +111,13 @@ class ShareSecret extends React.Component {
               </BigButton>
             </View>
           }
-          <Text style={styles.exclusive}>Show Me is exclusively available on iPhones</Text>
+          </View>
+          }
+          {!this.state.isReady ? null : <Text style={styles.exclusive}>Show Me is exclusively available on iPhones</Text>}
           <ActivityIndicator animationControl={this.props.animating} />
           {
-            this.props.error == "" ? null :
-            <Text style={styles.error}>{this.props.error}</Text>
+            this.props.error ? <Text style={styles.error}>{this.props.error}</Text> : null
           }
-
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
@@ -118,6 +126,13 @@ class ShareSecret extends React.Component {
 };
 
 var styles = StyleSheet.create({
+  prompt: {
+    width: 300,
+    marginLeft: 30,
+    fontSize: 16,
+    marginTop: 25,
+    marginBottom: 5,
+  },
   textInput: {
     height: 50,
     padding: 2,
@@ -126,7 +141,7 @@ var styles = StyleSheet.create({
     marginLeft: 30,
     borderColor: '#eee',
     borderWidth: 1,
-    width: 350,
+    width: 315,
     backgroundColor: '#fff'
   },
   label: {
@@ -149,6 +164,7 @@ const mapStateToProps = (state) => {
   return {
     animating: state.isAnimating,
     error: state.error,
+    contactsPermission: state.contactsPermission,
     phoneNumber: state.phoneNumber,
     secretKey: state.secretKey,
     firstName: state.firstName,

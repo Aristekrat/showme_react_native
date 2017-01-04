@@ -12,8 +12,8 @@ import {
 class MySecret extends React.Component {
   render(){
     return (
-      <TouchableHighlight 
-          underlayColor={StylingGlobals.colors.accentPressDown} 
+      <TouchableHighlight
+          underlayColor={StylingGlobals.colors.accentPressDown}
           onPress={this.props.updateSecret}
           style={this.props.updated ? styles.active : null}>
           <View style={styles.secretContainer}>
@@ -29,11 +29,11 @@ class MySecret extends React.Component {
 
 var styles = StyleSheet.create({
   secretContainer: {
-    borderBottomWidth: 1, 
+    borderBottomWidth: 1,
     borderBottomColor: '#eee',
     marginLeft: 10,
     marginRight: 10,
-    padding: 5, 
+    padding: 5,
     flex: 1,
     paddingBottom: 15,
   },
@@ -47,7 +47,7 @@ var styles = StyleSheet.create({
     margin: 5,
   },
   active: {
-    backgroundColor: StylingGlobals.colors.accentPressDown,
+    backgroundColor: StylingGlobals.colors.darkerAccent,
     borderBottomColor: StylingGlobals.colors.border,
     borderBottomWidth: 1,
   },

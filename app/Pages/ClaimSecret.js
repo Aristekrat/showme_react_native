@@ -32,11 +32,11 @@ class ClaimSecret extends React.Component {
   // TODO refactor this thing, it's much bigger than a well written function should be
   verifyCode() {
     if (!this.props.code) {
-      //this.setState({error: "Please enter a secret code. You would've got this in a friend's text invitation"});
       this.props.setError("Please enter a secret code. You would've got this in a friend's text invitation");
     } else {
       this.props.toggleAnimation();
-      this.verificationCodes.orderByValue().equalTo(this.props.code).once('value', (snapshot) => {
+      let whitespaceStripped = this.props.code.replace(/\s/g,'');
+      this.verificationCodes.orderByValue().equalTo(whitespaceStripped).once('value', (snapshot) => {
         let valReturned = snapshot.val();
         if (valReturned) {
           // Everthing within this block should be abstracted into its own function

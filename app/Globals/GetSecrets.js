@@ -36,6 +36,7 @@ const GetSecrets = {
     AsyncStorage.getItem('userData').then((user_data_json) => {
       if (user_data_json) {
         let user_data = JSON.parse(user_data_json); // TODO Needs to check AUTH, implement this at the end
+        this.uid = user_data.uid;
         this.DB.child('users').child(user_data.uid).child('secrets').once('value', (snapshot) => {
           var userSecrets = snapshot.val();
           if (userSecrets) {
@@ -62,14 +63,37 @@ const GetSecrets = {
   // Pushes one new secret obj to the local store.
   pushLocalSecret: function (newSecret) {
     AsyncStorage.getItem('secrets').then((secrets_data_string) => {
+      let secretCopy = Object.assign({}, newSecret);
+      secretCopy.askerName = this._setAskerName(newSecret.askerId, newSecret.askerName, this.uid);
+      secretCopy.answerNotification = this._setAnswerNotification(newSecret.state);
       if (secrets_data_string) {
         let secrets_data = JSON.parse(secrets_data_string);
-        secrets_data.push(newSecret);
+        secrets_data.push(secretCopy);
         AsyncStorage.setItem('secrets', JSON.stringify(secrets_data));
       } else {
-        AsyncStorage.setItem('secrets', JSON.stringify(newSecret));
+        AsyncStorage.setItem('secrets', JSON.stringify(secretCopy));
       }
     });
+  },
+
+  // Sets the 'Asker' field in an individual secret, called in listSecrets
+  _setAskerName: function(askerID, askerName, uid) {
+    if (uid && uid === askerID) {
+      return "You";
+    } else if (!askerName) {
+      return "Anonymous";
+    } else {
+      return askerName;
+    }
+  },
+
+  // Adds a special notification to a secret if the other person has answered
+  _setAnswerNotification: function(itemState) {
+    if (itemState.sentState === 'QS' && itemState.answerState === 'RA' || itemState.sentState === 'RR' && itemState.answerState === 'AA') {
+      return true;
+    } else {
+      return false;
+    }
   },
 
   pushPrivateSecret: function(text, uid, profileName = "Anonymous", successCB, errCB) {
@@ -95,7 +119,12 @@ const GetSecrets = {
 
   pushSecretsToAsyncStore: function () {
   	let remoteSecrets = this.remoteSecrets;
-		AsyncStorage.setItem('secrets', JSON.stringify(remoteSecrets));
+    let readyToRender = remoteSecrets.map((item, index) => {
+      item.answerNotification = this._setAnswerNotification(item.state);
+      item.askerName = this._setAskerName(item.askerId, item.askerName, this.uid);
+      return item;
+    });
+		AsyncStorage.setItem('secrets', JSON.stringify(readyToRender));
   },
 
 }
