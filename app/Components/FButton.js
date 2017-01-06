@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 const FBSDK = require('react-native-fbsdk');
-const FBLoginManager = require('NativeModules').FBLoginManager;
+//const FBLoginManager = require('NativeModules').FBLoginManager;
 const {
   LoginManager,
   LoginButton,
@@ -43,6 +43,7 @@ class FButton extends React.Component {
                             this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
                           } else {
                             this.props.successCB(authData, this.props);
+                            Utility.setLocalAuth(true);
                           }
                         })
                       }

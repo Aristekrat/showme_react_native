@@ -3,6 +3,12 @@ import {
   NetInfo
 } from 'react-native';
 
+const FBSDK = require('react-native-fbsdk');
+const {
+  AccessToken,
+  LoginManager,
+} = FBSDK;
+
 import actions from '../State/Actions/Actions';
 import Firebase from 'firebase';
 const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
@@ -27,6 +33,14 @@ var Utility = {
 	  }
 	},
 
+  getFacebookAuth: function() {
+    AccessToken.getCurrentAccessToken().then((fbToken) => {
+      if (fbToken) {
+        this.setLocalAuth(true);
+      }
+    });
+  },
+
   unAuth: function() {
     var ref = this.getRef();
     ref.unauth();
@@ -47,8 +61,14 @@ var Utility = {
 	},
 
 	logout: function() {
-		this.unAuth();
-		this.setLocalAuth(false);
+    AccessToken.getCurrentAccessToken().then((fbToken) => {
+      if (fbToken) {
+        LoginManager.logOut();
+      } else {
+        this.unAuth();
+      }
+      this.setLocalAuth(false);
+    });
 	},
 
   resetState(animating = false, errorMessage = "", formInput = "") {

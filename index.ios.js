@@ -15,6 +15,8 @@ import StylingGlobals from './app/Globals/StylingGlobals.js';
 import Gateway from './app/Pages/Gateway.js';
 import ClaimSecret from './app/Pages/ClaimSecret.js';
 import RegistrationInterim from './app/Pages/RegistrationInterim.js';
+import PrivacyPolicy from './app/Pages/PrivacyPolicy.js';
+import ChangeUserName from './app/Pages/ChangeUserName.js';
 import Utility from './app/Globals/UtilityFunctions.js';
 import GetSecrets from './app/Globals/GetSecrets.js';
 import Title from './app/Components/Title.js';
@@ -163,6 +165,8 @@ class ShowMe extends React.Component {
   componentWillMount() {
     if (Utility.getAuthStatus()) {
       Utility.setLocalAuth(true);
+    } else {
+      Utility.getFacebookAuth();
     }
 
     AsyncStorage.getItem('userData').then((user_data_string) => {
@@ -230,11 +234,19 @@ class ShowMe extends React.Component {
         );
       case 'MyAccount':
         return (
-          <MyAccount navigator={navigator} route={route} store={store}/>
+          <MyAccount navigator={navigator} route={route} db={this.db} store={store}/>
         );
       case 'ClaimSecret':
         return (
           <ClaimSecret navigator={navigator} route={route} db={this.db} store={store} />
+        );
+      case 'PrivacyPolicy':
+        return (
+          <PrivacyPolicy navigator={navigator} route={route} />
+        );
+      case 'ChangeUserName':
+        return (
+          <ChangeUserName navigator={navigator} route={route} db={this.db} store={store} />
         );
       case 'SignIn':
         return (

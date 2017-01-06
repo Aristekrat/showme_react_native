@@ -13,10 +13,12 @@ const GetSecrets = {
   _setRemoteSecrets: function(state, key, answer = null) {
     this.DB.child('privateSecrets').child(key).on('value', (secret) => {
       var sv = secret.val();
-      sv.state = state;
-      sv.key = key;
-      sv.answer = answer;
-      this.remoteSecrets.push(sv);
+      if (sv) {
+        sv.state = state;
+        sv.key = key;
+        sv.answer = answer;
+        this.remoteSecrets.push(sv);
+      }
     })
   },
 

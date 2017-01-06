@@ -123,7 +123,7 @@ var styles = StyleSheet.create({
     borderTopColor: StylingGlobals.colors.navColor,
   },
   tabItem: {
-
+    
   },
   tabText: {
     color: '#fff',

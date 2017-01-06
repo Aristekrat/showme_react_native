@@ -30,6 +30,8 @@ const TitleBar = {
         case 'Facebook':
         case 'RegistrationInterim':
         case 'ClaimSecret':
+        case 'PrivacyPolicy':
+        case 'ChangeUserName':
           return (
             <TouchableHighlight
               onPress={() => navigator.pop()}
@@ -93,6 +95,14 @@ const TitleBar = {
       case 'SecretCode':
         return (
           <Text style={styles.navBarTitleText}>Create Secret Code</Text>
+        );
+      case 'PrivacyPolicy':
+        return (
+          <Text style={styles.navBarTitleText}>Privacy Policy</Text>
+        );
+      case 'ChangeUserName':
+        return (
+          <Text style={styles.navBarTitleText}>Change User Name</Text>
         );
       case 'CreateYourOwn':
         return (

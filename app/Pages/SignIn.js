@@ -11,7 +11,6 @@ import { connect } from 'react-redux';
 import actions from '../State/Actions/Actions';
 import User from '../Globals/User';
 import FButton from '../Components/FButton.js';
-import Perf from 'react-addons-perf';
 
 import {
   StyleSheet,
@@ -102,6 +101,16 @@ class SignIn extends Component {
             <Text style={styles.buttonText}>Sign In</Text>
           </TouchableHighlight>
           {
+            this.props.message ?
+            <FButton
+              successCB={this.fbSuccessCB}
+              db={this.props.db}
+              navigator={this.props.navigator}
+              width={{width: 260, marginLeft: 35}}/>
+            :
+            null
+          }
+          {
             this.props.error ?
             <View style={styles.errorContainer}>
               <Text style={styles.errorText}>{this.props.error}</Text>
@@ -126,16 +135,6 @@ class SignIn extends Component {
             <View style={styles.switchBlock}>
               <ArrowLink skipTo={()=> this.switchToRegister()}>Register Instead</ArrowLink>
             </View>
-          }
-          {
-            this.props.message ?
-            <FButton
-              successCB={this.fbSuccessCB}
-              db={this.props.db}
-              navigator={this.props.navigator}
-              width={{width: 260, marginLeft: 35}}/>
-            :
-            null
           }
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
