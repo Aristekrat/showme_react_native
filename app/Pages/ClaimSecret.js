@@ -128,7 +128,6 @@ const mapDispatchToProps = function(dispatch, ownProps) {
 var styles = StyleSheet.create({
   paragraph: {
     marginLeft: 30,
-    color: '#555',
     marginTop: 5,
   },
   error: {

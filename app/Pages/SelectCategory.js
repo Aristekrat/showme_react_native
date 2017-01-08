@@ -74,6 +74,8 @@ class SelectCategory extends React.PureComponent {
   }
 
   componentWillMount() {
+    AsyncStorage.removeItem('selectCategoryIntro');
+
     Utility.resetState(this.props.animating, this.props.error);
 
     if (this.props.route.modalText) {

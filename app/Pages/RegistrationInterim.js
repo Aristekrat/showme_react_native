@@ -25,10 +25,10 @@ class RegistrationInterim extends React.Component {
           <Text style={StylingGlobals.header}>Do you have a secret code?</Text>
           <Text style={StylingGlobals.paragraph}>You would have got this in a text from a friend</Text>
           <View style={styles.buttonContainer}>
-            <TouchableHighlight onPress={() => this.props.navigator.push({name: 'ClaimSecret'}) } style={styles.button}>
+            <TouchableHighlight onPress={() => this.props.navigator.push({name: 'ClaimSecret'}) } style={[styles.button, styles.leftButton]}>
               <Text style={styles.buttonText}>Yes</Text>
             </TouchableHighlight>
-            <TouchableHighlight onPress={() => this.props.navigator.push({name: 'SelectCategory'}) } style={styles.button}>
+            <TouchableHighlight onPress={() => this.props.navigator.push({name: 'SelectCategory'}) } style={[styles.button, styles.rightButton]}>
               <Text style={styles.buttonText}>No</Text>
             </TouchableHighlight>
           </View>
@@ -49,8 +49,14 @@ const styles = StyleSheet.create({
     backgroundColor: StylingGlobals.colors.mainColor,
     padding: 12,
     height: 50,
-    width: 115,
-    marginRight: 30,
+    width: 120,
+  },
+  leftButton: {
+    marginRight: 15,
+    marginLeft: -15,
+  },
+  rightButton: {
+    marginLeft: 15,
   },
   buttonText: {
     color: '#fff',

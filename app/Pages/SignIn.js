@@ -44,7 +44,11 @@ class SignIn extends Component {
     AsyncStorage.setItem('userData', JSON.stringify(authData));
     Utility.setLocalAuth();
     props.actions.removeError();
-    props.navigator.pop();
+    if (props.message) {
+      props.navigator.pop();
+    } else {
+      props.navigator.push({name: 'SelectCategory'})
+    }
   }
 
   forgot() {
@@ -101,7 +105,7 @@ class SignIn extends Component {
             <Text style={styles.buttonText}>Sign In</Text>
           </TouchableHighlight>
           {
-            this.props.message ?
+            true ? // this.props.message
             <FButton
               successCB={this.fbSuccessCB}
               db={this.props.db}

@@ -68,6 +68,8 @@ var Utility = {
         this.unAuth();
       }
       this.setLocalAuth(false);
+      actions.setNotifications(0);
+      AsyncStorage.removeItem('secrets');
     });
 	},
 

@@ -280,7 +280,7 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "SignIn"}}
+        initialRoute={{name: "SelectCategory"}}
         />
       </Provider>
     );

@@ -9,6 +9,7 @@ import ArrowLink from '../Components/ArrowLink.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 import actions from '../State/Actions/Actions';
+import Utility from '../Globals/UtilityFunctions';
 import {
   StyleSheet,
   Text,
@@ -99,6 +100,10 @@ class MySecrets extends React.Component {
   }
 
   componentWillMount() {
+    if (!Utility.authStatus) {
+      //this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to Sign In first'});
+    }
+
     if (this.props.route.secret && this.props.route.secret.key) {
       this.props.actions.pushUpdatedSecret(this.props.route.secret.key);
     }

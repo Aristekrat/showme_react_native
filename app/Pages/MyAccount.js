@@ -37,6 +37,7 @@ class MyAccount extends React.Component {
     this.users = this.props.db.child('users');
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.answers = this.props.db.child('answers');
+    this.secretCodes = this.props.db.child('indexes').child('verificationCodes');
   }
 
   eraseSecrets(uid) {
@@ -62,9 +63,9 @@ class MyAccount extends React.Component {
             }
             this.answers.child(currentKey).remove();
             this.privateSecrets.child(currentKey).remove();
+            this.secretCodes.child(currentKey).remove();
           })
         });
-        //AsyncStorage.removeItem('secrets');
         this.setTimeout (
           () => {
             this.users.child(uid).child('secrets').remove();
@@ -84,13 +85,6 @@ class MyAccount extends React.Component {
     if (!Utility.authStatus) {
       //this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to Sign In first'});
     }
-
-    //console.log(LoginManager);
-    /*
-    AccessToken.getCurrentAccessToken().then((foo) => {
-      console.log(foo); // Will output an obj if logged in and null if not.
-    })
-    */
 
     if (!this.props.userId) {
       AsyncStorage.getItem('userData').then((user_data_string) => {

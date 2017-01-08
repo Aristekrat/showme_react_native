@@ -35,9 +35,9 @@ const GetSecrets = {
   getRemoteSecrets: function() {
   	this.remoteSecrets.length = 0;
     this.totalResults = '';
-    AsyncStorage.getItem('userData').then((user_data_json) => {
-      if (user_data_json) {
-        let user_data = JSON.parse(user_data_json); // TODO Needs to check AUTH, implement this at the end
+    AsyncStorage.getItem('userData').then((user_data_string) => {
+      if (user_data_string) {
+        let user_data = JSON.parse(user_data_string); // TODO Needs to check AUTH, implement this at the end
         this.uid = user_data.uid;
         this.DB.child('users').child(user_data.uid).child('secrets').once('value', (snapshot) => {
           var userSecrets = snapshot.val();
@@ -80,6 +80,7 @@ const GetSecrets = {
 
   // Sets the 'Asker' field in an individual secret, called in listSecrets
   _setAskerName: function(askerID, askerName, uid) {
+    console.log(uid, askerID);
     if (uid && uid === askerID) {
       return "You";
     } else if (!askerName) {
@@ -123,7 +124,7 @@ const GetSecrets = {
   	let remoteSecrets = this.remoteSecrets;
     let readyToRender = remoteSecrets.map((item, index) => {
       item.answerNotification = this._setAnswerNotification(item.state);
-      item.askerName = this._setAskerName(item.askerId, item.askerName, this.uid);
+      item.askerName = this._setAskerName(item.askerID, item.askerName, this.uid);
       return item;
     });
 		AsyncStorage.setItem('secrets', JSON.stringify(readyToRender));
