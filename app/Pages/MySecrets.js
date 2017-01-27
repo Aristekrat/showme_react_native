@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react';
 import StylingGlobals from '../Globals/StylingGlobals.js';
+import GetSecrets from '../Globals/GetSecrets.js';
 import TabBar from '../Components/TabBar.js';
 import Secret from '../Components/MySecret.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
@@ -24,24 +25,11 @@ import { connect } from 'react-redux'
 class MySecrets extends React.Component {
   constructor(props) {
     super(props);
-    this.mySecrets = this.props.route.secret ? this.props.route.secret : [];
+    this.mySecrets = [];
     this.contacts = [];
     this.state = {
       isReady: false,
     }
-  }
-
-  // Clears both updated secrets and decrements the notifications num
-  removeNotification(key) {
-    if (this.props.updatedSecrets && this.props.updatedSecrets[key]) {
-      this.props.actions.removeUpdatedSecret(key);
-      this.props.actions.decrementNotifications(1);
-      AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
-        let updatedSecrets = JSON.parse(updated_secrets_string);
-        delete updatedSecrets[key];
-        AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
-      });
-    };
   }
 
   // Determines the correct route for a secret to link to in listSecrets
@@ -56,6 +44,20 @@ class MySecrets extends React.Component {
     }
   }
 
+  // Clears both updated secrets and decrements the notifications num
+  // Need to move this in the future
+  removeNotification(key) {
+    if (this.props.updatedSecrets && this.props.updatedSecrets[key]) { // problematic for moving
+      this.props.actions.removeUpdatedSecret(key);
+      this.props.actions.decrementNotifications(1);
+      AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
+        let updatedSecrets = JSON.parse(updated_secrets_string);
+        delete updatedSecrets[key];
+        AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
+      });
+    };
+  }
+
   displaySecrets (item) {
     return item.state.sentState === this.props.displaying;
   }
@@ -65,7 +67,7 @@ class MySecrets extends React.Component {
     return arrayOfSecrets.map((item, index) => {
         return (
           <Secret
-            author={item.askerName}
+            author={item.askerName ? item.askerName : "Anonymous"}
             question={item.question}
             key={item.key}
             answer={item.answer ? 'A: ' + item.answer.responderAnswer : null}
@@ -85,6 +87,8 @@ class MySecrets extends React.Component {
   initialDisplay(secretsArr) {
     if (secretsArr.length === 0) { // User has no secrets
       this.props.actions.setMSDisplayType('NR');
+    } else if (this.props.route.secret) {
+      this.props.actions.setMSDisplayType(this.props.route.secret.state.sentState);
     } else if (this.props.updatedSecrets) { // Display column with an updated secret if there is one
       for (var i = 0; i <= secretsArr.length; i++) {
         if (i === secretsArr.length) {
@@ -100,9 +104,7 @@ class MySecrets extends React.Component {
   }
 
   componentWillMount() {
-    if (!Utility.authStatus) {
-      //this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to Sign In first'});
-    }
+    Utility.checkAllAuth();
 
     if (this.props.route.secret && this.props.route.secret.key) {
       this.props.actions.pushUpdatedSecret(this.props.route.secret.key);
@@ -112,19 +114,25 @@ class MySecrets extends React.Component {
       if (secrets_data_string) {
         let secrets_data = JSON.parse(secrets_data_string);
         let allSecrets = this.mySecrets.concat(secrets_data);
-        let secretsHash = {}
-        let dupsFilteredOut = allSecrets.filter((item) => {
-            return secretsHash.hasOwnProperty(item.key) ? false : (secretsHash[item.key] = true);
-        });
-        this.initialDisplay(dupsFilteredOut);
-        this.mySecrets = dupsFilteredOut;
+        if (this.props.route.secret) {
+          allSecrets.push(this.props.route.secret);
+        }
+        this.initialDisplay(allSecrets);
+        this.mySecrets = allSecrets;
       } else if (!this.props.route.secret && !secrets_data_string) {
         this.props.actions.setMSDisplayType('NR');
+      } else if (this.props.route.secret) {
+        this.mySecrets.push(this.props.route.secret);
+        this.initialDisplay(this.mySecrets);
       }
     });
   }
 
   componentDidMount() {
+    /*if (!Utility.authStatus) {
+        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
+    }*/
+
     InteractionManager.runAfterInteractions(() => {
       this.setState({isReady: true});
     });

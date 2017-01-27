@@ -41,6 +41,14 @@ var Utility = {
     });
   },
 
+  checkAllAuth: function (){
+    this.getFacebookAuth();
+    let signInAuth = this.getAuthStatus();
+    if (!this.authStatus && signInAuth) {
+      this.setLocalAuth(true);
+    }
+  },
+
   unAuth: function() {
     var ref = this.getRef();
     ref.unauth();

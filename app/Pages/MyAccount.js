@@ -82,9 +82,7 @@ class MyAccount extends React.Component {
   }
 
   componentWillMount() {
-    if (!Utility.authStatus) {
-      //this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to Sign In first'});
-    }
+    Utility.checkAllAuth();
 
     if (!this.props.userId) {
       AsyncStorage.getItem('userData').then((user_data_string) => {
@@ -97,6 +95,13 @@ class MyAccount extends React.Component {
       });
     }
   }
+
+  componentDidMount() {
+    if (!Utility.authStatus) {
+        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
+    }
+  }
+
   render(){
     return (
       <View style={StylingGlobals.container}>

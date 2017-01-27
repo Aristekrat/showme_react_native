@@ -25,7 +25,7 @@ class YourAnswer extends React.Component {
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
     this.answers = this.props.db.child('answers');
-    this.currentSecret = this.props.route.cookieData;
+    this.currentSecret = this.props.route.cookieData ? this.props.route.cookieData : null;
   }
 
   responderOrAsker(localID, secret) {
@@ -99,6 +99,10 @@ class YourAnswer extends React.Component {
     if(this.props.answer !== "") {
       this.props.actions.updateFormInput("");
     }
+
+    if (!this.props.route.cookieData || !this.props.route.cookieData.question) {
+      this.props.navigator.pop();
+    }
   }
 
   render() {
@@ -106,7 +110,7 @@ class YourAnswer extends React.Component {
       <View style={StylingGlobals.container}>
         <ScrollView style={styles.form}>
           <View>
-            <Text style={styles.question}>Q: {this.props.route.cookieData.question}</Text>
+            <Text style={styles.question}>Q: {this.currentSecret ? this.currentSecret.question : "No question"}</Text>
             <TextInput
                 style={styles.textInput}
                 autoFocus={true}

@@ -8,8 +8,6 @@ import ActivityIndicator from '../Components/ActivityIndicator.js';
 import SModal from '../Components/SModal.js';
 import CreateYourOwn from './CreateYourOwn.js';
 import SelectSecret from './SelectSecret.js';
-import ReactMixin from 'react-mixin';
-import ReactTimer from 'react-timer-mixin';
 import GetSecrets from '../Globals/GetSecrets.js';
 import actions from '../State/Actions/Actions';
 import { connect } from 'react-redux';
@@ -59,20 +57,6 @@ class SelectCategory extends React.PureComponent {
     AsyncStorage.setItem('selectCategoryIntro', 'true');
   }
 
-  // Largely duplicated in index, need to figure out how to split this guy off while retaining the setTimeout core
-  checkIfRemoteSecretsReceived() {
-    this.setTimeout (
-      () => {
-        if (GetSecrets.remoteSecrets.length === GetSecrets.totalResults) {
-          GetSecrets.pushSecretsToAsyncStore();
-        } else {
-          this.checkIfRemoteSecretsReceived();
-        }
-      },
-      1000
-    )
-  }
-
   componentWillMount() {
     AsyncStorage.removeItem('selectCategoryIntro');
 
@@ -90,7 +74,7 @@ class SelectCategory extends React.PureComponent {
     }
 
     if (this.props.route.refresh) {
-      this.checkIfRemoteSecretsReceived();
+      GetSecrets.checkIfRemoteSecretsReceived(GetSecrets.writeRemoteSecretsToAsyncStore);
     }
   }
 
@@ -179,8 +163,6 @@ var styles = StyleSheet.create({
     marginBottom: 0,
   }
 });
-
-ReactMixin(SelectCategory.prototype, ReactTimer);
 
 const mapStateToProps = (state) => {
   return {

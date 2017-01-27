@@ -47,7 +47,7 @@ class SignIn extends Component {
     if (props.message) {
       props.navigator.pop();
     } else {
-      props.navigator.push({name: 'SelectCategory'})
+      props.navigator.push({name: 'SelectCategory', refresh: true})
     }
   }
 

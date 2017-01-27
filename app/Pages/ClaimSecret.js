@@ -8,6 +8,8 @@ import BigButton from '../Components/BigButton.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import actions from '../State/Actions/Actions';
 import Utility from '../Globals/UtilityFunctions.js';
+import ReactMixin from 'react-mixin';
+import ReactTimer from 'react-timer-mixin';
 import {
   StyleSheet,
   Text,
@@ -29,6 +31,22 @@ class ClaimSecret extends React.Component {
     this.users = this.props.db.child('users');
   }
 
+  // Largely duplicated in index and select category, need to figure out how to split this guy off while retaining the setTimeout core
+  /*
+  checkIfRemoteSecretsReceived() {
+    this.setTimeout (
+      () => {
+        if (GetSecrets.remoteSecrets.length === GetSecrets.totalResults) {
+          GetSecrets.writeRemoteSecretsToAsyncStore();
+        } else {
+          this.checkIfRemoteSecretsReceived();
+        }
+      },
+      500
+    )
+  }
+  */
+
   // TODO refactor this thing, it's much bigger than a well written function should be
   verifyCode() {
     if (!this.props.code) {
@@ -49,15 +67,18 @@ class ClaimSecret extends React.Component {
                 () => {
                   this.privateSecrets.child(codeKey).once('value', (childSnapshot) => {
                     let ps = childSnapshot.val();
+                    let updatedHash = {}
+                    updatedHash[codeKey] = true;
                     ps.state = {
                       "sentState": "RR",
                       "answerState": "NA",
                     };
                     ps.key = codeKey;
-                    let secret = [ps];
                     actions.pushUpdatedSecret(ps.key);
+                    actions.incrementNotifications(1);
                     GetSecrets.pushLocalSecret(ps);
-                    this.props.navigator.push({name: 'MySecrets', secret: secret});
+                    GetSecrets.addUpdatedSecretsToAsyncStorage(updatedHash)
+                    this.props.navigator.push({name: 'MySecrets', secret: ps});
                   })
                 }
               )
@@ -83,6 +104,10 @@ class ClaimSecret extends React.Component {
 
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error, this.props.code);
+  }
+
+  componentDidMount() {
+    GetSecrets.checkIfRemoteSecretsReceived(GetSecrets.writeRemoteSecretsToAsyncStore);
   }
 
   render(){
@@ -111,6 +136,8 @@ class ClaimSecret extends React.Component {
     );
   }
 }
+
+ReactMixin(ClaimSecret.prototype, ReactTimer);
 
 const mapStateToProps = (state) => {
   return {

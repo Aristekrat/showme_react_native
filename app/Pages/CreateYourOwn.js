@@ -80,6 +80,7 @@ class CreateYourOwn extends React.Component {
 
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error, this.props.text);
+    //AsyncStorage.removeItem('secrets');
   }
 
   componentDidMount() {

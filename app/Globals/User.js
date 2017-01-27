@@ -30,10 +30,12 @@ User.prototype.postLoginProcessing = function(uid) {
     let userRecord = snapshot.val();
     userRecord.uid = uid;
     AsyncStorage.setItem('userData', JSON.stringify(userRecord));
+
   });
-  //AsyncStorage.removeItem('secrets');
+  AsyncStorage.removeItem('secrets');
+  AsyncStorage.removeItem('updatedSecrets');
   Utility.setLocalAuth(true);
-  GetSecrets.getRemoteSecrets();
+  GetSecrets.getRemoteSecrets(uid);
 }
 
 User.prototype.login = function (username, password, registrationFlag = false, referred = false) {
@@ -57,7 +59,7 @@ User.prototype.login = function (username, password, registrationFlag = false, r
           this.navigator.push({name: 'RegistrationInterim'});
         } else {
           Utility.resetState(true, true);
-          this.navigator.push({name: 'SelectCategory'});
+          this.navigator.push({name: 'SelectCategory', refresh: true});
         }
       }
     })

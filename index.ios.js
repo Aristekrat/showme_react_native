@@ -20,8 +20,6 @@ import ChangeUserName from './app/Pages/ChangeUserName.js';
 import Utility from './app/Globals/UtilityFunctions.js';
 import GetSecrets from './app/Globals/GetSecrets.js';
 import Title from './app/Components/Title.js';
-import ReactMixin from 'react-mixin';
-import ReactTimer from 'react-timer-mixin';
 import {
   AppRegistry,
   StyleSheet,
@@ -52,55 +50,17 @@ class ShowMe extends React.Component {
       remoteSecrets: [],
       localSecrets: [],
     };
-    totalResults: '';
   }
 
   // Processes data and sets up event listeners after all data is received from the remote
   allRemoteSecretsRetrieved() {
-    this.compareLocalAndRemoteSecrets();
-    this.listenForUpdatesToSecrets();
-    GetSecrets.pushSecretsToAsyncStore();
-  }
-
-  // Waits until all remote secrets are received then calls the implementation function
-  checkIfRemoteSecretsReceived() { // Add optional arg and move to GetSecrets? Doubt I can use a mixin there
-    this.setTimeout (
-      () => {
-        if (GetSecrets.remoteSecrets.length === GetSecrets.totalResults) {
-          this.allRemoteSecretsRetrieved();
-        } else {
-          this.checkIfRemoteSecretsReceived();
-        }
-      },
-      1000
-    )
-  }
-
-  // Not sure if I want to use this or just count the number of objs in updatedSecrets
-  addNotificationsToAsyncStorage(notificationNum) {
-    AsyncStorage.getItem('notificationCount').then((notification_count_string) => {
-      if (notification_count_string) {
-        let totalNotifications = Number(notification_count_string) + notificationNum;
-        AsyncStorage.setItem(String(totalNotifications));
-      } else {
-        AsyncStorage.setItem(String(notificationNum));
-      }
-    })
-  }
-
-  addUpdatedSecretsToAsyncStorage(updatedSecretsHash) {
-    AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
-      if (updated_secrets_string) {
-        let updated_secrets = JSON.parse(updated_secrets_string);
-        let combinedObj = Object.assign(updated_secrets, updatedSecretsHash);
-        AsyncStorage.setItem('updatedSecrets', JSON.stringify(combinedObj));
-      } else {
-        AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecretsHash));
-      }
-    });
+    GetSecrets.compareLocalAndRemoteSecrets();
+    //GetSecrets.listenForUpdatesToSecrets();
+    GetSecrets.writeRemoteSecretsToAsyncStore();
   }
 
   // Compares the local and remote secrets and then sets the notification count & updated secrets hash on detecting differences
+  /*
   compareLocalAndRemoteSecrets() {
     let count = (this.state.remoteSecrets.length - this.state.localSecrets.length) + Number(store.getState().notifications);
     let arrLength = this.state.localSecrets.length - 1;
@@ -112,26 +72,11 @@ class ShowMe extends React.Component {
       }
       if (arrLength === index) { // the for loop is at an end
         actions.incrementNotifications(count);
-        this.addUpdatedSecretsToAsyncStorage(store.getState().updatedSecrets);
+        GetSecrets.addUpdatedSecretsToAsyncStorage(store.getState().updatedSecrets);
       }
     });
   }
-
-  listenForUpdatesToSecrets() { // All notification
-    AsyncStorage.getItem('userData').then((user_data_json) => {
-      if (user_data_json) {
-        let user_data = JSON.parse(user_data_json);
-        this.DB.child('users').child(user_data.uid).child('secrets').on('child_changed', (childSnapshot) => {
-          let key = childSnapshot.key();
-          let newUpdate = {}
-          newUpdate[key] = true;
-          actions.incrementNotifications(1); // TODO Try and filter out user initiated changes
-          actions.pushUpdatedSecret(key);
-          this.addUpdatedSecretsToAsyncStorage(newUpdate);
-        })
-      }
-    });
-  }
+  */
 
   // This function listens for any firebase auth, saves the auth data, and transitions anon auths to signed in auths when appropriate
   anonAuthHandler() {
@@ -191,7 +136,7 @@ class ShowMe extends React.Component {
   }
 
   componentDidMount() {
-    this.checkIfRemoteSecretsReceived();
+    GetSecrets.checkIfRemoteSecretsReceived(this.allRemoteSecretsRetrieved);
   }
 
   renderScene (route, navigator) {
@@ -280,7 +225,7 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "SelectCategory"}}
+        initialRoute={{name: "Gateway"}}
         />
       </Provider>
     );
@@ -295,6 +240,6 @@ const styles = StyleSheet.create({
     },
 });
 
-ReactMixin(ShowMe.prototype, ReactTimer);
+//ReactMixin(ShowMe.prototype, ReactTimer);
 
 AppRegistry.registerComponent('ShowMe', () => ShowMe);
