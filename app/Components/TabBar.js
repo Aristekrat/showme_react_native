@@ -26,19 +26,19 @@ class TabBar extends React.Component {
         this.state.selectedTab = 'tabOne';
         break;
       case "SelectCategory":
-      case "CreateYourOwn":
-      case "SelectSecret":
-      case "ShareSecret":
         this.state.selectedTab = 'tabTwo';
         break;
-      case "ClaimSecret":
+      case "CreateYourOwn":
         this.state.selectedTab = 'tabThree';
+        break;
+      case "ClaimSecret":
+        this.state.selectedTab = 'tabFour';
         break;
       case "MyAccount":
       case "SignIn":
       case "Registration":
       case "Gateway":
-        this.state.selectedTab = 'tabFour';
+        this.state.selectedTab = 'tabFive';
         break;
     }
   }
@@ -54,9 +54,13 @@ class TabBar extends React.Component {
       })
     } else if (tabId === "tabThree") {
       this.props.navigator.push({
-        name: 'ClaimSecret'
+        name: 'CreateYourOwn'
       })
     } else if (tabId === "tabFour") {
+      this.props.navigator.push({
+        name: 'ClaimSecret'
+      })
+    } else if (tabId === "tabFive") {
       this.props.navigator.push({
         name: Utility.authStatus ? 'MyAccount' : 'SignIn'
       })
@@ -86,7 +90,7 @@ class TabBar extends React.Component {
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabTwo'}
               onPress={() => this.props.introPopup ? this.props.introPopup() : this.setTab('tabTwo')}
-              title={"New Secret"}
+              title={"Select New"}
               icon={require('../img/tabicon-new.png')}
               style={styles.tabItem}
               badge={this.props.introBadge ? this.props.introBadge : null}>
@@ -96,8 +100,8 @@ class TabBar extends React.Component {
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabThree'}
               onPress={() => this.setTab('tabThree')}
-              title={"Claim"}
-              icon={require('../img/tabicon-claim.png')}
+              title={""}
+              icon={require('../img/tabicon-create.png')}
               style={styles.tabItem}>
                 <View></View>
             </TabBarIOS.Item>
@@ -105,6 +109,15 @@ class TabBar extends React.Component {
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabFour'}
               onPress={() => this.setTab('tabFour')}
+              title={"Claim"}
+              icon={require('../img/tabicon-claim.png')}
+              style={styles.tabItem}>
+                <View></View>
+            </TabBarIOS.Item>
+
+            <TabBarIOS.Item
+              selected={this.state.selectedTab === 'tabFive'}
+              onPress={() => this.setTab('tabFive')}
               title={Utility.authStatus ? "My Account" : "Sign In" }
               icon={require('../img/tabicon-signin.png')} // business64
               style={styles.tabItem}>
@@ -123,7 +136,7 @@ var styles = StyleSheet.create({
     borderTopColor: StylingGlobals.colors.navColor,
   },
   tabItem: {
-    
+
   },
   tabText: {
     color: '#fff',

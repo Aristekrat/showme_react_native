@@ -225,7 +225,7 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "Gateway"}}
+        initialRoute={{name: "SelectCategory"}}
         />
       </Provider>
     );
