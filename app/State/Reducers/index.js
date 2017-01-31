@@ -22,6 +22,7 @@ import displaySkipReducer from './DisplaySkipReducer';
 import updatedSecretsReducer from './UpdatedSecretsReducer';
 import notificationsReducer from './NotificationReducer';
 import contactsPermissionReducer from './ContactsPermissionReducer';
+import securitySettingReducer from './SecuritySettingReducer';
 
 const reducers = combineReducers({
   displaySkip: displaySkipReducer,
@@ -45,6 +46,7 @@ const reducers = combineReducers({
   updatedSecrets: updatedSecretsReducer,
   notifications: notificationsReducer,
   contactsPermission: contactsPermissionReducer,
+  securityLevel: securitySettingReducer,
 });
 
 export default reducers;

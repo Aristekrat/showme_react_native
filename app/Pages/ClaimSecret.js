@@ -31,63 +31,16 @@ class ClaimSecret extends React.Component {
     this.users = this.props.db.child('users');
   }
 
-  // Largely duplicated in index and select category, need to figure out how to split this guy off while retaining the setTimeout core
-  /*
-  checkIfRemoteSecretsReceived() {
-    this.setTimeout (
-      () => {
-        if (GetSecrets.remoteSecrets.length === GetSecrets.totalResults) {
-          GetSecrets.writeRemoteSecretsToAsyncStore();
-        } else {
-          this.checkIfRemoteSecretsReceived();
-        }
-      },
-      500
-    )
-  }
-  */
-
-  // TODO refactor this thing, it's much bigger than a well written function should be
   verifyCode() {
     if (!this.props.code) {
-      this.props.setError("Please enter a secret code. You would've got this in a friend's text invitation");
+      this.props.actions.setError("Please enter a secret code. You would've got this in a friend's text invitation");
     } else {
-      this.props.toggleAnimation();
+      this.props.actions.toggleAnimation();
       let whitespaceStripped = this.props.code.replace(/\s/g,'');
       this.verificationCodes.orderByValue().equalTo(whitespaceStripped).once('value', (snapshot) => {
         let valReturned = snapshot.val();
         if (valReturned) {
-          // Everthing within this block should be abstracted into its own function
-          var codeKey = Object.keys(valReturned)[0];
-          AsyncStorage.getItem('userData').then((user_data_string) => {
-            if (user_data_string) {
-              this.props.toggleAnimation();
-              let user_data = JSON.parse(user_data_string);
-              this.privateSecrets.child(codeKey).update({responderID: user_data.uid}, //update private secrets with responder ID
-                () => {
-                  this.privateSecrets.child(codeKey).once('value', (childSnapshot) => {
-                    let ps = childSnapshot.val();
-                    let updatedHash = {}
-                    updatedHash[codeKey] = true;
-                    ps.state = {
-                      "sentState": "RR",
-                      "answerState": "NA",
-                    };
-                    ps.key = codeKey;
-                    actions.pushUpdatedSecret(ps.key);
-                    actions.incrementNotifications(1);
-                    GetSecrets.pushLocalSecret(ps);
-                    GetSecrets.addUpdatedSecretsToAsyncStorage(updatedHash)
-                    this.props.navigator.push({name: 'MySecrets', secret: ps});
-                  })
-                }
-              )
-              this.verifiedIndex.child(user_data.uid).set(true);
-              this.users.child(user_data.uid).child('secrets').child(codeKey).set({answerState: 'NA', sentState: 'RR'}); // answerState is hard code atm, might be AA, need to check in the future
-            } else {
-              this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
-            }
-          });
+          this.secretClaimed(valReturned);
         } else {
           this.setErrorState("Sorry, we couldn't find that code");
         }
@@ -97,13 +50,61 @@ class ClaimSecret extends React.Component {
     }
   }
 
+  secretClaimed(claimedSecret) {
+    let codeKey = Object.keys(claimedSecret)[0];
+    this.privateSecrets.child(codeKey).update({responderID: this.props.userId}, //update private secrets with responder ID
+      () => {
+        this.privateSecrets.child(codeKey).once('value', (childSnapshot) => {
+          this.props.actions.toggleAnimation();
+          let ps = childSnapshot.val();
+          let updatedHash = {}
+          updatedHash[codeKey] = true;
+          this.props.actions.pushUpdatedSecret(codeKey);
+          this.props.actions.incrementNotifications(1);
+          GetSecrets.addUpdatedSecretsToAsyncStorage(updatedHash)
+          this.users.child(ps.askerID).child('secrets').child(codeKey).once('value', (grandchildSnapshot) => {
+            ps.state = {
+              "sentState": "RR",
+              "answerState": grandchildSnapshot.val().answerState,
+            };
+            ps.key = codeKey;
+            GetSecrets.pushLocalSecret(ps);
+            this.props.navigator.push({name: 'MySecrets', secret: ps});
+            this.users.child(this.props.userId).child('secrets').child(codeKey).set({answerState: grandchildSnapshot.val().answerState, sentState: 'RR'});
+          });
+          //this.verificationCodes.child(codeKey).remove();
+          //this.verifiedIndex.child(this.props.userId).set(true);
+        })
+      }
+    )
+  }
+
   setErrorState(errorText) {
-    this.props.setError(errorText);
-    this.props.toggleAnimation();
+    this.props.actions.setError(errorText);
+    this.props.actions.toggleAnimation();
   }
 
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error, this.props.code);
+
+    if (!Utility.authStatus && this.props.securityLevel) {
+        this.setTimeout (
+          () => {
+            this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
+          }, 0
+        )
+    }
+
+    if (!this.props.userId) {
+      AsyncStorage.getItem('userData').then((user_data_string) => {
+        if (user_data_string) {
+          let user_data = JSON.parse(user_data_string);
+          this.props.actions.updateUserId(user_data.uid);
+        } else {
+          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
+        }
+      });
+    }
   }
 
   componentDidMount() {
@@ -120,7 +121,7 @@ class ClaimSecret extends React.Component {
           <TextInput
             style={StylingGlobals.textInput}
             autoFocus={true}
-            onChangeText={(text) => this.props.updateFormInput(text)}
+            onChangeText={(text) => this.props.actions.updateFormInput(text)}
             value={this.props.code} />
           <Text style={styles.paragraph}>Check the text you received for your code</Text>
           <BigButton do={() => this.verifyCode()}>
@@ -145,11 +146,15 @@ const mapStateToProps = (state) => {
     error: state.error,
     code: state.formInput,
     updatedSecrets: state.updatedSecrets,
+    securityLevel: state.securityLevel,
+    userId: state.userId,
   };
 }
 
 const mapDispatchToProps = function(dispatch, ownProps) {
-  return actions;
+  return {
+    actions: actions
+  }
 }
 
 var styles = StyleSheet.create({

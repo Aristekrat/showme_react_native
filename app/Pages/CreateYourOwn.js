@@ -137,7 +137,7 @@ class CreateYourOwn extends React.Component {
               { this.props.error ? <Text style={styles.errorText}>{this.props.error}</Text> : null }
           </View>
           <View style={styles.row}>
-            <Text style={styles.publicExplanatory}>Let other people to use this question?
+            <Text style={styles.publicExplanatory}>Let other people use this question?
             { this.props.public ?
               ' Yes' :
               ' No'

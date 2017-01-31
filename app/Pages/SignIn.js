@@ -64,12 +64,12 @@ class SignIn extends Component {
     this.props.navigator.push({name: 'Register'});
   }
 
-  componentWillMount() {
+  componentDidMount() {
+    Utility.resetState(this.props.animating, this.props.error);
+    console.log(this.props.navigator.state.routeStack);
     if (this.props.route.message) {
       this.props.actions.setError(this.props.route.message);
     }
-
-    Utility.resetState(this.props.animating, this.props.error);
   }
 
   render() {
@@ -206,12 +206,13 @@ var styles = StyleSheet.create({
     width: 250,
   },
   errorContainer: {
-    marginLeft: 15,
+    marginLeft: 30,
     marginRight: 15,
   },
   errorText: {
     flex: 1,
     marginTop: 15,
+    fontSize: 18,
     textAlign: 'center',
   }
 });

@@ -24,6 +24,7 @@ import {
   ScrollView,
   TouchableHighlight,
   AsyncStorage,
+  Switch,
   Modal,
 } from 'react-native';
 
@@ -31,7 +32,8 @@ class MyAccount extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      visible: false,
+      eraseVisible: false,
+      switchVisible: false,
       secretsErased: false,
     }
     this.users = this.props.db.child('users');
@@ -81,8 +83,16 @@ class MyAccount extends React.Component {
     }
   }
 
+  changeSecuritySetting() {
+    this.users.child(this.props.userId).child('securityEnabled').set(!this.props.securityLevel);
+    this.props.actions.setSecurityLevel(!this.props.securityLevel);
+  }
+
   componentWillMount() {
     Utility.checkAllAuth();
+    if (!Utility.authStatus) {
+      this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to Sign In first'});
+    }
 
     if (!this.props.userId) {
       AsyncStorage.getItem('userData').then((user_data_string) => {
@@ -97,9 +107,17 @@ class MyAccount extends React.Component {
   }
 
   componentDidMount() {
-    if (!Utility.authStatus) {
-        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
-    }
+    this.setTimeout (
+      () => {
+        if (this.props.userId) {
+          this.users.child(this.props.userId).child('securityEnabled').once('value', (snapshot) => {
+            this.props.actions.setSecurityLevel(snapshot.val());
+          })
+        } else {
+          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
+        }
+      }, 500
+    )
   }
 
   render(){
@@ -107,6 +125,29 @@ class MyAccount extends React.Component {
       <View style={StylingGlobals.container}>
         <ScrollView>
           <ActivityIndicator animationControl={this.props.animating} />
+
+          <TouchableHighlight
+            style={styles.accountLinkContainer}
+            underlayColor={'transparent'}
+            onPress={() => this.setState({switchVisible: !this.state.switchVisible}) } >
+            <Text style={styles.accountLink}>Set Security Level</Text>
+          </TouchableHighlight>
+
+          {this.state.switchVisible ?
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchText}>Current Setting: {this.props.securityLevel ? "High" : "Low" }</Text>
+              <Switch
+                onValueChange={() => this.changeSecuritySetting() }
+                onTintColor={StylingGlobals.colors.pressDown}
+                value={this.props.securityLevel}>
+              </Switch>
+              <Text style={styles.switchText}>{this.props.securityLevel ?
+                      "You will need to be logged in to access your secrets. This setting is more secure, but less convenient.":
+                      "This setting rarely requires login. It is less secure, but more convenient."}</Text>
+            </View>
+            :
+            null
+          }
 
           <TouchableHighlight
             style={styles.accountLinkContainer}
@@ -119,7 +160,7 @@ class MyAccount extends React.Component {
             style={styles.accountLinkContainer}
             underlayColor={'transparent'}
             onPress={() => {
-              this.setState({visible: true})
+              this.setState({eraseVisible: true})
             }} >
             <Text style={styles.accountLink}>Erase Secrets</Text>
           </TouchableHighlight>
@@ -128,7 +169,7 @@ class MyAccount extends React.Component {
 
           <Modal
             animationType={'slide'}
-            visible={this.state.visible} >
+            visible={this.state.eraseVisible} >
             <View style={styles.modalContainer}>
               <Text style={styles.modalText}>Are you sure you want to erase your secrets?</Text>
               <View style={styles.modalButtonContainer}>
@@ -136,7 +177,7 @@ class MyAccount extends React.Component {
                   underlayColor={StylingGlobals.colors.pressDown}
                   onPress={() => {
                     this.props.actions.toggleAnimation();
-                    this.setState({visible: false});
+                    this.setState({eraseVisible: false});
                     this.eraseSecrets(this.props.userId);
                   }}>
                   <Text style={styles.modalButtonText}>
@@ -147,7 +188,7 @@ class MyAccount extends React.Component {
                 <TouchableHighlight
                     style={styles.modalButton}
                     underlayColor={StylingGlobals.colors.pressDown}
-                    onPress={() => this.setState({visible: false}) }>
+                    onPress={() => this.setState({eraseVisible: false}) }>
                   <Text style={styles.modalButtonText}>
                     No
                   </Text>
@@ -197,6 +238,15 @@ const styles = StyleSheet.create({
     color: StylingGlobals.colors.pressDown,
     fontSize: 17,
   },
+  switchContainer: {
+    marginLeft: 40,
+    marginRight: 20,
+    marginTop: -30,
+  },
+  switchText: {
+    marginTop: 5,
+    marginBottom: 5,
+  },
   modalContainer: {
     alignSelf: 'center',
     marginTop: 150,
@@ -233,6 +283,7 @@ const mapStateToProps = (state) => {
   return {
     animating: state.isAnimating,
     userId: state.userId,
+    securityLevel: state.securityLevel,
   };
 }
 

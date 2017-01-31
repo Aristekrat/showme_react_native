@@ -79,6 +79,7 @@ class SelectCategory extends React.PureComponent {
   }
 
   componentDidMount() {
+
     if (this.props.route.modalText) {
       this.refs.smodal.setModalVisible(true);
     }

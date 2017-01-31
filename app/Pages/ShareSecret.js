@@ -12,6 +12,8 @@ import actions from '../State/Actions/Actions';
 import { connect } from 'react-redux';
 import Utility from '../Globals/UtilityFunctions.js';
 import Contacts from 'react-native-contacts';
+import ReactMixin from 'react-mixin';
+import ReactTimer from 'react-timer-mixin';
 
 import {
   StyleSheet,
@@ -67,6 +69,10 @@ class ShareSecret extends React.Component {
     InteractionManager.runAfterInteractions(() => {
       this.setState({isReady: true});
     });
+
+    if (!Utility.authStatus && this.props.securityLevel) {
+      this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
+    }
   }
 
   render() {
@@ -125,6 +131,8 @@ class ShareSecret extends React.Component {
   }
 };
 
+ReactMixin(ShareSecret.prototype, ReactTimer);
+
 var styles = StyleSheet.create({
   prompt: {
     width: 300,
@@ -169,6 +177,7 @@ const mapStateToProps = (state) => {
     secretKey: state.secretKey,
     firstName: state.firstName,
     userId: state.userId,
+    securityLevel: state.securityLevel,
   };
 }
 

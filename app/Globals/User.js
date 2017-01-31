@@ -30,13 +30,12 @@ User.prototype.postLoginProcessing = function(uid) {
     let userRecord = snapshot.val();
     userRecord.uid = uid;
     AsyncStorage.setItem('userData', JSON.stringify(userRecord));
-
   });
   AsyncStorage.removeItem('secrets');
   AsyncStorage.removeItem('updatedSecrets');
   Utility.setLocalAuth(true);
   GetSecrets.getRemoteSecrets(uid);
-}
+};
 
 User.prototype.login = function (username, password, registrationFlag = false, referred = false) {
     let email = username.trim();
@@ -64,8 +63,6 @@ User.prototype.login = function (username, password, registrationFlag = false, r
       }
     })
 }
-
-
 
 User.prototype.forgotPassword = function (username) {
   this.db.resetPassword({
@@ -104,6 +101,6 @@ User.prototype.errorHandler = function (error) {
       actions.setError('We encountered an error, probably due to a bad connection. Either retry or skip for now.');
       break;
   }
-}
+};
 
 export default User;

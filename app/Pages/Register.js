@@ -42,10 +42,10 @@ class Register extends Component {
       if (error) {
         this.userFunctions.errorHandler(error);
       } else {
-        let t = Utility.escapeEmail(email)
+        let filteredEmail = Utility.escapeEmail(email)
         let defaultName = email.split("@")[0];
-        this.users.child(userData.uid).set({email: email, secrets: {}, profileName: defaultName });
-        this.usersIndex.child(t).set(true);
+        this.users.child(userData.uid).set({email: email, secrets: {}, securityEnabled: false, profileName: defaultName });
+        this.usersIndex.child(filteredEmail).set(true);
         this.props.actions.toggleAnimation();
         this.userFunctions.login(email, this.props.password, true);
         //AsyncStorage.removeItem('secrets');

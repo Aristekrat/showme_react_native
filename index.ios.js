@@ -11,15 +11,15 @@ import MyAccount from './app/Pages/MyAccount.js';
 import CreateYourOwn from './app/Pages/CreateYourOwn.js';
 import SignIn from './app/Pages/SignIn.js';
 import Register from './app/Pages/Register.js';
-import StylingGlobals from './app/Globals/StylingGlobals.js';
 import Gateway from './app/Pages/Gateway.js';
 import ClaimSecret from './app/Pages/ClaimSecret.js';
 import RegistrationInterim from './app/Pages/RegistrationInterim.js';
 import PrivacyPolicy from './app/Pages/PrivacyPolicy.js';
 import ChangeUserName from './app/Pages/ChangeUserName.js';
+import Title from './app/Components/Title.js';
 import Utility from './app/Globals/UtilityFunctions.js';
 import GetSecrets from './app/Globals/GetSecrets.js';
-import Title from './app/Components/Title.js';
+import StylingGlobals from './app/Globals/StylingGlobals.js';
 import {
   AppRegistry,
   StyleSheet,
@@ -49,7 +49,7 @@ class ShowMe extends React.Component {
     this.state = {
       remoteSecrets: [],
       localSecrets: [],
-    };
+    }
   }
 
   // Processes data and sets up event listeners after all data is received from the remote
@@ -58,25 +58,6 @@ class ShowMe extends React.Component {
     //GetSecrets.listenForUpdatesToSecrets();
     GetSecrets.writeRemoteSecretsToAsyncStore();
   }
-
-  // Compares the local and remote secrets and then sets the notification count & updated secrets hash on detecting differences
-  /*
-  compareLocalAndRemoteSecrets() {
-    let count = (this.state.remoteSecrets.length - this.state.localSecrets.length) + Number(store.getState().notifications);
-    let arrLength = this.state.localSecrets.length - 1;
-
-    this.state.localSecrets.forEach((item, index) => { // Checks for differences between remote and local secrets
-      if (JSON.stringify(this.state.remoteSecrets[index]) !== JSON.stringify(this.state.localSecrets[index])) {
-        count = count + 1;
-        actions.pushUpdatedSecret(this.state.remoteSecrets[index].key);
-      }
-      if (arrLength === index) { // the for loop is at an end
-        actions.incrementNotifications(count);
-        GetSecrets.addUpdatedSecretsToAsyncStorage(store.getState().updatedSecrets);
-      }
-    });
-  }
-  */
 
   // This function listens for any firebase auth, saves the auth data, and transitions anon auths to signed in auths when appropriate
   anonAuthHandler() {
@@ -137,6 +118,7 @@ class ShowMe extends React.Component {
 
   componentDidMount() {
     GetSecrets.checkIfRemoteSecretsReceived(this.allRemoteSecretsRetrieved);
+    Utility.getSecSetting();
   }
 
   renderScene (route, navigator) {
@@ -225,7 +207,7 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "SelectCategory"}}
+        initialRoute={{name: "MySecrets"}}
         />
       </Provider>
     );

@@ -58,6 +58,21 @@ class MySecrets extends React.Component {
     };
   }
 
+  reconcileUpdatedSecrets(secretsList, updatedSecrets) { // secretsList = arr of objs; updatedSecrets = hash obj, key: bool
+    console.log(secretsList, updatedSecrets);
+    let secretsListHash = {}
+    for (var i = 0; i < secretsList.length; i++) {
+      secretsListHash[secretsList[i].key] = true;
+    }
+
+    for (var key in updatedSecrets) {
+      if (!secretsListHash[key]) {
+        this.removeNotification(key);
+      }
+    }
+
+  }
+
   displaySecrets (item) {
     return item.state.sentState === this.props.displaying;
   }
@@ -65,12 +80,16 @@ class MySecrets extends React.Component {
   // The main implementation function to actually wire secrets in the view
   listSecrets (arrayOfSecrets = this.mySecrets) {
     return arrayOfSecrets.map((item, index) => {
+        let otherAnswer;
+        if (item.answer) {
+          otherAnswer = item.askerID === this.props.userId ? item.answer.responderAnswer : item.answer.askerAnswer;
+        }
         return (
           <Secret
             author={item.askerName ? item.askerName : "Anonymous"}
             question={item.question}
             key={item.key}
-            answer={item.answer ? 'A: ' + item.answer.responderAnswer : null}
+            answer={item.answer ? 'A: ' + otherAnswer : null}
             answerNotification={item.answerNotification ? "They've answered! To see it, write your own answer now." : null}
             updateSecret={() =>  this.setUpdateSecretFunc(this.props.displaying, item)}
             updated={this.props.updatedSecrets[item.key]}
@@ -129,9 +148,13 @@ class MySecrets extends React.Component {
   }
 
   componentDidMount() {
-    /*if (!Utility.authStatus) {
-        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
-    }*/
+    if (!Utility.authStatus && this.props.securityLevel) {
+        this.setTimeout (
+          () => {
+            this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
+          }, 0
+        )
+    }
 
     InteractionManager.runAfterInteractions(() => {
       this.setState({isReady: true});
@@ -148,15 +171,25 @@ class MySecrets extends React.Component {
       1000
     )
 
+    this.setTimeout (
+      () => {
+        this.reconcileUpdatedSecrets(this.mySecrets, this.props.updatedSecrets);
+      },
+      100
+    )
+
     if (!this.props.userId) {
       AsyncStorage.getItem('userData').then((user_data_string) => {
         if (user_data_string) {
           let user_data = JSON.parse(user_data_string);
           this.props.actions.updateUserId(user_data.uid);
+          Utility.getSecSetting(user_data.uid);
         } else {
           this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
         }
       });
+    } else {
+      Utility.getSecSetting(this.props.userId);
     }
   }
 
@@ -265,6 +298,7 @@ const mapStateToProps = (state) => {
     userId: state.userId,
     displaying: state.mySecretsType,
     updatedSecrets: state.updatedSecrets,
+    securityLevel: state.securityLevel,
   };
 }
 
