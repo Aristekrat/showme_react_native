@@ -7,6 +7,7 @@ import TabBar from '../Components/TabBar.js';
 import Secret from '../Components/MySecret.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import ArrowLink from '../Components/ArrowLink.js';
+import SModal from '../Components/SModal.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 import actions from '../State/Actions/Actions';
@@ -34,7 +35,7 @@ class MySecrets extends React.Component {
 
   // Determines the correct route for a secret to link to in listSecrets
   setUpdateSecretFunc(currentState, item) {
-    this.removeNotification(item.key);
+    GetSecrets.removeNotification(item.key);
     if (currentState === 'CR') {
       return this.props.navigator.push({ name: 'ShareSecret', cookieData: item, contacts: this.contacts });
     } else if (currentState === 'QS' || currentState === 'RR') {
@@ -42,35 +43,6 @@ class MySecrets extends React.Component {
     } else if (currentState === 'SO') {
       return null;
     }
-  }
-
-  // Clears both updated secrets and decrements the notifications num
-  // Need to move this in the future
-  removeNotification(key) {
-    if (this.props.updatedSecrets && this.props.updatedSecrets[key]) { // problematic for moving
-      this.props.actions.removeUpdatedSecret(key);
-      this.props.actions.decrementNotifications(1);
-      AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
-        let updatedSecrets = JSON.parse(updated_secrets_string);
-        delete updatedSecrets[key];
-        AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
-      });
-    };
-  }
-
-  reconcileUpdatedSecrets(secretsList, updatedSecrets) { // secretsList = arr of objs; updatedSecrets = hash obj, key: bool
-    console.log(secretsList, updatedSecrets);
-    let secretsListHash = {}
-    for (var i = 0; i < secretsList.length; i++) {
-      secretsListHash[secretsList[i].key] = true;
-    }
-
-    for (var key in updatedSecrets) {
-      if (!secretsListHash[key]) {
-        this.removeNotification(key);
-      }
-    }
-
   }
 
   displaySecrets (item) {
@@ -138,16 +110,26 @@ class MySecrets extends React.Component {
         }
         this.initialDisplay(allSecrets);
         this.mySecrets = allSecrets;
+        if (this.props.updatedSecrets) {
+          GetSecrets.reconcileUpdatedSecrets(this.mySecrets, this.props.updatedSecrets);
+        }
       } else if (!this.props.route.secret && !secrets_data_string) {
         this.props.actions.setMSDisplayType('NR');
       } else if (this.props.route.secret) {
         this.mySecrets.push(this.props.route.secret);
         this.initialDisplay(this.mySecrets);
+        if (this.props.updatedSecrets) {
+          GetSecrets.reconcileUpdatedSecrets(this.mySecrets, this.props.updatedSecrets);
+        }
       }
     });
   }
 
   componentDidMount() {
+    if (this.props.route.modalText) {
+      this.refs.smodal.setModalVisible(true);
+    }
+
     if (!Utility.authStatus && this.props.securityLevel) {
         this.setTimeout (
           () => {
@@ -169,13 +151,6 @@ class MySecrets extends React.Component {
         });
       },
       1000
-    )
-
-    this.setTimeout (
-      () => {
-        this.reconcileUpdatedSecrets(this.mySecrets, this.props.updatedSecrets);
-      },
-      100
     )
 
     if (!this.props.userId) {
@@ -251,6 +226,7 @@ class MySecrets extends React.Component {
             {!this.state.isReady ? <ActivityIndicator animationControl={true}/> : secretsList}
           </View>
         </ScrollView>
+        <SModal modalTitle={this.props.route.modalTitle} modalText={this.props.route.modalText} secondaryText={this.props.route.modalSecondaryText} ref="smodal" />
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
     );

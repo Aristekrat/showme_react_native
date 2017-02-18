@@ -29,6 +29,7 @@ class YourAnswer extends React.Component {
   }
 
   responderOrAsker(localID, secret) {
+    console.log(localID, secret);
     if (localID === secret.askerID) {
       return "askerAnswer";
     } else if (localID === secret.responderID) {
@@ -40,6 +41,7 @@ class YourAnswer extends React.Component {
   }
 
   notify(notificationText) {
+    console.log("NOTIFY");
     this.props.actions.toggleAnimation();
     this.props.actions.setError(notificationText); // Not actually an error here, a success notification instead
   }
@@ -66,6 +68,8 @@ class YourAnswer extends React.Component {
   }
 
   updateUsersTable(userStatus, userId) {
+    console.log("UPDATEUSERSTABLE");
+    console.log(this.currentSecret, userStatus, userId);
     this.answers.child(this.currentSecret.key).once('value', (snapshot) => {
       var ans = snapshot.val();
       if (ans.askerAnswer && ans.responderAnswer) {
@@ -88,17 +92,16 @@ class YourAnswer extends React.Component {
     }
     this.notify("Success! We'll notify you when you both answer");
     this.setTimeout (
-      () => { this.props.navigator.pop(); },
-      2000
+      () => {
+        console.log("SHOULD ALWAYS HIT HERE");
+        this.props.navigator.pop();
+      },
+      1500
     );
   }
 
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error, this.props.answer);
-
-    if(this.props.answer !== "") {
-      this.props.actions.updateFormInput("");
-    }
 
     if (!this.props.route.cookieData || !this.props.route.cookieData.question) {
       this.props.navigator.pop();
@@ -106,6 +109,7 @@ class YourAnswer extends React.Component {
   }
 
   render() {
+    console.log(this.currentSecret, this.props.answer);
     return (
       <View style={StylingGlobals.container}>
         <ScrollView style={styles.form}>

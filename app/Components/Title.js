@@ -32,6 +32,7 @@ const TitleBar = {
         case 'ClaimSecret':
         case 'PrivacyPolicy':
         case 'ChangeUserName':
+        case 'BetaExplanation':
           return (
             <TouchableHighlight
               onPress={() => navigator.pop()}
@@ -78,11 +79,11 @@ const TitleBar = {
         );
       case 'SelectCategory':
         return (
-          <Text style={styles.navBarTitleText}>Select Secret Type</Text>
+          <Text style={styles.navBarTitleText}>Secret Types</Text>
         );
       case 'SelectSecret':
         return (
-          <Text style={styles.navBarTitleText}>Select Secret</Text>
+          <Text style={styles.navBarTitleText}>Select {route.category} Secret</Text>
         );
       case 'ShareSecret':
         return (
@@ -95,6 +96,14 @@ const TitleBar = {
       case 'SecretCode':
         return (
           <Text style={styles.navBarTitleText}>Create Secret Code</Text>
+        );
+      case 'BetaLock':
+        return (
+          <Text style={styles.navBarTitleText}>Welcome</Text>
+        );
+      case 'BetaExplanation':
+        return (
+          <Text style={styles.navBarTitleText}>Request an Invitation</Text>
         );
       case 'PrivacyPolicy':
         return (

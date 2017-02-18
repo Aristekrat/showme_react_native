@@ -9,6 +9,8 @@ import MySecrets from './app/Pages/MySecrets.js';
 import YourAnswer from './app/Pages/YourAnswer.js';
 import MyAccount from './app/Pages/MyAccount.js';
 import CreateYourOwn from './app/Pages/CreateYourOwn.js';
+import BetaLock from './app/Pages/BetaLock.js';
+import BetaExplanation from './app/Pages/BetaExplanation.js';
 import SignIn from './app/Pages/SignIn.js';
 import Register from './app/Pages/Register.js';
 import Gateway from './app/Pages/Gateway.js';
@@ -55,34 +57,32 @@ class ShowMe extends React.Component {
   // Processes data and sets up event listeners after all data is received from the remote
   allRemoteSecretsRetrieved() {
     GetSecrets.compareLocalAndRemoteSecrets();
-    //GetSecrets.listenForUpdatesToSecrets();
     GetSecrets.writeRemoteSecretsToAsyncStore();
+    let uid = store.getState().userId;
+    if (uid) {
+      GetSecrets.listenForUpdatesToSecrets(uid);
+    }
   }
 
   // This function listens for any firebase auth, saves the auth data, and transitions anon auths to signed in auths when appropriate
   anonAuthHandler() {
     this.DB.onAuth((authData) => {
       if (authData) {
-        if (authData.provider === 'anonymous') {
-          AsyncStorage.setItem('userData', JSON.stringify(authData));
-        } else {
-          AsyncStorage.getItem('userData').then((user_data_string) => {
-            if (user_data_string) {
-              let user_data = JSON.parse(user_data_string);
-              if (user_data.provider === 'anonymous') {
-                var anonRef = this.DB.child('users').child(user_data.uid);
-                anonRef.once('value', (anonSnapshot) => {
-                  let anonData = anonSnapshot.val();
-                  if (anonData && anonData.secrets) {
-                    this.DB.child('users').child(authData.uid).child('secrets').update(anonData.secrets);
-                  }
-                  anonRef.remove();
-                });
-              }
-            } else { // First time login, non-anon option chosen
-              AsyncStorage.setItem('userData', JSON.stringify(authData));
+        if (authData.provider !== 'anonymous') {
+          AsyncStorage.getItem("anonFlag").then((anonFlag) => {
+            if (anonFlag) {
+              let oldUID = JSON.parse(anonFlag);
+              let anonRef = this.DB.child('users').child(oldUID);
+              anonRef.once('value', (anonSnapshot) => {
+                let anonData = anonSnapshot.val();
+                if (anonData && anonData.secrets) {
+                  this.DB.child('users').child(authData.uid).child('secrets').update(anonData.secrets);
+                }
+                anonRef.remove();
+                AsyncStorage.removeItem('anonFlag');
+              });
             }
-          });
+          })
         }
       }
     })
@@ -100,6 +100,10 @@ class ShowMe extends React.Component {
         let user_data = JSON.parse(user_data_string);
         actions.updateUserId(user_data.uid);
         Utility.getVerificationStatus(user_data.uid);
+        if (user_data.provider) {
+          Utility.setProvider(user_data.provider);
+        }
+        Utility.getSecSetting(user_data.uid);
       }
     });
 
@@ -118,7 +122,6 @@ class ShowMe extends React.Component {
 
   componentDidMount() {
     GetSecrets.checkIfRemoteSecretsReceived(this.allRemoteSecretsRetrieved);
-    Utility.getSecSetting();
   }
 
   renderScene (route, navigator) {
@@ -175,6 +178,14 @@ class ShowMe extends React.Component {
         return (
           <ChangeUserName navigator={navigator} route={route} db={this.db} store={store} />
         );
+      case 'BetaLock':
+        return (
+          <BetaLock navigator={navigator} route={route} db={this.db} store={store} />
+        );
+      case 'BetaExplanation':
+        return (
+          <BetaExplanation navigator={navigator} route={route} db={this.db} store={store} />
+        );
       case 'SignIn':
         return (
           <SignIn navigator={navigator} route={route} db={this.db} />
@@ -207,7 +218,7 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "MySecrets"}}
+        initialRoute={{name: "SelectCategory"}}
         />
       </Provider>
     );

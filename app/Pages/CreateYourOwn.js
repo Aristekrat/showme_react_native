@@ -127,7 +127,7 @@ class CreateYourOwn extends React.Component {
       <View style={StylingGlobals.container}>
         <ScrollView style={styles.form}>
           <View style={styles.row}>
-            <Text style={styles.label}>Secret Question</Text>
+            <Text style={styles.label}>Create New Secret</Text>
             <TextInput
                 style={styles.textInput}
                 autoFocus={true}
@@ -151,8 +151,9 @@ class CreateYourOwn extends React.Component {
           </View>
           { this.props.public ? // category picker for public secrets or nothing
             <View>
-              <Text style={styles.label}>Category you would like to submit this secret to...</Text>
+              <Text style={styles.label}>Which category?</Text>
               <CategoryPicker ref="catPicker" />
+              <Text style={[styles.publicExplanatory, {marginBottom: 15}]}>No one will know you wrote this secret</Text>
             </View>
             :
             null
@@ -210,7 +211,8 @@ var styles = StyleSheet.create({
     padding: 5,
   },
   label: {
-    marginBottom: 3
+    marginBottom: 3,
+    fontSize: 16,
   },
   publicExplanatory: {
     fontSize: 12,

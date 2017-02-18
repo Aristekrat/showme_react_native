@@ -18,23 +18,26 @@ User.prototype.anonAuth = function () {
     if (err || !authData) {
       actions.setError("Sorry, there was a problem. Are you connected to the internet?");
     } else {
-      this.usersTable.child(authData.uid).set({email: ""});
-      this.navigator.push({name: 'RegistrationInterim'});
+      this.usersTable.child(authData.uid).set({email: "", secrets: {}, securityEnabled: false, profileName: "Anonymous" });
+      AsyncStorage.setItem('anonFlag', JSON.stringify(authData.uid));
+      this.postLoginProcessing(authData.uid, authData.provider);
     }
   })
 };
 
-User.prototype.postLoginProcessing = function(uid) {
-  actions.updateUserId(uid);
+User.prototype.postLoginProcessing = function(uid, provider = "anonymous") {
   this.db.child('users').child(uid).once('value', (snapshot) => {
     let userRecord = snapshot.val();
     userRecord.uid = uid;
+    userRecord.provider = provider;
     AsyncStorage.setItem('userData', JSON.stringify(userRecord));
+    actions.updateUserId(uid);
   });
   AsyncStorage.removeItem('secrets');
   AsyncStorage.removeItem('updatedSecrets');
   Utility.setLocalAuth(true);
   GetSecrets.getRemoteSecrets(uid);
+  GetSecrets.listenForUpdatesToSecrets(uid);
 };
 
 User.prototype.login = function (username, password, registrationFlag = false, referred = false) {
@@ -50,12 +53,12 @@ User.prototype.login = function (username, password, registrationFlag = false, r
         this.errorHandler(error);
       } else {
         actions.toggleAnimation();
-        this.postLoginProcessing(userData.uid);
+        this.postLoginProcessing(userData.uid, userData.provider);
         if (referred) {
           Utility.resetState(true, true, true);
           this.navigator.pop();
         } else if (registrationFlag) {
-          this.navigator.push({name: 'RegistrationInterim'});
+          this.navigator.push({name: 'RegistrationInterim'}); // Needs to be commented out
         } else {
           Utility.resetState(true, true);
           this.navigator.push({name: 'SelectCategory', refresh: true});

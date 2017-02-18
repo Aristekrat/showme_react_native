@@ -37,7 +37,7 @@ class SecretCode extends React.Component {
   }
 
   checkLength(text) {
-    if (text.length <= 10) {
+    if (text.length <= 9) {
       this.props.actions.setError("Secret codes must be longer than nine characters");
     } else {
       if (this.props.error) {
@@ -50,7 +50,7 @@ class SecretCode extends React.Component {
     let psKey = this.props.route.key;
     //let ph = this.props.route.receiverPH;
     //let filteredPH = ph.replace(/[^0-9 ]/g, "").split(' ').join('');
-    if (this.props.code && this.props.code.length >= 10) {
+    if (this.props.code && this.props.code.length >= 9) {
       this.props.actions.setAnimation(true);
       this.verificationIndex.child(psKey).set(this.props.code);
       SendSecret.router(this.props.code);

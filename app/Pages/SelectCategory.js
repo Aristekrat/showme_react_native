@@ -45,7 +45,6 @@ class SelectCategory extends React.PureComponent {
   }
 
   selectCategory (categoryName) {
-    //Utility.checkConnection();
     this.props.navigator.push({
       name: 'SelectSecret',
       category: categoryName,
@@ -53,25 +52,8 @@ class SelectCategory extends React.PureComponent {
     });
   }
 
-  sawIntro() {
-    AsyncStorage.setItem('selectCategoryIntro', 'true');
-  }
-
   componentWillMount() {
-    AsyncStorage.removeItem('selectCategoryIntro');
-
     Utility.resetState(this.props.animating, this.props.error);
-
-    if (this.props.route.modalText) {
-      this.props.actions.setModalText(this.props.route.modalText);
-    } else {
-      AsyncStorage.getItem('selectCategoryIntro').then((hasBeenIntroducedString) => {
-        if (!hasBeenIntroducedString) {
-          this.props.actions.intro(false);
-          this.props.actions.setModalText('Use this menu to create a new secret or select a premade secret')
-        }
-      });
-    }
 
     if (this.props.route.refresh) {
       GetSecrets.checkIfRemoteSecretsReceived(GetSecrets.writeRemoteSecretsToAsyncStore);
@@ -79,7 +61,6 @@ class SelectCategory extends React.PureComponent {
   }
 
   componentDidMount() {
-
     if (this.props.route.modalText) {
       this.refs.smodal.setModalVisible(true);
     }
@@ -136,19 +117,12 @@ class SelectCategory extends React.PureComponent {
             imgSource={require("../img/caticon-past.png")} // music-player17
             elsewhere={() =>  this.selectCategory(this.categories[6].title) } />
         </ScrollView>
-        <SModal modalText={this.props.modalText} ref="smodal" />
+        <SModal modalTitle={this.props.route.modalTitle} modalText={this.props.route.modalText} secondaryText={this.props.route.modalSecondaryText} ref="smodal" />
         <TabBar
           navigator={this.props.navigator}
           route={this.props.route}
           db={this.props.db}
-          introBadge={this.props.hasBeenIntroduced ? 0 : 1 }
           ref="tabbar"
-          introPopup={this.props.hasBeenIntroduced ? null : () => {
-              this.refs.smodal.setModalVisible(true);
-              this.props.actions.intro(true);
-              this.sawIntro();
-            }
-          }
         />
       </View>
     );

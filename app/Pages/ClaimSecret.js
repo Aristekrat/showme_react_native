@@ -72,8 +72,8 @@ class ClaimSecret extends React.Component {
             this.props.navigator.push({name: 'MySecrets', secret: ps});
             this.users.child(this.props.userId).child('secrets').child(codeKey).set({answerState: grandchildSnapshot.val().answerState, sentState: 'RR'});
           });
-          //this.verificationCodes.child(codeKey).remove();
-          //this.verifiedIndex.child(this.props.userId).set(true);
+          this.verificationCodes.child(codeKey).remove();
+          this.verifiedIndex.child(this.props.userId).set(true);
         })
       }
     )

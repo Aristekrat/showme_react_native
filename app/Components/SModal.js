@@ -32,8 +32,9 @@ class SModal extends React.Component {
           style={styles.modalContainer}
           underlayColor={StylingGlobals.colors.pressDown} >
           <View>
-            <Text></Text>
+            {this.props.modalTitle ? <Text style={styles.modalTitle}>{this.props.modalTitle}</Text> : <Text></Text>}
             <Text style={styles.modalText}>{this.props.modalText}</Text>
+            {this.props.secondaryText ? <Text style={styles.modalText}>{this.props.secondaryText}</Text> : <Text></Text> }
             <Text style={styles.tapToClose}>Tap to close</Text>
           </View>
         </TouchableHighlight>
@@ -57,7 +58,14 @@ const styles = StyleSheet.create({
   },
   modalText: {
     color: '#fff',
-    marginBottom: 30,
+    marginBottom: 15,
+  },
+  modalTitle: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 10,
   },
   tapToClose: {
     fontSize: 10,

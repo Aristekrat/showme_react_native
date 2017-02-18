@@ -43,6 +43,26 @@ class TabBar extends React.Component {
     }
   }
 
+  tabFiveRoute() {
+    if (Utility.authStatus && Utility.provider === "anonymous") {
+      return "Register";
+    } else if (Utility.authStatus && Utility.provider !== "anonymous") {
+      return "MyAccount";
+    } else {
+      return "SignIn"
+    }
+  }
+
+  tabFiveName() {
+    if (Utility.authStatus && Utility.provider === "anonymous") {
+      return "Register";
+    } else if (Utility.authStatus && Utility.provider !== "anonymous") {
+      return "My Account";
+    } else {
+      return "Sign In"
+    }
+  }
+
   setTab(tabId, navigate) {
     if (tabId === "tabOne" && this.props.route.name !== 'MySecrets') {
       this.props.navigator.push({
@@ -62,13 +82,14 @@ class TabBar extends React.Component {
       })
     } else if (tabId === "tabFive") {
       this.props.navigator.push({
-        name: Utility.authStatus ? 'MyAccount' : 'SignIn'
+        name: this.tabFiveRoute()
       })
     }
   }
 
   componentWillMount() {
     this.setActiveTab();
+    this.foo = "Bar"
   }
 
   render() {
@@ -118,7 +139,7 @@ class TabBar extends React.Component {
             <TabBarIOS.Item
               selected={this.state.selectedTab === 'tabFive'}
               onPress={() => this.setTab('tabFive')}
-              title={Utility.authStatus ? "My Account" : "Sign In" }
+              title={this.tabFiveName()}
               icon={require('../img/tabicon-signin.png')} // business64
               style={styles.tabItem}>
                 <View></View>

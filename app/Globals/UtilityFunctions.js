@@ -17,6 +17,7 @@ var Utility = {
 	dbURL: FirebaseURL,
 	authStatus: false,
 	verified: false,
+  provider: 'anonymous',
 	ref: new Firebase(FirebaseURL),
 
 	getRef: function () {
@@ -58,15 +59,24 @@ var Utility = {
     this.authStatus = setTo;
   },
 
+  setProvider: function (provider) {
+    this.provider = provider;
+  },
+
 	getVerificationStatus: function(uid) {
 		this.ref.child('indexes').child('verified').child(uid).once('value', (snapshot)=> {
 			this.verified = snapshot.val();
 		});
 	},
 
-	escapeEmail(email) {
+	escapeEmail: function(email) {
 		return (email || '').replace('.', ',');
 	},
+
+  validateEmail: function(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  },
 
 	logout: function() {
     AccessToken.getCurrentAccessToken().then((fbToken) => {
@@ -81,7 +91,7 @@ var Utility = {
     });
 	},
 
-  resetState(animating = false, errorMessage = "", formInput = "") {
+  resetState: function(animating = false, errorMessage = "", formInput = "") {
     if (animating !== false) {
       actions.setAnimation(false);
     }

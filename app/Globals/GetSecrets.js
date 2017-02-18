@@ -121,7 +121,7 @@ const GetSecrets = {
   pushLocalSecret: function (newSecret) {
     AsyncStorage.getItem('secrets').then((secrets_data_string) => {
       let secretCopy = Object.assign({}, newSecret);
-      secretCopy.askerName = this._setAskerName(newSecret.askerId, newSecret.askerName, this.uid);
+      secretCopy.askerName = this._setAskerName(newSecret.askerID, newSecret.askerName, this.uid);
       secretCopy.answerNotification = this._setAnswerNotification(newSecret.state);
       if (secrets_data_string) {
         let secrets_data = JSON.parse(secrets_data_string);
@@ -164,40 +164,84 @@ const GetSecrets = {
     });
   },
 
-  listenForUpdatesToSecrets: function() { // All notification
-    AsyncStorage.getItem('userData').then((user_data_json) => {
-      if (user_data_json) {
-        let user_data = JSON.parse(user_data_json);
-        this.DB.child('users').child(user_data.uid).child('secrets').on('child_changed', (childSnapshot) => {
-          let key = childSnapshot.key();
-          let newUpdate = {}
-          newUpdate[key] = true;
-          actions.incrementNotifications(1); // TODO Try and filter out user initiated changes
-          actions.pushUpdatedSecret(key);
-          this.addUpdatedSecretsToAsyncStorage(newUpdate);
-        })
-      }
+  listenForUpdatesToSecrets: function(uid) {
+    this.DB.child('users').child(uid).child('secrets').on('child_changed', (childSnapshot) => {
+      let key = childSnapshot.key();
+      let stateUpdate = childSnapshot.val();
+      this.notificationHandler(stateUpdate, key);
+      this.secretsHandler(uid);
     });
+  },
+
+  notificationHandler: function(stateUpdate, key) {
+    let userAnsweredOne = (stateUpdate.answerState === "AA" || stateUpdate.answerState === "NA") && stateUpdate.sentState === "QS"
+    let userAnsweredTwo = stateUpdate.sentState === "RR" && (stateUpdate.answerState === "RA" || stateUpdate.answerState === "NA");
+    if (!userAnsweredOne && !userAnsweredTwo) { //suppresses updates to a user when they're the ones to update a secret
+      let newUpdate = {}
+      newUpdate[key] = true;
+      actions.incrementNotifications(1);
+      actions.pushUpdatedSecret(key);
+      this.addUpdatedSecretsToAsyncStorage(newUpdate);
+    }
+  },
+
+  // Could do it's job more efficiently, should be fine for now
+  secretsHandler: function(uid) {
+    this.getRemoteSecrets(uid);
+    this.checkIfRemoteSecretsReceived(this.writeRemoteSecretsToAsyncStore);
   },
 
   // Manages updated secrets and notifications
   compareLocalAndRemoteSecrets: function() {
     let count = 0;
     let arrLength = this.localSecrets.length - 1;
-    this.localSecrets.forEach((item, index) => { // Checks for differences between remote and local secrets
-      if (JSON.stringify(this.remoteSecrets[index].state) !== JSON.stringify(this.localSecrets[index].state)) {
-        count = count + 1;
-        actions.pushUpdatedSecret(this.remoteSecrets[index].key);
-      }
-      if (arrLength === index) { // the for loop is at an end
-        actions.incrementNotifications(count);
-        this.addUpdatedSecretsToAsyncStorage(store.getState().updatedSecrets);
-        this.listenForUpdatesToSecrets();
-      }
-    });
+    if (this.localSecrets.length !== this.remoteSecrets.length) {
+      this.writeRemoteSecretsToAsyncStore(this.remoteSecrets);
+    } else {
+      this.localSecrets.forEach((item, index) => {
+        if (JSON.stringify(this.remoteSecrets[index].state) !== JSON.stringify(this.localSecrets[index].state)) { // Checks for differences between remote and local secrets
+          count = count + 1;
+          actions.pushUpdatedSecret(this.remoteSecrets[index].key);
+        }
+        if (arrLength === index) { // the for loop is at an end
+          actions.incrementNotifications(count);
+          this.addUpdatedSecretsToAsyncStorage(store.getState().updatedSecrets);
+          //this.listenForUpdatesToSecrets();
+        }
+      });
+    }
   },
 
-  checkIfRemoteSecretsReceived: function(successCB) { // Add optional arg and move to GetSecrets? Doubt I can use a mixin there
+  // Clears an updated secret from AsyncStorage and the state tree and decrements the notifications num
+  removeNotification: function(key) {
+    let updatedSecrets = store.getState().updatedSecrets;
+    if (updatedSecrets && updatedSecrets[key]) {
+      actions.removeUpdatedSecret(key);
+      actions.decrementNotifications(1);
+      AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
+        if (updated_secrets_string) {
+          let updatedSecrets = JSON.parse(updated_secrets_string);
+          delete updatedSecrets[key];
+          AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
+        }
+      });
+    };
+  },
+
+  reconcileUpdatedSecrets: function(secretsList, updatedSecrets) { // secretsList = arr of objs; updatedSecrets = hash obj, key: bool
+    let secretsListHash = {}
+    for (var i = 0; i < secretsList.length; i++) {
+      secretsListHash[secretsList[i].key] = true;
+    }
+
+    for (var key in updatedSecrets) {
+      if (!secretsListHash[key]) {
+        this.removeNotification(key);
+      }
+    }
+  },
+
+  checkIfRemoteSecretsReceived: function(successCB) {
     ReactTimer.setTimeout (
       () => {
         if (GetSecrets.remoteSecrets.length === GetSecrets.totalResults) {

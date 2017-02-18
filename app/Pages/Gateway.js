@@ -29,21 +29,12 @@ class Gateway extends React.Component {
     this.userFunctions = new User(this.props.db, this.users, this.props.navigator);
   }
 
-  validateEmail(email) {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-  }
-
-  escapeEmail(email) {
-    return (email || '').replace('.', ',');
-  }
-
   checkEmail() {
     // Utility.checkConnection();
     this.props.actions.toggleAnimation();
-    if (this.validateEmail(this.props.emailAddress)) {
+    if (Utility.validateEmail(this.props.emailAddress)) {
       this.userIndex.once('value', (snapshot) => {
-        if (snapshot.hasChild(this.escapeEmail(this.props.emailAddress))) {
+        if (snapshot.hasChild(Utility.escapeEmail(this.props.emailAddress))) {
           this.props.navigator.push({name: 'SignIn', cookieData: this.props.emailAddress}); // Go to login
         } else {
           this.props.navigator.push({name: 'Register', cookieData: this.props.emailAddress}); // Go to registration
@@ -61,7 +52,7 @@ class Gateway extends React.Component {
     var email = Utility.escapeEmail(authData.auth.token.email); // These four lines are different in Gateway & SignIn
     props.db.child('indexes').child('userIndex').child(email).set(true);
     props.db.child('users').child(authData.uid).update({email: email});
-    props.navigator.push({name: 'RegistrationInterim'});
+    props.navigator.push({name: 'SelectCategory'});
   }
 
   componentWillMount() {
@@ -106,7 +97,7 @@ class Gateway extends React.Component {
 
           <FButton successCB={this.fbSuccessCB} db={this.props.db} navigator={this.props.navigator} />
 
-          <ArrowLink skipTo={() => this.userFunctions.anonAuth() }>Skip for Now</ArrowLink>
+          <ArrowLink skipTo={() => { this.userFunctions.anonAuth(); this.props.navigator.push({name: 'RegistrationInterim'}) } }>Skip for Now</ArrowLink>
         </ScrollView>
       </View>
     );

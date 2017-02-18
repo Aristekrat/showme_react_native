@@ -66,7 +66,6 @@ class SignIn extends Component {
 
   componentDidMount() {
     Utility.resetState(this.props.animating, this.props.error);
-    console.log(this.props.navigator.state.routeStack);
     if (this.props.route.message) {
       this.props.actions.setError(this.props.route.message);
     }
