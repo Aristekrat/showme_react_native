@@ -19,6 +19,7 @@ import RegistrationInterim from './app/Pages/RegistrationInterim.js';
 import PrivacyPolicy from './app/Pages/PrivacyPolicy.js';
 import ChangeUserName from './app/Pages/ChangeUserName.js';
 import Title from './app/Components/Title.js';
+import generator from './app/Components/CodeGenerator/CodeGenerator.js';
 import Utility from './app/Globals/UtilityFunctions.js';
 import GetSecrets from './app/Globals/GetSecrets.js';
 import StylingGlobals from './app/Globals/StylingGlobals.js';
@@ -118,6 +119,17 @@ class ShowMe extends React.Component {
     GetSecrets.getLocalSecrets();
     GetSecrets.getRemoteSecrets();
     this.anonAuthHandler();
+
+    /*
+    this.DB.child('indexes').child('pureInvitation').once('value', (snapshot) => {
+      console.log(Object.keys(snapshot.val()).length);
+    })
+
+    let foo = generator(1,1,9);
+    let foo2 = foo.join('');
+    this.DB.child('indexes').child('verificationCodes').push(foo2);
+    this.DB.child('indexes').child('pureInvitation').child(foo2).set(true);
+    */
   }
 
   componentDidMount() {

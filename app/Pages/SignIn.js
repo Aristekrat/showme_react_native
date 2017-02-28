@@ -84,8 +84,8 @@ class SignIn extends Component {
                 autoFocus={true}
                 keyboardType={'email-address'}
                 value={this.props.email}
-                onEndEditing={(text) => {this.refs.password.focus()}}
-                onChangeText={(email) => this.props.actions.updateFormInput(email) }
+                onEndEditing={ (text) => {this.refs.password.focus()}}
+                onChangeText={ (email) => this.props.actions.updateFormInput(email) }
                 selectionColor={StylingGlobals.colors.mainColor} />
           </View>
           <View style={styles.row}>
@@ -93,7 +93,7 @@ class SignIn extends Component {
             <TextInput
               style={styles.textInput}
               ref="password"
-              onChangeText={(password) => this.props.actions.updatePassword(password) }
+              onChangeText={ (password) => this.props.actions.updatePassword(password) }
               secureTextEntry={true}
               selectionColor={StylingGlobals.colors.navColor} />
           </View>

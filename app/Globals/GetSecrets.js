@@ -99,6 +99,7 @@ const GetSecrets = {
   pushPrivateSecret: function(text, uid, profileName = "Anonymous", successCB, errCB) {
     let psData = {question: text, askerID: uid, askerName: profileName, responderID: '', responderName: ''};
     let privateSecret = this.DB.child('privateSecrets').push(psData, (err, snapshot) => {
+      console.log(err, snapshot);
       if (err) {
         errCB();
       } else {

@@ -78,6 +78,21 @@ var Utility = {
     return re.test(email);
   },
 
+  validateStringInput: function(string, stringName) {
+    if (string === "" || !string) {
+      actions.setError("Please enter your " + stringName);
+      return false;
+    } else if (string.length < 6) {
+      actions.setError("Your " + stringName + " is too short");
+      return false;
+    } else if (string.length > 500) {
+      actions.setError("Your " + stringName + " is too long");
+      return false;
+    } else {
+      return true;
+    }
+  },
+
 	logout: function() {
     AccessToken.getCurrentAccessToken().then((fbToken) => {
       if (fbToken) {

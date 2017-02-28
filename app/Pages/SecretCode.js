@@ -29,6 +29,7 @@ class SecretCode extends React.Component {
       isReady: false,
     }
     this.verificationIndex = this.props.db.child('indexes').child('verificationCodes');
+    this.secretCodesIndex = this.props.db.child('indexes').child('pureInvitation');
   }
 
   generate() {
@@ -48,15 +49,21 @@ class SecretCode extends React.Component {
 
   createCode() {
     let psKey = this.props.route.key;
-    //let ph = this.props.route.receiverPH;
-    //let filteredPH = ph.replace(/[^0-9 ]/g, "").split(' ').join('');
-    if (this.props.code && this.props.code.length >= 9) {
+    //if (this.props.code && this.props.code.length >= 9) {
       this.props.actions.setAnimation(true);
-      this.verificationIndex.child(psKey).set(this.props.code);
-      SendSecret.router(this.props.code);
-    } else {
-      this.props.actions.setError("Please enter a valid secret code");
-    }
+      this.secretCodesIndex.once('value', (snapshot) => {
+        if (!snapshot.hasChild(this.props.code)) {
+          this.verificationIndex.child(psKey).set(this.props.code);
+          this.secretCodesIndex.child(this.props.code).set(true);
+          SendSecret.router(this.props.code);
+        } else {
+          this.props.actions.setError("Please enter a different code");
+          this.props.actions.setAnimation(false);
+        }
+      });
+    //} else {
+    //  this.props.actions.setError("Please enter a valid secret code");
+    //}
   }
 
   componentWillMount() {

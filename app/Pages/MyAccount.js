@@ -90,6 +90,7 @@ class MyAccount extends React.Component {
 
   componentWillMount() {
     Utility.checkAllAuth();
+    
     if (!Utility.authStatus) {
       this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to Sign In first'});
     }

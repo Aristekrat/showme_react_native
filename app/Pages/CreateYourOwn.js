@@ -47,6 +47,7 @@ class CreateYourOwn extends React.Component {
       this.success(psData);
     }, () => {
       this.props.actions.setError("We're sorry, there was an error connecting to the server");
+      this.props.actions.setAnimation(false);
     })
   }
 
@@ -64,17 +65,30 @@ class CreateYourOwn extends React.Component {
     })
   }
 
+  validate (secretQuestion) {
+    if (secretQuestion === "" || !secretQuestion) {
+      this.props.actions.setError("Please enter your question");
+      return false;
+    } else if (secretQuestion.length < 6) {
+      this.props.actions.setError("Your question is too short");
+      return false;
+    } else if (secretQuestion.length > 500) {
+      this.props.actions.setError("Your question is too long");
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   // An implementation function that calls either pushToPrivateSecrets or publicSecrets with pushToPrivate as a callback
   submitSecret() {
-    if (this.props.text !== '') {
+    if (this.validate(this.props.text)) {
       this.props.actions.setAnimation(true);
       if (!this.props.public) {
         this.pushToPrivateSecrets();
       } else {
         this.pushToPublicSecrets(true);
       }
-    } else {
-      this.props.actions.setError("Please enter your question");
     }
   }
 
@@ -94,8 +108,6 @@ class CreateYourOwn extends React.Component {
         AsyncStorage.setItem('contacts', JSON.stringify(contacts));
       }
     });
-
-
 
     AsyncStorage.getItem('userData').then((user_data_string) => {
       if (user_data_string) {

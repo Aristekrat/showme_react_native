@@ -2,7 +2,6 @@
 
 import React, { Component } from 'react';
 import StylingGlobals from '../Globals/StylingGlobals.js';
-import GetSecrets from '../Globals/GetSecrets.js';
 import TabBar from '../Components/TabBar.js';
 import Secret from '../Components/SelectableSecret.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
@@ -100,6 +99,7 @@ class SelectSecret extends React.Component {
     }, (errorObject) => {
       this.props.actions.setError("Sorry, we experienced a network error");
     });
+
   }
 
   render() {

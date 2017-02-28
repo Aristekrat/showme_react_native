@@ -29,47 +29,37 @@ class YourAnswer extends React.Component {
   }
 
   responderOrAsker(localID, secret) {
-    console.log(localID, secret);
     if (localID === secret.askerID) {
       return "askerAnswer";
     } else if (localID === secret.responderID) {
       return "responderAnswer";
     } else {
-      this.props.actions.setError("Sorry, the app has experienced an error");
-      this.props.navigator.pop();
+      return false;
     }
   }
 
   notify(notificationText) {
-    console.log("NOTIFY");
     this.props.actions.toggleAnimation();
     this.props.actions.setError(notificationText); // Not actually an error here, a success notification instead
   }
 
   submitAnswer() {
-    if (this.props.answer.length > 5) {
-      this.props.actions.toggleAnimation();
-      let secretID = this.currentSecret.key;
-      AsyncStorage.getItem('userData').then((user_data_string) => {
-        if (user_data_string) {
-          // Utility.checkConnection()
-          let user_data = JSON.parse(user_data_string);
-          let userStatus = this.responderOrAsker(user_data.uid, this.props.route.cookieData);
-          let updatedAnswer = {};
-          updatedAnswer[userStatus] = this.props.answer;
-          this.answers.child(secretID).update(updatedAnswer, this.updateUsersTable(userStatus, user_data.uid));
-        } else {
-          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
-        }
-      });
-    } else {
-      this.props.actions.setError('Please provide an answer');
+    if (Utility.validateStringInput(this.props.answer, "answer")) {
+      let userStatus = this.responderOrAsker(this.props.userId, this.props.route.cookieData);
+      if (userStatus) {
+        this.props.actions.toggleAnimation();
+        let secretID = this.currentSecret.key;
+        let updatedAnswer = {};
+        updatedAnswer[userStatus] = this.props.answer;
+        this.answers.child(secretID).update(updatedAnswer, this.updateUsersTable(userStatus, this.props.userId));
+      } else {
+        this.props.actions.setError("Sorry, the app has experienced an error");
+        this.props.navigator.pop();
+      }
     }
   }
 
   updateUsersTable(userStatus, userId) {
-    console.log("UPDATEUSERSTABLE");
-    console.log(this.currentSecret, userStatus, userId);
     this.answers.child(this.currentSecret.key).once('value', (snapshot) => {
       var ans = snapshot.val();
       if (ans.askerAnswer && ans.responderAnswer) {
@@ -91,13 +81,6 @@ class YourAnswer extends React.Component {
       this.users.child(this.currentSecret.askerID).child('secrets').child(this.currentSecret.key).update(stateToUpdate);
     }
     this.notify("Success! We'll notify you when you both answer");
-    this.setTimeout (
-      () => {
-        console.log("SHOULD ALWAYS HIT HERE");
-        this.props.navigator.pop();
-      },
-      1500
-    );
   }
 
   componentWillMount() {
@@ -108,8 +91,20 @@ class YourAnswer extends React.Component {
     }
   }
 
+  componentDidMount() {
+    if (!this.props.userId) {
+      AsyncStorage.getItem('userData').then((user_data_string) => {
+        if (user_data_string) {
+          let user_data = JSON.parse(user_data_string);
+          this.props.actions.updateUserId(user_data.uid);
+        } else {
+          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+        }
+      });
+    }
+  }
+
   render() {
-    console.log(this.currentSecret, this.props.answer);
     return (
       <View style={StylingGlobals.container}>
         <ScrollView style={styles.form}>
@@ -176,6 +171,7 @@ const mapStateToProps = (state) => {
     animating: state.isAnimating,
     answer: state.formInput,
     error: state.error,
+    userId: state.userId,
   };
 }
 

@@ -55,7 +55,11 @@ class Register extends Component {
 
   submitUser() {
     if (this.props.email !== '' && this.props.password !== '') {
-      this.registerUser();
+      if (this.props.password.length > 5) {
+        this.registerUser();
+      } else {
+        this.props.actions.setError('Your password must be longer than five characters')
+      }
     } else {
       this.props.actions.setError('Please enter an email and password');
     }
