@@ -23,6 +23,9 @@ import generator from './app/Components/CodeGenerator/CodeGenerator.js';
 import Utility from './app/Globals/UtilityFunctions.js';
 import GetSecrets from './app/Globals/GetSecrets.js';
 import StylingGlobals from './app/Globals/StylingGlobals.js';
+import ReactMixin from 'react-mixin';
+import ReactTimer from 'react-timer-mixin';
+
 import {
   AppRegistry,
   StyleSheet,
@@ -37,8 +40,8 @@ import {
   AsyncStorage,
 } from 'react-native';
 
-import Firebase from 'firebase';
-const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
+// import Firebase from 'firebase';
+// const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 
 import { Provider } from 'react-redux';
 import store from './app/State/Store';
@@ -48,7 +51,8 @@ import { connect } from 'react-redux';
 class ShowMe extends React.Component {
   constructor(props) {
     super(props)
-    this.DB = Utility.getRef();
+    this.DB = Utility.ref;
+    this.firebase = Utility.firebaseApp;
     this.state = {
       remoteSecrets: [],
       localSecrets: [],
@@ -90,12 +94,6 @@ class ShowMe extends React.Component {
   }
 
   componentWillMount() {
-    if (Utility.getAuthStatus()) {
-      Utility.setLocalAuth(true);
-    } else {
-      Utility.getFacebookAuth();
-    }
-
     AsyncStorage.getItem('userData').then((user_data_string) => {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
@@ -118,22 +116,21 @@ class ShowMe extends React.Component {
 
     GetSecrets.getLocalSecrets();
     GetSecrets.getRemoteSecrets();
-    this.anonAuthHandler();
-
-    /*
-    this.DB.child('indexes').child('pureInvitation').once('value', (snapshot) => {
-      console.log(Object.keys(snapshot.val()).length);
-    })
-
-    let foo = generator(1,1,9);
-    let foo2 = foo.join('');
-    this.DB.child('indexes').child('verificationCodes').push(foo2);
-    this.DB.child('indexes').child('pureInvitation').child(foo2).set(true);
-    */
+    // this.anonAuthHandler();
   }
 
   componentDidMount() {
     GetSecrets.checkIfRemoteSecretsReceived(this.allRemoteSecretsRetrieved);
+
+    this.setTimeout (
+      () => {
+        console.log(Utility.getAuthStatus());
+        if (Utility.getAuthStatus()) {
+          Utility.setLocalAuth(true);
+        }
+      }, 1000
+    )
+
   }
 
   renderScene (route, navigator) {
@@ -192,7 +189,7 @@ class ShowMe extends React.Component {
         );
       case 'BetaLock':
         return (
-          <BetaLock navigator={navigator} route={route} db={this.db} store={store} />
+          <BetaLock navigator={navigator} route={route} db={this.db} firebase={this.firebase} store={store} />
         );
       case 'BetaExplanation':
         return (
@@ -230,7 +227,7 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "SelectCategory"}}
+        initialRoute={{name: "BetaLock"}}
         />
       </Provider>
     );
@@ -245,6 +242,6 @@ const styles = StyleSheet.create({
     },
 });
 
-//ReactMixin(ShowMe.prototype, ReactTimer);
+ReactMixin(ShowMe.prototype, ReactTimer);
 
 AppRegistry.registerComponent('ShowMe', () => ShowMe);

@@ -31,7 +31,7 @@ class BetaLock extends React.Component {
     this.verifiedIndex = this.props.db.child('indexes').child('verified');
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
-    this.userFunctions = new User(this.props.db, this.users, this.props.navigator);
+    this.userFunctions = new User(Utility.firebaseApp, this.props.db, this.users, this.props.navigator);
   }
 
   waitOnAuth(counter = 0, codeKey, privateSecret) {
@@ -86,10 +86,17 @@ class BetaLock extends React.Component {
           this.props.actions.incrementNotifications(1);
           GetSecrets.addUpdatedSecretsToAsyncStorage(updatedHash)
           this.users.child(ps.askerID).child('secrets').child(codeKey).once('value', (grandchildSnapshot) => {
-            ps.state = {
-              "sentState": "RR",
-              "answerState": grandchildSnapshot.val().answerState,
-            };
+            if (grandchildSnapshot.val()) {
+              ps.state = {
+                "sentState": "RR",
+                "answerState": grandchildSnapshot.val().answerState,
+              };
+            } else {
+              ps.state = {
+                "sentState": "RR",
+                "answerState": ""
+              }
+            }
             ps.key = codeKey;
             ps.answer = null;
             this.props.actions.toggleAnimation();
@@ -102,7 +109,7 @@ class BetaLock extends React.Component {
               }, 1000
             )
           });
-          this.verificationCodes.child(codeKey).remove();
+          // this.verificationCodes.child(codeKey).remove();
       }
     )
   }

@@ -26,7 +26,8 @@ class Register extends Component {
     super(props);
     this.usersIndex = this.props.db.child('indexes').child('userIndex');
     this.users = this.props.db.child('users');
-    this.userFunctions = new User(this.props.db, this.users, this.props.navigator);
+    this.firebase = Utility.firebaseApp;
+    this.userFunctions = new User(Utility.firebaseApp, this.props.db, this.users, this.props.navigator);
   }
 
   registerUser() {
@@ -34,7 +35,18 @@ class Register extends Component {
     this.props.actions.removeError();
     // Utility.checkConnection();
     let email = this.props.email.trim();
-
+    this.firebase.auth().createUserWithEmailAndPassword(email, this.props.password).then((userData) => {
+      let filteredEmail = Utility.escapeEmail(email)
+      let defaultName = email.split("@")[0];
+      this.users.child(userData.uid).set({email: email, secrets: {}, securityEnabled: false, profileName: defaultName });
+      this.usersIndex.child(filteredEmail).set(true);
+      this.props.actions.toggleAnimation();
+      this.userFunctions.login(email, this.props.password, true);
+      //AsyncStorage.removeItem('secrets');
+    }).catch((error) => {
+      this.userFunctions.errorHandler(error);
+    })
+    /*
     this.props.db.createUser({
       email: email,
       password: this.props.password
@@ -51,6 +63,7 @@ class Register extends Component {
         //AsyncStorage.removeItem('secrets');
       }
     }) // End parent function
+    */
   }
 
   submitUser() {

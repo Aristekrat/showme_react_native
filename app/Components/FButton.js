@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import StylingGlobals from '../Globals/StylingGlobals';
 import actions from '../State/Actions/Actions';
 import Utility from '../Globals/UtilityFunctions';
+import * as firebase from 'firebase';
 import { connect } from 'react-redux';
 import {
   StyleSheet,
@@ -22,6 +23,7 @@ const {
 class FButton extends React.Component {
   constructor(props) {
     super(props);
+    this.firebaseApp = Utility.firebaseApp;
   }
 
   render() {
@@ -38,14 +40,13 @@ class FButton extends React.Component {
                   if (!result.isCancelled) {
                     AccessToken.getCurrentAccessToken().then(
                       (data) => {
-                        this.props.db.authWithOAuthToken('facebook', data.accessToken.toString(), (error, authData) => {
-                          if (error) {
-                            this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
-                          } else {
-                            this.props.successCB(authData, this.props);
-                            Utility.setLocalAuth(true);
-                          }
-                        })
+                        let credential = firebase.auth.FacebookAuthProvider.credential(data.accessToken.toString());
+                        this.firebaseApp.auth().signInWithCredential(credential).then((authData) => {
+                          this.props.successCB(authData, this.props);
+                          Utility.setLocalAuth(true);
+                        }).catch((error) => {
+                          this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
+                        });
                       }
                     )
                   }

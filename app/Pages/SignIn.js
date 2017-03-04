@@ -29,7 +29,7 @@ class SignIn extends Component {
     super(props);
     this.usersIndex = this.props.db.child('indexes').child('userIndex');
     this.users = this.props.db.child('users');
-    this.userFunctions = new User(this.props.db, this.users, this.props.navigator);
+    this.userFunctions = new User(Utility.firebaseApp, this.props.db, this.users, this.props.navigator);
   }
 
   submitUser() {

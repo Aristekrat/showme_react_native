@@ -99,13 +99,13 @@ const GetSecrets = {
   pushPrivateSecret: function(text, uid, profileName = "Anonymous", successCB, errCB) {
     let psData = {question: text, askerID: uid, askerName: profileName, responderID: '', responderName: ''};
     let privateSecret = this.DB.child('privateSecrets').push(psData, (err, snapshot) => {
-      console.log(err, snapshot);
       if (err) {
         errCB();
       } else {
-        var sKey = privateSecret.key();
+        var sKey = privateSecret.key;
         let initialState = {answerState: 'NA', sentState: 'CR'};
         this.DB.child('answers').child(sKey).set({askerAnswer: '', responderAnswer: ''});
+        console.log(uid, sKey);
         this.DB.child('users').child(uid).child('secrets').child(sKey).set(initialState);
         psData.key = sKey;
         psData.state = initialState;
@@ -167,7 +167,7 @@ const GetSecrets = {
 
   listenForUpdatesToSecrets: function(uid) {
     this.DB.child('users').child(uid).child('secrets').on('child_changed', (childSnapshot) => {
-      let key = childSnapshot.key();
+      let key = childSnapshot.key;
       let stateUpdate = childSnapshot.val();
       this.notificationHandler(stateUpdate, key);
       this.secretsHandler(uid);

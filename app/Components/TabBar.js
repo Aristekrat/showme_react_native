@@ -89,7 +89,6 @@ class TabBar extends React.Component {
 
   componentWillMount() {
     this.setActiveTab();
-    this.foo = "Bar"
   }
 
   render() {

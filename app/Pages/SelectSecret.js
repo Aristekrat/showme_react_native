@@ -87,7 +87,7 @@ class SelectSecret extends React.Component {
 
     this.publicSecrets.orderByPriority().on("child_added", (snapshot) => {
       var secret = snapshot.val();
-      secret.key = snapshot.key();
+      secret.key = snapshot.key;
       if (this.knownUser) {
         secret.vote = secret.votes[this.knownUser];
       }

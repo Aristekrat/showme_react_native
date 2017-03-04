@@ -10,30 +10,55 @@ const {
 } = FBSDK;
 
 import actions from '../State/Actions/Actions';
-import Firebase from 'firebase';
-const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
+import * as firebase from 'firebase';
+const FirebaseConfig = {
+  apiKey: 'AIzaSyARDyBVxphYfkamoXUe-jITn_l65_apd2U',
+  authDomain: 'glaring-torch-4659.firebaseapp.com',
+  databaseURL: 'https://glaring-torch-4659.firebaseio.com/'
+};
+
+const firebaseApp = firebase.initializeApp(FirebaseConfig);
+
+//const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
 
 var Utility = {
-	dbURL: FirebaseURL,
+  dbConfig: FirebaseConfig,
 	authStatus: false,
 	verified: false,
   provider: 'anonymous',
-	ref: new Firebase(FirebaseURL),
+  ref: firebaseApp.database().ref(),
+  firebaseApp: firebaseApp,
+  //ref: Firebase.database.ref(),
+	//ref: new Firebase(FirebaseURL),
 
 	getRef: function () {
-		return new Firebase(this.dbURL)
+    return firebaseApp.database().ref();
+		//return new Firebase(this.dbURL)
 	},
 
+
 	getAuthStatus: function() {
-	  var ref = Utility.getRef();
+    let user = this.firebaseApp.auth().currentUser;
+    if (user) {
+      if (user.providerData.length > 0 && user.providerData[0].providerId) {
+        this.provider = user.providerData[0].providerId;
+      }
+      return true;
+    } else {
+      return false;
+    }
+    /*
+    var ref = Utility.getRef();
 	  var authData = ref.getAuth();
 	  if (authData) {
 	    return true;
 	  } else {
 	    return false;
 	  }
+    */
 	},
 
+  /*
   getFacebookAuth: function() {
     AccessToken.getCurrentAccessToken().then((fbToken) => {
       if (fbToken) {
@@ -41,9 +66,10 @@ var Utility = {
       }
     });
   },
+  */
 
   checkAllAuth: function (){
-    this.getFacebookAuth();
+    //this.getFacebookAuth();
     let signInAuth = this.getAuthStatus();
     if (!this.authStatus && signInAuth) {
       this.setLocalAuth(true);
@@ -51,8 +77,15 @@ var Utility = {
   },
 
   unAuth: function() {
+    this.firebaseApp.auth().signOut().then(() => {
+      console.log("Successfully logged out");
+    }).catch((error) => {
+      console.log(error)
+    })
+    /*
     var ref = this.getRef();
     ref.unauth();
+    */
   },
 
   setLocalAuth: function (setTo) {

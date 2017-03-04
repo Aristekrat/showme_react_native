@@ -49,7 +49,7 @@ class SecretCode extends React.Component {
 
   createCode() {
     let psKey = this.props.route.key;
-    //if (this.props.code && this.props.code.length >= 9) {
+    if (this.props.code && this.props.code.length >= 9) {
       this.props.actions.setAnimation(true);
       this.secretCodesIndex.once('value', (snapshot) => {
         if (!snapshot.hasChild(this.props.code)) {
@@ -61,9 +61,9 @@ class SecretCode extends React.Component {
           this.props.actions.setAnimation(false);
         }
       });
-    //} else {
-    //  this.props.actions.setError("Please enter a valid secret code");
-    //}
+    } else {
+      this.props.actions.setError("Please enter a valid secret code");
+    }
   }
 
   componentWillMount() {

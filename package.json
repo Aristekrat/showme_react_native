@@ -7,7 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "firebase": "^2.4.2",
+    "firebase": "^3.6.10",
     "react": "15.4.1",
     "react-mixin": "^3.0.5",
     "react-native": "^0.38.0",

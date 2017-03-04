@@ -95,7 +95,7 @@ class MySecrets extends React.Component {
   }
 
   componentWillMount() {
-    Utility.checkAllAuth();
+    // Utility.checkAllAuth();
 
     if (this.props.route.secret && this.props.route.secret.key) {
       this.props.actions.pushUpdatedSecret(this.props.route.secret.key);
@@ -150,7 +150,6 @@ class MySecrets extends React.Component {
           }
         });
       },
-      1000
     )
 
     if (!this.props.userId) {
