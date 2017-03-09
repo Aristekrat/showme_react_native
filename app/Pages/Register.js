@@ -10,6 +10,7 @@ import GetSecrets from '../Globals/GetSecrets.js';
 import { connect } from 'react-redux';
 import actions from '../State/Actions/Actions';
 import User from '../Globals/User';
+import * as firebase from 'firebase';
 import {
   StyleSheet,
   Text,
@@ -46,24 +47,6 @@ class Register extends Component {
     }).catch((error) => {
       this.userFunctions.errorHandler(error);
     })
-    /*
-    this.props.db.createUser({
-      email: email,
-      password: this.props.password
-    }, (error, userData) => {
-      if (error) {
-        this.userFunctions.errorHandler(error);
-      } else {
-        let filteredEmail = Utility.escapeEmail(email)
-        let defaultName = email.split("@")[0];
-        this.users.child(userData.uid).set({email: email, secrets: {}, securityEnabled: false, profileName: defaultName });
-        this.usersIndex.child(filteredEmail).set(true);
-        this.props.actions.toggleAnimation();
-        this.userFunctions.login(email, this.props.password, true);
-        //AsyncStorage.removeItem('secrets');
-      }
-    }) // End parent function
-    */
   }
 
   submitUser() {

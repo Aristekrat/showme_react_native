@@ -130,7 +130,7 @@ class MySecrets extends React.Component {
       this.refs.smodal.setModalVisible(true);
     }
 
-    if (!Utility.authStatus && this.props.securityLevel) {
+    if (!Utility.authStatus) {
         this.setTimeout (
           () => {
             this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});

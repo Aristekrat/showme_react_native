@@ -45,8 +45,12 @@ class CreateYourOwn extends React.Component {
   pushToPrivateSecrets() {
     GetSecrets.pushPrivateSecret(this.props.text, this.props.userId, this.askerName, (psData) => {
       this.success(psData);
-    }, () => {
-      this.props.actions.setError("We're sorry, there was an error connecting to the server");
+    }, (error) => {
+      if (error == "Error: PERMISSION_DENIED: Permission denied") {
+        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+      } else {
+        this.props.actions.setError("We're sorry, there was an error connecting to the server");
+      }
       this.props.actions.setAnimation(false);
     })
   }

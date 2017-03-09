@@ -17,33 +17,13 @@ function User(firebase, db, usersTable, navigator) {
 User.prototype.anonAuth = function () {
   this.firebase.auth().signInAnonymously().then((authData) => {
     this.usersTable.child(authData.uid).set({email: "", secrets: {}, securityEnabled: false, profileName: "Anonymous" });
+    console.log("JUST ANON AUTHD");
     AsyncStorage.setItem('anonFlag', JSON.stringify(authData.uid));
     this.postLoginProcessing(authData.uid, authData.provider);
   }).catch((error) => {
     actions.setError("Sorry, there was a problem. Are you connected to the internet?");
   });
-  /*
-  this.db.authAnonymously((err, authData) => {
-    if (err || !authData) {
-      actions.setError("Sorry, there was a problem. Are you connected to the internet?");
-    } else {
-      this.usersTable.child(authData.uid).set({email: "", secrets: {}, securityEnabled: false, profileName: "Anonymous" });
-      AsyncStorage.setItem('anonFlag', JSON.stringify(authData.uid));
-      this.postLoginProcessing(authData.uid, authData.provider);
-    }
-  })
-  */
 };
-
-/*
-firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    // User is signed in.
-  } else {
-    // No user is signed in.
-  }
-});
-*/
 
 User.prototype.postLoginProcessing = function(uid, provider = "anonymous") {
   this.db.child('users').child(uid).once('value', (snapshot) => {
@@ -78,31 +58,8 @@ User.prototype.login = function (username, password, registrationFlag = false, r
         this.navigator.push({name: 'SelectCategory', refresh: true});
       }
     }).catch((error) => {
-      console.log(error);
       this.errorHandler(error);
     })
-    /*
-    this.db.authWithPassword({
-      email: email,
-      password: password
-    }, (error, userData) => {
-      if (error) {
-        this.errorHandler(error);
-      } else {
-        actions.toggleAnimation();
-        this.postLoginProcessing(userData.uid, userData.provider);
-        if (referred) {
-          Utility.resetState(true, true, true);
-          this.navigator.pop();
-        } else if (registrationFlag) {
-          this.navigator.push({name: 'RegistrationInterim'}); // Needs to be commented out
-        } else {
-          Utility.resetState(true, true);
-          this.navigator.push({name: 'SelectCategory', refresh: true});
-        }
-      }
-    })
-    */
 }
 
 User.prototype.forgotPassword = function (username) {
@@ -120,25 +77,6 @@ User.prototype.forgotPassword = function (username) {
         break;
     }
   });
-  /*
-  this.db.resetPassword({
-    email: username
-  }, (error) => {
-      if (error) {
-        switch (error.code) {
-          case "INVALID_USER":
-            actions.setError('We did not find your email address. Do you need to register?');
-            break;
-          default:
-            actions.displaySkip(true);
-            actions.setError('We encountered an error, probably due to a bad connection. Either retry or skip for now.');
-            break;
-        }
-      } else {
-        actions.setError('Password reset successfully. Please check your email.');
-      }
-  });
-  */
 }
 
 User.prototype.errorHandler = function (error) {

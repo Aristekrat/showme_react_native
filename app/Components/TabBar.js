@@ -44,9 +44,9 @@ class TabBar extends React.Component {
   }
 
   tabFiveRoute() {
-    if (Utility.authStatus && Utility.provider === "anonymous") {
+    if (Utility.authStatus && Utility.isAnonymous) {
       return "Register";
-    } else if (Utility.authStatus && Utility.provider !== "anonymous") {
+    } else if (Utility.authStatus && !Utility.isAnonymous) {
       return "MyAccount";
     } else {
       return "SignIn"
@@ -54,9 +54,9 @@ class TabBar extends React.Component {
   }
 
   tabFiveName() {
-    if (Utility.authStatus && Utility.provider === "anonymous") {
+    if (Utility.authStatus && Utility.isAnonymous) {
       return "Register";
-    } else if (Utility.authStatus && Utility.provider !== "anonymous") {
+    } else if (Utility.authStatus && !Utility.isAnonymous) {
       return "My Account";
     } else {
       return "Sign In"

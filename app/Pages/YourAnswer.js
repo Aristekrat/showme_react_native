@@ -62,6 +62,7 @@ class YourAnswer extends React.Component {
   updateUsersTable(userStatus, userId) {
     this.answers.child(this.currentSecret.key).once('value', (snapshot) => {
       var ans = snapshot.val();
+      console.log(ans);
       if (ans.askerAnswer && ans.responderAnswer) {
         var update = {answerState: 'BR', sentState: 'SO'}
         this.performUserSecretsUpdate(update);

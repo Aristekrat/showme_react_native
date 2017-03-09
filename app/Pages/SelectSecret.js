@@ -7,6 +7,7 @@ import Secret from '../Components/SelectableSecret.js';
 import ActivityIndicator from '../Components/ActivityIndicator.js';
 import actions from '../State/Actions/Actions';
 import Utility from '../Globals/UtilityFunctions';
+import SendSecret from '../Globals/SendSecret.js';
 import { connect } from 'react-redux';
 import {
   StyleSheet,
@@ -27,6 +28,7 @@ class SelectSecret extends React.Component {
       isReady: false,
     }
     this.secrets = [];
+    this.profileName = "Anonymous";
     this.knownUser = this.props.userId ? this.props.userId : false;
     this.category = this.props.route.category ? this.props.route.category : "Social";
     this.publicSecrets = this.props.db.child('publicSecrets').child(this.category);
@@ -64,6 +66,46 @@ class SelectSecret extends React.Component {
     }
   }
 
+  selectSecret() {
+    if (this.props.userId) {
+      GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, user_data.uid, user_data.profileName, (psData) => {
+       this.props.actions.updateSecretKey(psData.key);
+      }, (error) => {
+       if (error == "Error: PERMISSION_DENIED: Permission denied") {
+         this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+       } else {
+         this.props.actions.setError("We're sorry, there was an error connecting to the server");
+       }
+     })
+    } else {
+      this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+    }
+    /*
+    AsyncStorage.getItem('userData').then((user_data_string) => {
+      if (user_data_string) {
+        let user_data = JSON.parse(user_data_string);
+        if (!user_data.profileName) {
+          user_data.profileName = "Anonymous";
+        }
+        SendSecret.lookUpSenderPH(user_data.uid);
+        if (this.props.route.publicSecret) {
+           GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, user_data.uid, user_data.profileName, (psData) => {
+            this.props.actions.updateSecretKey(psData.key);
+          }, (error) => {
+            if (error == "Error: PERMISSION_DENIED: Permission denied") {
+              this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+            } else {
+              this.props.actions.setError("We're sorry, there was an error connecting to the server");
+            }
+          })
+        }
+      } else {
+        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+      }
+    });
+    */
+  }
+
   componentWillMount() {
     Utility.resetState(false, this.props.error);
 
@@ -99,6 +141,24 @@ class SelectSecret extends React.Component {
     }, (errorObject) => {
       this.props.actions.setError("Sorry, we experienced a network error");
     });
+
+    AsyncStorage.getItem('userData').then((user_data_string) => {
+      if (user_data_string) {
+        let user_data = JSON.parse(user_data_string);
+        if (!user_data.profileName) {
+          user_data.profileName = "Anonymous";
+        }
+      }
+    })
+
+    /*
+    Utility.firebaseApp.auth().onAuthStateChanged((user) => {
+      console.log("EXECUTED", user);
+      if (!user) {
+        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+      }
+    });
+    */
 
   }
 

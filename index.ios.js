@@ -40,9 +40,6 @@ import {
   AsyncStorage,
 } from 'react-native';
 
-// import Firebase from 'firebase';
-// const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
-
 import { Provider } from 'react-redux';
 import store from './app/State/Store';
 import actions from './app/State/Actions/Actions';
@@ -71,9 +68,10 @@ class ShowMe extends React.Component {
 
   // This function listens for any firebase auth, saves the auth data, and transitions anon auths to signed in auths when appropriate
   anonAuthHandler() {
-    this.DB.onAuth((authData) => {
+    Utility.firebaseApp.auth().onAuthStateChanged((authData) => {
       if (authData) {
-        if (authData.provider !== 'anonymous') {
+        Utility.isAnonymous = authData.isAnonymous
+        if (!authData.isAnonymous) {
           AsyncStorage.getItem("anonFlag").then((anonFlag) => {
             if (anonFlag) {
               let oldUID = JSON.parse(anonFlag);
@@ -83,14 +81,13 @@ class ShowMe extends React.Component {
                 if (anonData && anonData.secrets) {
                   this.DB.child('users').child(authData.uid).child('secrets').update(anonData.secrets);
                 }
-                anonRef.remove();
                 AsyncStorage.removeItem('anonFlag');
               });
             }
           })
         }
       }
-    })
+    });
   }
 
   componentWillMount() {
@@ -116,7 +113,7 @@ class ShowMe extends React.Component {
 
     GetSecrets.getLocalSecrets();
     GetSecrets.getRemoteSecrets();
-    // this.anonAuthHandler();
+    this.anonAuthHandler();
   }
 
   componentDidMount() {
@@ -124,11 +121,12 @@ class ShowMe extends React.Component {
 
     this.setTimeout (
       () => {
-        console.log(Utility.getAuthStatus());
-        if (Utility.getAuthStatus()) {
-          Utility.setLocalAuth(true);
-        }
-      }, 1000
+        Utility.firebaseApp.auth().onAuthStateChanged((user) => {
+          if (user) {
+            Utility.setLocalAuth(true);
+          }
+        });
+      }, 0
     )
 
   }
@@ -227,7 +225,7 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "BetaLock"}}
+        initialRoute={{name: "SelectCategory"}}
         />
       </Provider>
     );

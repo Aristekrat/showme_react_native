@@ -55,8 +55,12 @@ class ShareSecret extends React.Component {
         if (this.props.route.publicSecret) {
            GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, user_data.uid, user_data.profileName, (psData) => {
             this.props.actions.updateSecretKey(psData.key);
-          }, () => {
-            this.props.actions.setError("We're sorry, there was an error connecting to the server");
+          }, (error) => {
+            if (error == "Error: PERMISSION_DENIED: Permission denied") {
+              this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+            } else {
+              this.props.actions.setError("We're sorry, there was an error connecting to the server");
+            }
           })
         }
       } else {
@@ -66,12 +70,12 @@ class ShareSecret extends React.Component {
   }
 
   componentDidMount() {
-    InteractionManager.runAfterInteractions(() => {
-      this.setState({isReady: true});
-    });
-
-    if (!Utility.authStatus && this.props.securityLevel) {
+    if (!Utility.authStatus) {
       this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
+    } else {
+      InteractionManager.runAfterInteractions(() => {
+        this.setState({isReady: true});
+      });
     }
   }
 

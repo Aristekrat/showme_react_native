@@ -65,7 +65,7 @@ class SignIn extends Component {
   }
 
   componentDidMount() {
-    Utility.resetState(this.props.animating, this.props.error);
+    Utility.resetState(this.props.animating, this.props.error, this.props.email);
     if (this.props.route.message) {
       this.props.actions.setError(this.props.route.message);
     }
@@ -76,6 +76,14 @@ class SignIn extends Component {
       <View style={styles.container}>
         <ActivityIndicator animationControl={this.props.animating}/>
         <ScrollView style={styles.form}>
+          {
+            this.props.error ?
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{this.props.error}</Text>
+            </View>
+            :
+            null
+          }
           <View style={styles.row}>
             <Text style={styles.label}>Email</Text>
             <TextInput
@@ -103,24 +111,11 @@ class SignIn extends Component {
               onPress={() => this.submitUser()}>
             <Text style={styles.buttonText}>Sign In</Text>
           </TouchableHighlight>
-          {
-            true ? // this.props.message
-            <FButton
-              successCB={this.fbSuccessCB}
-              db={this.props.db}
-              navigator={this.props.navigator}
-              width={{width: 260, marginLeft: 35}}/>
-            :
-            null
-          }
-          {
-            this.props.error ?
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{this.props.error}</Text>
-            </View>
-            :
-            null
-          }
+          <FButton
+            successCB={this.fbSuccessCB}
+            db={this.props.db}
+            navigator={this.props.navigator}
+            width={{width: 260, marginLeft: 35}}/>
           {
             this.props.displaySkip ?
             <View style={styles.forgotPasswordBlock}>
@@ -210,9 +205,10 @@ var styles = StyleSheet.create({
   },
   errorText: {
     flex: 1,
-    marginTop: 15,
-    fontSize: 18,
+    marginTop: 0,
+    fontSize: 16,
     textAlign: 'center',
+    color: StylingGlobals.colors.pressDown,
   }
 });
 

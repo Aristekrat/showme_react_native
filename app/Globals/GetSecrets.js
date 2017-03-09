@@ -100,12 +100,11 @@ const GetSecrets = {
     let psData = {question: text, askerID: uid, askerName: profileName, responderID: '', responderName: ''};
     let privateSecret = this.DB.child('privateSecrets').push(psData, (err, snapshot) => {
       if (err) {
-        errCB();
+        errCB(err);
       } else {
         var sKey = privateSecret.key;
         let initialState = {answerState: 'NA', sentState: 'CR'};
         this.DB.child('answers').child(sKey).set({askerAnswer: '', responderAnswer: ''});
-        console.log(uid, sKey);
         this.DB.child('users').child(uid).child('secrets').child(sKey).set(initialState);
         psData.key = sKey;
         psData.state = initialState;
@@ -207,7 +206,6 @@ const GetSecrets = {
         if (arrLength === index) { // the for loop is at an end
           actions.incrementNotifications(count);
           this.addUpdatedSecretsToAsyncStorage(store.getState().updatedSecrets);
-          //this.listenForUpdatesToSecrets();
         }
       });
     }

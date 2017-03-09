@@ -28,6 +28,7 @@ class BetaLock extends React.Component {
   constructor(props) {
     super(props);
     this.verificationCodes = this.props.db.child('indexes').child('verificationCodes');
+    this.pureInvitation = this.props.db.child('indexes').child('pureInvitation');
     this.verifiedIndex = this.props.db.child('indexes').child('verified');
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
@@ -55,8 +56,10 @@ class BetaLock extends React.Component {
     } else {
       this.props.actions.toggleAnimation();
       let whitespaceStripped = this.props.code.replace(/\s/g,'');
+      console.log(whitespaceStripped);
       this.verificationCodes.orderByValue().equalTo(whitespaceStripped).once('value', (snapshot) => {
         let valReturned = snapshot.val();
+        console.log(valReturned);
         if (valReturned) {
           this.userFunctions.anonAuth();
           let codeKey = Object.keys(valReturned)[0];
@@ -66,8 +69,9 @@ class BetaLock extends React.Component {
               this.waitOnAuth(0, codeKey, privateSecret);
             } else {
               this.verificationCodes.child(codeKey).remove();
+              this.pureInvitation.child(whitespaceStripped).remove();
               this.props.actions.toggleAnimation();
-              this.props.navigator.push({name: 'SelectCategory', modalText: 'You have the power to invite new users.', modalTitle: 'Welcome', modalSecondaryText: "Your security settings are currently 'low', you can register to increase security."});
+              this.props.navigator.push({name: 'SelectCategory', modalText: 'You have the power to invite new users.', modalTitle: 'Welcome', modalSecondaryText: "Select a premade secret or make your own to get started."});
             }
           });
         } else {

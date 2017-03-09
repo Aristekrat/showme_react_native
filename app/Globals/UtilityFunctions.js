@@ -25,7 +25,7 @@ var Utility = {
   dbConfig: FirebaseConfig,
 	authStatus: false,
 	verified: false,
-  provider: 'anonymous',
+  isAnonymous: true,
   ref: firebaseApp.database().ref(),
   firebaseApp: firebaseApp,
   //ref: Firebase.database.ref(),
