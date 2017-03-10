@@ -89,9 +89,6 @@ const Actions = {
   updateContactsPermission: function (bool) {
     this.dispatch({type: 'updateContactsPermission', value: bool});
   },
-  setSecurityLevel: function (bool) {
-    this.dispatch({type: 'setSecurityLevel', value: bool});
-  },
 }
 
 export default Actions;

@@ -181,7 +181,6 @@ const mapStateToProps = (state) => {
     secretKey: state.secretKey,
     firstName: state.firstName,
     userId: state.userId,
-    securityLevel: state.securityLevel,
   };
 }
 

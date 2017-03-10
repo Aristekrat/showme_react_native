@@ -153,12 +153,15 @@ var Utility = {
     }
   },
 
+  /*
   setLocalSecurityLevel: function(uid) {
     this.ref.child('users').child(uid).child('securityEnabled').once('value', (snapshot) => {
       actions.setSecurityLevel(snapshot.val());
     })
   },
+  */
 
+  /*
   getSecSetting: function(uid) {
     if (uid) {
       this.setLocalSecurityLevel(uid)
@@ -173,6 +176,7 @@ var Utility = {
       });
     }
   },
+  */
 
   checkConnection: function() {
     NetInfo.isConnected.fetch().then().done((connStatus) => {

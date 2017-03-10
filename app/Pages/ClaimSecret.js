@@ -87,14 +87,6 @@ class ClaimSecret extends React.Component {
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error, this.props.code);
 
-    if (!Utility.authStatus && this.props.securityLevel) {
-        this.setTimeout (
-          () => {
-            this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
-          }, 0
-        )
-    }
-
     if (!this.props.userId) {
       AsyncStorage.getItem('userData').then((user_data_string) => {
         if (user_data_string) {
@@ -146,7 +138,6 @@ const mapStateToProps = (state) => {
     error: state.error,
     code: state.formInput,
     updatedSecrets: state.updatedSecrets,
-    securityLevel: state.securityLevel,
     userId: state.userId,
   };
 }

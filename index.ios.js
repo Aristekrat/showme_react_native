@@ -99,7 +99,6 @@ class ShowMe extends React.Component {
         if (user_data.provider) {
           Utility.setProvider(user_data.provider);
         }
-        Utility.getSecSetting(user_data.uid);
       }
     });
 

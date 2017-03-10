@@ -166,7 +166,6 @@ const mapStateToProps = (state) => {
     error: state.error,
     code: state.formInput,
     updatedSecrets: state.updatedSecrets,
-    securityLevel: state.securityLevel,
     userId: state.userId,
   };
 }
