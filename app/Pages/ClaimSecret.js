@@ -88,7 +88,7 @@ class ClaimSecret extends React.Component {
     Utility.resetState(this.props.animating, this.props.error, this.props.code);
 
     if (!this.props.userId) {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
+      AsyncStorage.getItem('smUserData').then((user_data_string) => {
         if (user_data_string) {
           let user_data = JSON.parse(user_data_string);
           this.props.actions.updateUserId(user_data.uid);

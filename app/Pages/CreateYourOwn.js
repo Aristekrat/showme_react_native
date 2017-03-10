@@ -98,7 +98,6 @@ class CreateYourOwn extends React.Component {
 
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error, this.props.text);
-    //AsyncStorage.removeItem('secrets');
   }
 
   componentDidMount() {
@@ -106,14 +105,14 @@ class CreateYourOwn extends React.Component {
     Contacts.getAll((err, contacts) => {
       if(err && err.type === 'permissionDenied'){
         this.contacts = 'PermissionDenied'
-        AsyncStorage.setItem('contacts', JSON.stringify(this.contacts));
+        AsyncStorage.setItem('smContacts', JSON.stringify(this.contacts));
       } else {
         this.contacts = contacts;
-        AsyncStorage.setItem('contacts', JSON.stringify(contacts));
+        AsyncStorage.setItem('smContacts', JSON.stringify(contacts));
       }
     });
 
-    AsyncStorage.getItem('userData').then((user_data_string) => {
+    AsyncStorage.getItem('smUserData').then((user_data_string) => {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
         if (user_data.profileName) {
@@ -125,7 +124,7 @@ class CreateYourOwn extends React.Component {
         this.users.child(this.props.userId).once('value', (snapshot) => {
           let userRecord = snapshot.val();
           userRecord.uid = this.props.userId;
-          AsyncStorage.setItem('userData', userRecord);
+          AsyncStorage.setItem('smUserData', userRecord);
           if (userRecord.profileName) {
             this.askerName = userRecord.profileName
           } else {

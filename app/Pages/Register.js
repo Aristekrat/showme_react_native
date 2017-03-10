@@ -19,7 +19,6 @@ import {
   Image,
   ScrollView,
   TextInput,
-  AsyncStorage
 } from 'react-native';
 
 class Register extends Component {
@@ -43,7 +42,6 @@ class Register extends Component {
       this.usersIndex.child(filteredEmail).set(true);
       this.props.actions.toggleAnimation();
       this.userFunctions.login(email, this.props.password, true);
-      //AsyncStorage.removeItem('secrets');
     }).catch((error) => {
       this.userFunctions.errorHandler(error);
     })

@@ -135,7 +135,7 @@ var Utility = {
       }
       this.setLocalAuth(false);
       actions.setNotifications(0);
-      AsyncStorage.removeItem('secrets');
+      AsyncStorage.removeItem('smSecrets');
     });
 	},
 
@@ -152,31 +152,6 @@ var Utility = {
       actions.updateFormInput("");
     }
   },
-
-  /*
-  setLocalSecurityLevel: function(uid) {
-    this.ref.child('users').child(uid).child('securityEnabled').once('value', (snapshot) => {
-      actions.setSecurityLevel(snapshot.val());
-    })
-  },
-  */
-
-  /*
-  getSecSetting: function(uid) {
-    if (uid) {
-      this.setLocalSecurityLevel(uid)
-    } else {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
-        if (user_data_string) {
-          let user_data = JSON.parse(user_data_string);
-          this.setLocalSecurityLevel(user_data.uid)
-        } else {
-          console.log("USER NOT FOUND");
-        }
-      });
-    }
-  },
-  */
 
   checkConnection: function() {
     NetInfo.isConnected.fetch().then().done((connStatus) => {

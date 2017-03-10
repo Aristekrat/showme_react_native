@@ -1,8 +1,5 @@
 import Contacts from 'react-native-contacts';
 import Utility from './UtilityFunctions.js';
-import {
-  AsyncStorage
-} from 'react-native';
 const Composer = require('NativeModules').RNMessageComposer;
 
 const SendSecret = {

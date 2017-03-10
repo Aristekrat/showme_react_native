@@ -18,7 +18,6 @@ import {
   ScrollView,
   TextInput,
   TouchableHighlight,
-  AsyncStorage,
   InteractionManager
 } from 'react-native';
 

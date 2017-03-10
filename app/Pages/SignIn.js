@@ -41,7 +41,7 @@ class SignIn extends Component {
   }
 
   fbSuccessCB(authData, props) {
-    AsyncStorage.setItem('userData', JSON.stringify(authData));
+    AsyncStorage.setItem('smUserData', JSON.stringify(authData));
     Utility.setLocalAuth();
     props.actions.removeError();
     if (props.message) {

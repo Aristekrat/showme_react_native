@@ -101,7 +101,7 @@ class MySecrets extends React.Component {
       this.props.actions.pushUpdatedSecret(this.props.route.secret.key);
     }
 
-    AsyncStorage.getItem('secrets').then((secrets_data_string) => {
+    AsyncStorage.getItem('smSecrets').then((secrets_data_string) => {
       if (secrets_data_string) {
         let secrets_data = JSON.parse(secrets_data_string);
         let allSecrets = this.mySecrets.concat(secrets_data);
@@ -144,7 +144,7 @@ class MySecrets extends React.Component {
 
     this.setTimeout (
       () => {
-        AsyncStorage.getItem('contacts').then((contacts_string) => {
+        AsyncStorage.getItem('smContacts').then((contacts_string) => {
           if (contacts_string) {
             this.contacts = JSON.parse(contacts_string);
           }
@@ -153,7 +153,7 @@ class MySecrets extends React.Component {
     )
 
     if (!this.props.userId) {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
+      AsyncStorage.getItem('smUserData').then((user_data_string) => {
         if (user_data_string) {
           let user_data = JSON.parse(user_data_string);
           this.props.actions.updateUserId(user_data.uid);
@@ -162,7 +162,7 @@ class MySecrets extends React.Component {
         }
       });
     }
-    
+
   }
 
   render() {

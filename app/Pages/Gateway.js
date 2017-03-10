@@ -47,7 +47,7 @@ class Gateway extends React.Component {
   }
 
   fbSuccessCB(authData, props) {
-    AsyncStorage.setItem('userData', JSON.stringify(authData));
+    AsyncStorage.setItem('smUserData', JSON.stringify(authData));
     Utility.setLocalAuth(true);
     var email = Utility.escapeEmail(authData.auth.token.email); // These four lines are different in Gateway & SignIn
     props.db.child('indexes').child('userIndex').child(email).set(true);
@@ -56,7 +56,7 @@ class Gateway extends React.Component {
   }
 
   componentWillMount() {
-    AsyncStorage.removeItem('hasBeenIntroduced');
+    AsyncStorage.removeItem('smHasBeenIntroduced');
   }
 
   render() {

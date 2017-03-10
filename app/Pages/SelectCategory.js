@@ -69,10 +69,10 @@ class SelectCategory extends React.PureComponent {
     Contacts.getAll((err, contacts) => {
       if(err && err.type === 'permissionDenied'){
         this.contacts = 'PermissionDenied'
-        AsyncStorage.setItem('contacts', JSON.stringify(this.contacts));
+        AsyncStorage.setItem('smContacts', JSON.stringify(this.contacts));
       } else {
         this.contacts = contacts;
-        AsyncStorage.setItem('contacts', JSON.stringify(contacts));
+        AsyncStorage.setItem('smContacts', JSON.stringify(contacts));
       }
     });
 

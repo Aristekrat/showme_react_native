@@ -18,7 +18,7 @@ User.prototype.anonAuth = function () {
   this.firebase.auth().signInAnonymously().then((authData) => {
     this.usersTable.child(authData.uid).set({email: "", secrets: {}, securityEnabled: false, profileName: "Anonymous" });
     console.log("JUST ANON AUTHD");
-    AsyncStorage.setItem('anonFlag', JSON.stringify(authData.uid));
+    AsyncStorage.setItem('smAnonFlag', JSON.stringify(authData.uid));
     this.postLoginProcessing(authData.uid, authData.provider);
   }).catch((error) => {
     actions.setError("Sorry, there was a problem. Are you connected to the internet?");
@@ -30,11 +30,11 @@ User.prototype.postLoginProcessing = function(uid, provider = "anonymous") {
     let userRecord = snapshot.val();
     userRecord.uid = uid;
     userRecord.provider = provider;
-    AsyncStorage.setItem('userData', JSON.stringify(userRecord));
+    AsyncStorage.setItem('smUserData', JSON.stringify(userRecord));
     actions.updateUserId(uid);
   });
-  AsyncStorage.removeItem('secrets');
-  AsyncStorage.removeItem('updatedSecrets');
+  AsyncStorage.removeItem('smSecrets');
+  AsyncStorage.removeItem('smUpdatedSecrets');
   Utility.setLocalAuth(true);
   GetSecrets.getRemoteSecrets(uid);
   GetSecrets.listenForUpdatesToSecrets(uid);

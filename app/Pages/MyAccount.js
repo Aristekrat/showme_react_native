@@ -44,10 +44,10 @@ class MyAccount extends React.Component {
 
   eraseSecrets(uid) {
     if (uid) {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
+      AsyncStorage.getItem('smUserData').then((user_data_string) => {
         let userData = JSON.parse(user_data_string);
         userData.secrets = {};
-        AsyncStorage.setItem('userData', JSON.stringify(userData));
+        AsyncStorage.setItem('smUserData', JSON.stringify(userData));
       });
 
       this.users.child(uid).child('secrets').once('value', (snapshot) => {
@@ -73,7 +73,7 @@ class MyAccount extends React.Component {
             this.users.child(uid).child('secrets').remove();
             this.setState({secretsErased: true});
             this.props.actions.toggleAnimation();
-            AsyncStorage.removeItem('secrets');
+            AsyncStorage.removeItem('smSecrets');
           },
           5000
         )
@@ -91,7 +91,7 @@ class MyAccount extends React.Component {
     }
 
     if (!this.props.userId) {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
+      AsyncStorage.getItem('smUserData').then((user_data_string) => {
         if (user_data_string) {
           let userData = JSON.parse(user_data_string);
           this.props.actions.updateUserId(userData.uid);

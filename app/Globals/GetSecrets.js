@@ -28,7 +28,7 @@ const GetSecrets = {
   },
 
 	getLocalSecrets: function () {
-    AsyncStorage.getItem('secrets').then((secret_data_string) => {
+    AsyncStorage.getItem('smSecrets').then((secret_data_string) => {
       if (secret_data_string) {
         let secret_data = JSON.parse(secret_data_string);
         this.localSecrets = secret_data;
@@ -44,7 +44,7 @@ const GetSecrets = {
       this.uid = uid;
       this.pullDownSecrets(uid)
     } else {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
+      AsyncStorage.getItem('smUserData').then((user_data_string) => {
         if (user_data_string) {
           let user_data = JSON.parse(user_data_string); // TODO Needs to check AUTH, implement this at the end
           this.uid = user_data.uid;
@@ -119,7 +119,7 @@ const GetSecrets = {
 
   // Pushes one new secret obj to the local store.
   pushLocalSecret: function (newSecret) {
-    AsyncStorage.getItem('secrets').then((secrets_data_string) => {
+    AsyncStorage.getItem('smSecrets').then((secrets_data_string) => {
       let secretCopy = Object.assign({}, newSecret);
       secretCopy.askerName = this._setAskerName(newSecret.askerID, newSecret.askerName, this.uid);
       secretCopy.answerNotification = this._setAnswerNotification(newSecret.state);
@@ -129,11 +129,11 @@ const GetSecrets = {
           console.log("pushLocalSecret, invalid data type received ", secrets_data);
         }
         secrets_data.push(secretCopy);
-        AsyncStorage.setItem('secrets', JSON.stringify(secrets_data));
+        AsyncStorage.setItem('smSecrets', JSON.stringify(secrets_data));
       } else {
         let localData = [];
         localData.push(secretCopy);
-        AsyncStorage.setItem('secrets', JSON.stringify(localData));
+        AsyncStorage.setItem('smSecrets', JSON.stringify(localData));
       }
     });
   },
@@ -148,18 +148,18 @@ const GetSecrets = {
       item.askerName = GetSecrets._setAskerName(item.askerID, item.askerName, GetSecrets.uid);
       return item;
     });
-		AsyncStorage.setItem('secrets', JSON.stringify(readyToRender));
+		AsyncStorage.setItem('smSecrets', JSON.stringify(readyToRender));
   },
 
   // Only updates AsyncStorage with updatedSecrets
   addUpdatedSecretsToAsyncStorage: function(updatedSecretsHash) {
-    AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
+    AsyncStorage.getItem('smUpdatedSecrets').then((updated_secrets_string) => {
       if (updated_secrets_string) {
         let updated_secrets = JSON.parse(updated_secrets_string);
         let combinedObj = Object.assign(updated_secrets, updatedSecretsHash);
-        AsyncStorage.setItem('updatedSecrets', JSON.stringify(combinedObj));
+        AsyncStorage.setItem('smUpdatedSecrets', JSON.stringify(combinedObj));
       } else {
-        AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecretsHash));
+        AsyncStorage.setItem('smUpdatedSecrets', JSON.stringify(updatedSecretsHash));
       }
     });
   },
@@ -217,11 +217,11 @@ const GetSecrets = {
     if (updatedSecrets && updatedSecrets[key]) {
       actions.removeUpdatedSecret(key);
       actions.decrementNotifications(1);
-      AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
+      AsyncStorage.getItem('smUpdatedSecrets').then((updated_secrets_string) => {
         if (updated_secrets_string) {
           let updatedSecrets = JSON.parse(updated_secrets_string);
           delete updatedSecrets[key];
-          AsyncStorage.setItem('updatedSecrets', JSON.stringify(updatedSecrets));
+          AsyncStorage.setItem('smUpdatedSecrets', JSON.stringify(updatedSecrets));
         }
       });
     };

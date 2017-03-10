@@ -72,7 +72,7 @@ class ShowMe extends React.Component {
       if (authData) {
         Utility.isAnonymous = authData.isAnonymous
         if (!authData.isAnonymous) {
-          AsyncStorage.getItem("anonFlag").then((anonFlag) => {
+          AsyncStorage.getItem("smAnonFlag").then((anonFlag) => {
             if (anonFlag) {
               let oldUID = JSON.parse(anonFlag);
               let anonRef = this.DB.child('users').child(oldUID);
@@ -81,7 +81,7 @@ class ShowMe extends React.Component {
                 if (anonData && anonData.secrets) {
                   this.DB.child('users').child(authData.uid).child('secrets').update(anonData.secrets);
                 }
-                AsyncStorage.removeItem('anonFlag');
+                AsyncStorage.removeItem('smAnonFlag');
               });
             }
           })
@@ -91,7 +91,7 @@ class ShowMe extends React.Component {
   }
 
   componentWillMount() {
-    AsyncStorage.getItem('userData').then((user_data_string) => {
+    AsyncStorage.getItem('smUserData').then((user_data_string) => {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
         actions.updateUserId(user_data.uid);
@@ -102,7 +102,7 @@ class ShowMe extends React.Component {
       }
     });
 
-    AsyncStorage.getItem('updatedSecrets').then((updated_secrets_string) => {
+    AsyncStorage.getItem('smUpdatedSecrets').then((updated_secrets_string) => {
       if (updated_secrets_string) {
         let updatedSecrets = JSON.parse(updated_secrets_string);
         actions.pushMultipleUpdatedSecrets(updatedSecrets);

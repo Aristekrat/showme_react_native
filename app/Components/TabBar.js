@@ -10,7 +10,6 @@ import {
   Text,
   View,
   TabBarIOS,
-  AsyncStorage
 } from 'react-native';
 
 class TabBar extends React.Component {

@@ -52,7 +52,7 @@ class ChangeUserName extends React.Component {
     if (this.props.userId) {
       this.lookUpUserName(this.props.userId);
     } else {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
+      AsyncStorage.getItem('smUserData').then((user_data_string) => {
         if (user_data_string) {
           let userData = JSON.parse(user_data_string);
           this.props.actions.updateUserId(userData.uid);

@@ -43,7 +43,7 @@ class UserContacts extends React.Component {
   componentWillMount() {
     // Handles no contacts props. This should rarely get triggered
     if (!this.props.contacts || this.props.contacts == undefined) {
-      AsyncStorage.getItem('contacts').then((contacts_string) => {
+      AsyncStorage.getItem('smContacts').then((contacts_string) => {
         if (contacts_string) {
           let contacts_json = JSON.parse(contacts_string)
           this.setState({contacts: contacts_json.filter(this.filterSecrets)})
@@ -53,7 +53,7 @@ class UserContacts extends React.Component {
               actions.updateContactsPermission(false);
             } else {
               this.setState({contacts: contacts.filter(this.filterSecrets)})
-              AsyncStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+              AsyncStorage.setItem('smContacts', JSON.stringify(this.state.contacts));
             }
           });
         }

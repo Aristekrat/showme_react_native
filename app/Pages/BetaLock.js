@@ -18,8 +18,7 @@ import {
   ScrollView,
   Image,
   TextInput,
-  TouchableHighlight,
-  AsyncStorage
+  TouchableHighlight
 } from 'react-native';
 
 import { connect } from 'react-redux';

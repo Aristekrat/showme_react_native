@@ -80,37 +80,13 @@ class SelectSecret extends React.Component {
     } else {
       this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
     }
-    /*
-    AsyncStorage.getItem('userData').then((user_data_string) => {
-      if (user_data_string) {
-        let user_data = JSON.parse(user_data_string);
-        if (!user_data.profileName) {
-          user_data.profileName = "Anonymous";
-        }
-        SendSecret.lookUpSenderPH(user_data.uid);
-        if (this.props.route.publicSecret) {
-           GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, user_data.uid, user_data.profileName, (psData) => {
-            this.props.actions.updateSecretKey(psData.key);
-          }, (error) => {
-            if (error == "Error: PERMISSION_DENIED: Permission denied") {
-              this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
-            } else {
-              this.props.actions.setError("We're sorry, there was an error connecting to the server");
-            }
-          })
-        }
-      } else {
-        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
-      }
-    });
-    */
   }
 
   componentWillMount() {
     Utility.resetState(false, this.props.error);
 
     if (!this.props.userId) {
-      AsyncStorage.getItem('userData').then((user_data_string) => {
+      AsyncStorage.getItem('smUserData').then((user_data_string) => {
         if (user_data_string) {
           let user_data = JSON.parse(user_data_string);
           if (user_data.uid) {
@@ -142,7 +118,7 @@ class SelectSecret extends React.Component {
       this.props.actions.setError("Sorry, we experienced a network error");
     });
 
-    AsyncStorage.getItem('userData').then((user_data_string) => {
+    AsyncStorage.getItem('smUserData').then((user_data_string) => {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
         if (!user_data.profileName) {

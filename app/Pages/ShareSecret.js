@@ -45,7 +45,7 @@ class ShareSecret extends React.Component {
       this.props.actions.updateSecretKey(this.props.route.cookieData.key);
     };
 
-    AsyncStorage.getItem('userData').then((user_data_string) => {
+    AsyncStorage.getItem('smUserData').then((user_data_string) => {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
         if (!user_data.profileName) {
