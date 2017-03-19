@@ -18,7 +18,8 @@ import {
   ScrollView,
   TextInput,
   TouchableHighlight,
-  InteractionManager
+  InteractionManager,
+  AsyncStorage,
 } from 'react-native';
 
 class SecretCode extends React.Component {
@@ -91,7 +92,7 @@ class SecretCode extends React.Component {
             autoFocus={true}
             onChangeText={(text) => {this.props.actions.updateSecretCode(text); this.checkLength(text)} }
             value={this.props.code} />
-          <Text style={styles.paragraph}>We will use this to securely identify your friend</Text>
+          <Text style={styles.paragraph}>We will use this code to securely identify your friend</Text>
           <BigButton do={() => this.createCode()}>
             Submit
           </BigButton>

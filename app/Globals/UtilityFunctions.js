@@ -19,8 +19,6 @@ const FirebaseConfig = {
 
 const firebaseApp = firebase.initializeApp(FirebaseConfig);
 
-//const FirebaseURL = 'https://glaring-torch-4659.firebaseio.com/';
-
 var Utility = {
   dbConfig: FirebaseConfig,
 	authStatus: false,
@@ -28,53 +26,10 @@ var Utility = {
   isAnonymous: true,
   ref: firebaseApp.database().ref(),
   firebaseApp: firebaseApp,
-  //ref: Firebase.database.ref(),
-	//ref: new Firebase(FirebaseURL),
 
 	getRef: function () {
     return firebaseApp.database().ref();
-		//return new Firebase(this.dbURL)
 	},
-
-
-	getAuthStatus: function() {
-    let user = this.firebaseApp.auth().currentUser;
-    if (user) {
-      if (user.providerData.length > 0 && user.providerData[0].providerId) {
-        this.provider = user.providerData[0].providerId;
-      }
-      return true;
-    } else {
-      return false;
-    }
-    /*
-    var ref = Utility.getRef();
-	  var authData = ref.getAuth();
-	  if (authData) {
-	    return true;
-	  } else {
-	    return false;
-	  }
-    */
-	},
-
-  /*
-  getFacebookAuth: function() {
-    AccessToken.getCurrentAccessToken().then((fbToken) => {
-      if (fbToken) {
-        this.setLocalAuth(true);
-      }
-    });
-  },
-  */
-
-  checkAllAuth: function (){
-    //this.getFacebookAuth();
-    let signInAuth = this.getAuthStatus();
-    if (!this.authStatus && signInAuth) {
-      this.setLocalAuth(true);
-    }
-  },
 
   unAuth: function() {
     this.firebaseApp.auth().signOut().then(() => {
@@ -82,10 +37,6 @@ var Utility = {
     }).catch((error) => {
       console.log(error)
     })
-    /*
-    var ref = this.getRef();
-    ref.unauth();
-    */
   },
 
   setLocalAuth: function (setTo) {
@@ -136,6 +87,7 @@ var Utility = {
       this.setLocalAuth(false);
       actions.setNotifications(0);
       AsyncStorage.removeItem('smSecrets');
+      AsyncStorage.removeItem('smUpdatedSecrets');
     });
 	},
 

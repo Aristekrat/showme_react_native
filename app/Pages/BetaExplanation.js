@@ -50,7 +50,7 @@ class BetaExplanation extends React.Component {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
-          <Image style={styles.heroImage} source={require("../img/show-me-skirt.png")} />
+          <Image style={styles.heroImage} source={require("../img/show-me-skirt-compressed.png")} />
           <Text style={styles.mainHeader}>
             Please enter your email
           </Text>
@@ -73,7 +73,7 @@ class BetaExplanation extends React.Component {
             this.props.error ? <Text style={styles.error}>{this.props.error}</Text> : null
           }
           <ActivityIndicator animationControl={this.props.animating} />
-          <ArrowLink skipTo={() => this.setState({moreExplanation: !this.state.moreExplanation}) }>Why does ShowMe require an invitation?</ArrowLink>
+          <ArrowLink extraStyling={{marginTop: -10}} skipTo={() => this.setState({moreExplanation: !this.state.moreExplanation}) }>Why does ShowMe require an invitation?</ArrowLink>
           {
             this.state.moreExplanation ?
             <Text style={styles.moreExplanation}>ShowMe is brand new and currently in Beta. We want to keep our userbase limited while we test new features.</Text> :
@@ -101,15 +101,15 @@ const mapDispatchToProps = function(dispatch, ownProps) {
 
 var styles = StyleSheet.create({
   heroImage: {
-    width: 205,
-    height: 205,
+    width: 105,
+    height: 80,
     alignSelf: 'center',
-    marginTop: -15,
-    marginBottom: -15,
+    marginTop: 10,
   },
   mainHeader: {
     marginLeft: 30,
     marginRight: 30,
+    marginTop: 7,
     fontSize: 18,
     marginBottom: 7,
     textAlign: 'center',

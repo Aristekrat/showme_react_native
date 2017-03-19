@@ -51,18 +51,20 @@ class YourAnswer extends React.Component {
         let secretID = this.currentSecret.key;
         let updatedAnswer = {};
         updatedAnswer[userStatus] = this.props.answer;
+        console.log(userStatus, this.props.userId, updatedAnswer);
         this.answers.child(secretID).update(updatedAnswer, this.updateUsersTable(userStatus, this.props.userId));
       } else {
         this.props.actions.setError("Sorry, the app has experienced an error");
         this.props.navigator.pop();
       }
+    } else {
+      console.log("Invalid string input?")
     }
   }
 
   updateUsersTable(userStatus, userId) {
     this.answers.child(this.currentSecret.key).once('value', (snapshot) => {
       var ans = snapshot.val();
-      console.log(ans);
       if (ans.askerAnswer && ans.responderAnswer) {
         var update = {answerState: 'BR', sentState: 'SO'}
         this.performUserSecretsUpdate(update);

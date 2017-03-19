@@ -95,8 +95,6 @@ class MySecrets extends React.Component {
   }
 
   componentWillMount() {
-    // Utility.checkAllAuth();
-
     if (this.props.route.secret && this.props.route.secret.key) {
       this.props.actions.pushUpdatedSecret(this.props.route.secret.key);
     }
@@ -131,11 +129,11 @@ class MySecrets extends React.Component {
     }
 
     if (!Utility.authStatus) {
-        this.setTimeout (
-          () => {
-            this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to login first'});
-          }, 0
-        )
+      Utility.firebaseApp.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+        }
+      });
     }
 
     InteractionManager.runAfterInteractions(() => {
@@ -149,7 +147,7 @@ class MySecrets extends React.Component {
             this.contacts = JSON.parse(contacts_string);
           }
         });
-      },
+      }, 100
     )
 
     if (!this.props.userId) {

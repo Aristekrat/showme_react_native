@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Text,
   View,
+  AsyncStorage,
 } from 'react-native';
 
 const FBSDK = require('react-native-fbsdk');
@@ -45,6 +46,8 @@ class FButton extends React.Component {
                           this.props.successCB(authData, this.props);
                           Utility.setLocalAuth(true);
                         }).catch((error) => {
+                          console.log("HERE");
+                          console.log(error);
                           this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
                         });
                       }

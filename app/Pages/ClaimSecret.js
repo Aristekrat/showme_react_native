@@ -34,6 +34,8 @@ class ClaimSecret extends React.Component {
   verifyCode() {
     if (!this.props.code) {
       this.props.actions.setError("Please enter a secret code. You would've got this in a friend's text invitation");
+    } else if (this.props.code.length < 9) {
+      this.props.actions.setError("Your code is too short");
     } else {
       this.props.actions.toggleAnimation();
       let whitespaceStripped = this.props.code.replace(/\s/g,'');
@@ -52,31 +54,33 @@ class ClaimSecret extends React.Component {
 
   secretClaimed(claimedSecret) {
     let codeKey = Object.keys(claimedSecret)[0];
-    this.privateSecrets.child(codeKey).update({responderID: this.props.userId}, //update private secrets with responder ID
-      () => {
-        this.privateSecrets.child(codeKey).once('value', (childSnapshot) => {
-          this.props.actions.toggleAnimation();
-          let ps = childSnapshot.val();
-          let updatedHash = {}
-          updatedHash[codeKey] = true;
-          this.props.actions.pushUpdatedSecret(codeKey);
-          this.props.actions.incrementNotifications(1);
-          GetSecrets.addUpdatedSecretsToAsyncStorage(updatedHash)
-          this.users.child(ps.askerID).child('secrets').child(codeKey).once('value', (grandchildSnapshot) => {
-            ps.state = {
-              "sentState": "RR",
-              "answerState": grandchildSnapshot.val().answerState,
-            };
-            ps.key = codeKey;
-            GetSecrets.pushLocalSecret(ps);
-            this.props.navigator.push({name: 'MySecrets', secret: ps});
-            this.users.child(this.props.userId).child('secrets').child(codeKey).set({answerState: grandchildSnapshot.val().answerState, sentState: 'RR'});
-          });
-          this.verificationCodes.child(codeKey).remove();
-          this.verifiedIndex.child(this.props.userId).set(true);
-        })
+    this.privateSecrets.child(codeKey).once('value', (childSnapshot) => {
+      if (childSnapshot.val()) {
+        this.props.actions.toggleAnimation();
+        let ps = childSnapshot.val();
+        let updatedHash = {}
+        updatedHash[codeKey] = true;
+        this.props.actions.pushUpdatedSecret(codeKey);
+        this.props.actions.incrementNotifications(1);
+        GetSecrets.addUpdatedSecretsToAsyncStorage(updatedHash);
+        this.privateSecrets.child(codeKey).update({responderID: this.props.userId});
+        this.users.child(ps.askerID).child('secrets').child(codeKey).once('value', (grandchildSnapshot) => {
+          ps.state = {
+            "sentState": "RR",
+            "answerState": grandchildSnapshot.val().answerState,
+          };
+          ps.key = codeKey;
+          ps.responderID = this.props.userId;
+          GetSecrets.pushLocalSecret(ps);
+          this.props.navigator.push({name: 'MySecrets', secret: ps});
+          this.users.child(this.props.userId).child('secrets').child(codeKey).set({answerState: grandchildSnapshot.val().answerState, sentState: 'RR'});
+        });
+        this.verificationCodes.child(codeKey).remove();
+        this.verifiedIndex.child(this.props.userId).set(true);
+      } else {
+        this.setErrorState("Sorry, we couldn't find that code");
       }
-    )
+    });
   }
 
   setErrorState(errorText) {

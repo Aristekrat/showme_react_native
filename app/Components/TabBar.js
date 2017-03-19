@@ -25,6 +25,9 @@ class TabBar extends React.Component {
         this.state.selectedTab = 'tabOne';
         break;
       case "SelectCategory":
+      case "SelectSecret":
+      case "ShareSecret":
+      case "SecretCode":
         this.state.selectedTab = 'tabTwo';
         break;
       case "CreateYourOwn":
@@ -35,8 +38,11 @@ class TabBar extends React.Component {
         break;
       case "MyAccount":
       case "SignIn":
-      case "Registration":
+      case "Register":
       case "Gateway":
+      case "RegistrationInterim":
+      case "PrivacyPolicy":
+      case "ChangeUserName":
         this.state.selectedTab = 'tabFive';
         break;
     }

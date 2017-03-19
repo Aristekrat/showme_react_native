@@ -91,6 +91,13 @@ class ShowMe extends React.Component {
   }
 
   componentWillMount() {
+    Utility.firebaseApp.auth().onAuthStateChanged((user) => {
+      if (user) {
+        actions.updateUserId(user.uid);
+        Utility.setLocalAuth(true);
+      }
+    });
+
     AsyncStorage.getItem('smUserData').then((user_data_string) => {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
@@ -117,17 +124,6 @@ class ShowMe extends React.Component {
 
   componentDidMount() {
     GetSecrets.checkIfRemoteSecretsReceived(this.allRemoteSecretsRetrieved);
-
-    this.setTimeout (
-      () => {
-        Utility.firebaseApp.auth().onAuthStateChanged((user) => {
-          if (user) {
-            Utility.setLocalAuth(true);
-          }
-        });
-      }, 0
-    )
-
   }
 
   renderScene (route, navigator) {

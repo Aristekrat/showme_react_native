@@ -76,6 +76,9 @@ class SelectCategory extends React.PureComponent {
       }
     });
 
+    AsyncStorage.getItem('smUserData').then((secrets_data_string) => {
+      console.log(JSON.parse(secrets_data_string));
+    });
   }
 
   render(){
@@ -141,7 +144,6 @@ var styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
   return {
-    hasBeenIntroduced: state.selectCategoryIntro,
     modalText: state.modalText,
     animating: state.isAnimating,
     error: state.error,

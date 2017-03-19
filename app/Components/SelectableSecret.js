@@ -79,25 +79,25 @@ var styles = StyleSheet.create({
     },
     voteContainer: {
       flexDirection: 'row',
-      paddingBottom: 15,
+      paddingBottom: 10,
       paddingTop: 5,
     },
     voteImg: {
-      width: 25,
-      height: 25,
+      width: 32,
+      height: 32,
       tintColor: StylingGlobals.colors.navColor,
       opacity: 0.5,
     },
     upVote: {
       width: 70,
-      height: 30,
+      height: 40,
     },
     upvoteImg: {
       alignSelf: 'center'
     },
     downVote: {
       width: 70,
-      height: 30,
+      height: 40,
     },
     active: {
       opacity: 1.0,
@@ -107,9 +107,9 @@ var styles = StyleSheet.create({
     },
     count: {
       //paddingRight: 20,
-      marginTop: 2,
+      marginTop: 8,
       marginLeft: 15,
-      fontSize: 12,
+      fontSize: 13,
     },
 });
 

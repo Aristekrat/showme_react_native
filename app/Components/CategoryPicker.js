@@ -12,12 +12,12 @@ var PickerItemIOS = PickerIOS.Item;
 
 const CATEGORIES = ["Love", "Sex", "Social", "Funny", "Embarassing", "Past"]
 
-class CategoryPicker extends React.Component { 
+class CategoryPicker extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       category: 'Social'
-    } 
+    }
   }
   render () {
     return (
@@ -39,7 +39,7 @@ class CategoryPicker extends React.Component {
 
 var styles = StyleSheet.create({
   categoryPicker: {
-
+    marginTop: -30
   },
 });
 

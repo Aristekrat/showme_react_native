@@ -44,7 +44,7 @@ class SelectSecret extends React.Component {
     this.publicSecrets.child(key).child('score').transaction((currentRank) => {
       return currentRank + voteAmt;
     }, (error, committed, snapshot) => {
-      var foo = snapshot.val();
+      var foo = snapshot.val(); // This line blew up once
       this.publicSecrets.child(key).setPriority(-foo);
     });
   }
@@ -86,16 +86,13 @@ class SelectSecret extends React.Component {
     Utility.resetState(false, this.props.error);
 
     if (!this.props.userId) {
-      AsyncStorage.getItem('smUserData').then((user_data_string) => {
-        if (user_data_string) {
-          let user_data = JSON.parse(user_data_string);
-          if (user_data.uid) {
-            this.knownUser = user_data.uid;
-            this.props.actions.updateUserId(user_data.uid);
-          }
+      Utility.firebaseApp.auth().onAuthStateChanged((user) => {
+        if (user) {
+          this.knownUser = user.uid;
         }
       });
     }
+    
   }
 
   componentDidMount() {
@@ -125,17 +122,7 @@ class SelectSecret extends React.Component {
           user_data.profileName = "Anonymous";
         }
       }
-    })
-
-    /*
-    Utility.firebaseApp.auth().onAuthStateChanged((user) => {
-      console.log("EXECUTED", user);
-      if (!user) {
-        this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
-      }
     });
-    */
-
   }
 
   render() {

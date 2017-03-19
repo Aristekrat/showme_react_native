@@ -2,6 +2,10 @@ import Contacts from 'react-native-contacts';
 import Utility from './UtilityFunctions.js';
 const Composer = require('NativeModules').RNMessageComposer;
 
+import {
+  AsyncStorage,
+} from 'react-native';
+
 const SendSecret = {
   DB: Utility.getRef(),
   senderPH: "",
@@ -76,22 +80,40 @@ const SendSecret = {
                   this.navigator.push({name: 'SelectCategory', modalText: 'Message Sent'});
                   break;
               case Composer.Cancelled:
-                  this.navigator.push({name: 'SecretCode'})
-                  console.log('user cancelled sending the message');
+                  this.navigator.push({name: 'SelectCategory'});
                   break;
               case Composer.Failed:
-                  this.navigator.push({name: 'SecretCode', modalText: 'Sorry, sending text failed. Try again?'})
+                  this.navigator.push({name: 'SelectCategory', modalText: 'Sorry, sending text failed. Try again?'})
                   break;
               case Composer.NotSupported:
                   this.navigator.push({name: 'SelectCategory', modalText: 'Sorry, your device is unsupported'});
-                  console.log('this device does not support sending texts');
                   break;
               default:
-                  this.navigator.push({name: 'SecretCode', modalText: 'Network Error'});
+                  this.navigator.push({name: 'SelectCategory', modalText: 'Network Error'});
                   break;
           }
       }
     );
+  },
+
+  updateLocalSecretState: function (secretsArr) {
+    let newArr = [];
+    secretsArr.forEach((item, index) => {
+      let updateIndex;
+      if (item.key === this.key) {
+        updateIndex = index
+      }
+
+      if (index === secretsArr.length) {
+        let newArr = secretsArr;
+        if (updateIndex) {
+          newArr[updateIndex].state.sentState = "RR";
+          AsyncStorage.setItem('smSecrets', JSON.stringify(newArr));
+        } else {
+          console.log("ERR!");
+        }
+      }
+    })
   },
 
   updateSentStatus: function(updatedSecret) {
@@ -100,6 +122,9 @@ const SendSecret = {
     if (updatedSecret.responderID) {
       this.DB.child('users').child(updatedSecret.responderID).child('secrets').child(this.key).update({sentState: 'RR'}); // DB Dependency
     }
+    AsyncStorage.getItem('smSecrets').then((secrets_data_string) => {
+      this.updateLocalSecretState(JSON.parse(secrets_data_string))
+    });
   },
 
 }

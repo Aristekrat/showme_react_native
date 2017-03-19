@@ -48,12 +48,12 @@ class ShareSecret extends React.Component {
     AsyncStorage.getItem('smUserData').then((user_data_string) => {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
-        if (!user_data.profileName) {
-          user_data.profileName = "Anonymous";
-        }
         SendSecret.lookUpSenderPH(user_data.uid);
         if (this.props.route.publicSecret) {
-           GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, user_data.uid, user_data.profileName, (psData) => {
+          if (!user_data.profileName) {
+            user_data.profileName = "Anonymous";
+          }
+          GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, user_data.uid, user_data.profileName, (psData) => {
             this.props.actions.updateSecretKey(psData.key);
           }, (error) => {
             if (error == "Error: PERMISSION_DENIED: Permission denied") {
@@ -63,6 +63,19 @@ class ShareSecret extends React.Component {
             }
           })
         }
+      } else if (this.props.userId) {
+          SendSecret.lookUpSenderPH(this.props.userId)
+          if (this.props.route.publicSecret) {
+            GetSecrets.pushPrivateSecret(this.props.route.cookieData.text, this.props.userId, "Anonymous", (psData) => {
+              this.props.actions.updateSecretKey(psData.key);
+            }, (error) => {
+              if (error == "Error: PERMISSION_DENIED: Permission denied") {
+                this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
+              } else {
+                this.props.actions.setError("We're sorry, there was an error connecting to the server");
+              }
+            });
+          }
       } else {
         this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to sign in first'});
       }
@@ -123,7 +136,6 @@ class ShareSecret extends React.Component {
           }
           </View>
           }
-          {!this.state.isReady ? null : <Text style={styles.exclusive}>Show Me is exclusively available on iPhones</Text>}
           <ActivityIndicator animationControl={this.props.animating} />
           {
             this.props.error ? <Text style={styles.error}>{this.props.error}</Text> : null

@@ -18,7 +18,8 @@ import {
   ScrollView,
   Image,
   TextInput,
-  TouchableHighlight
+  TouchableHighlight,
+  AsyncStorage
 } from 'react-native';
 
 import { connect } from 'react-redux';
@@ -45,7 +46,11 @@ class BetaLock extends React.Component {
       this.verificationCodes.child(codeKey).remove();
       this.props.navigator.push({name: 'SelectCategory', welcomeModal: true});
     } else {
-      this.secretClaimed(codeKey, privateSecret);
+      this.setTimeout (
+        () => {
+          this.secretClaimed(codeKey, privateSecret);
+        }, 700
+      )
     }
   }
 
@@ -55,10 +60,8 @@ class BetaLock extends React.Component {
     } else {
       this.props.actions.toggleAnimation();
       let whitespaceStripped = this.props.code.replace(/\s/g,'');
-      console.log(whitespaceStripped);
       this.verificationCodes.orderByValue().equalTo(whitespaceStripped).once('value', (snapshot) => {
         let valReturned = snapshot.val();
-        console.log(valReturned);
         if (valReturned) {
           this.userFunctions.anonAuth();
           let codeKey = Object.keys(valReturned)[0];
@@ -87,7 +90,8 @@ class BetaLock extends React.Component {
           updatedHash[codeKey] = true;
           this.props.actions.pushUpdatedSecret(codeKey);
           this.props.actions.incrementNotifications(1);
-          GetSecrets.addUpdatedSecretsToAsyncStorage(updatedHash)
+          GetSecrets.addUpdatedSecretsToAsyncStorage(updatedHash);
+          // The absence of a ps.askerID can cause this func to fail, might want to handle it gracefully
           this.users.child(ps.askerID).child('secrets').child(codeKey).once('value', (grandchildSnapshot) => {
             if (grandchildSnapshot.val()) {
               ps.state = {
@@ -102,8 +106,9 @@ class BetaLock extends React.Component {
             }
             ps.key = codeKey;
             ps.answer = null;
+            ps.responderID = this.props.userId;
             this.props.actions.toggleAnimation();
-            this.props.navigator.push({name: 'MySecrets', secret: ps, modalText: 'You have the power to invite new users.', modalTitle: 'Welcome', modalSecondaryText: "Your security settings are currently 'low', you can register to increase security."});
+            this.props.navigator.push({name: 'MySecrets', secret: ps, modalText: 'You have the power to invite new users.', modalTitle: 'Welcome', modalSecondaryText: "You can also answer your friend's secret question here."});
             this.setTimeout (
               () => {
                 this.users.child(this.props.userId).child('secrets').child(codeKey).set({answerState: grandchildSnapshot.val().answerState, sentState: 'RR'});
@@ -112,7 +117,7 @@ class BetaLock extends React.Component {
               }, 1000
             )
           });
-          // this.verificationCodes.child(codeKey).remove();
+          this.verificationCodes.child(codeKey).remove();
       }
     )
   }
@@ -122,7 +127,14 @@ class BetaLock extends React.Component {
     this.props.actions.toggleAnimation();
   }
 
+  resetAppState() {
+    Utility.logout();
+    AsyncStorage.removeItem('smSecrets');
+    AsyncStorage.removeItem('smUserData');
+  }
+
   componentWillMount() {
+    this.resetAppState();
     Utility.resetState(this.props.animating, this.props.error, this.props.email);
   }
 
@@ -130,12 +142,12 @@ class BetaLock extends React.Component {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>
-          <Image style={styles.heroImage} source={require("../img/show-me-skirt.png")} />
+          <Image style={styles.heroImage} source={require("../img/show-me-skirt-compressed.png")} />
           <Text style={styles.mainHeader}>
             Please enter your invitation
           </Text>
           <Text style={styles.header}>
-            You would have received this in a text from a friend or directly from ShowMe.
+            You would have received this in a text from a friend or from ShowMe.
           </Text>
           <TextInput
             style={StylingGlobals.textInput}
@@ -150,7 +162,8 @@ class BetaLock extends React.Component {
             this.props.error ? <Text style={styles.error}>{this.props.error}</Text> : null
           }
           <ActivityIndicator animationControl={this.props.animating} />
-          <ArrowLink skipTo={() => {this.props.navigator.push({name: "BetaExplanation"}); this.props.actions.updateFormInput('')} }>Dont have an invitation?</ArrowLink>
+          <ArrowLink extraStyling={{marginTop: -12}} skipTo={() => {this.props.navigator.push({name: "BetaExplanation"}); this.props.actions.updateFormInput('')} }>Dont have an invitation?</ArrowLink>
+
         </ScrollView>
       </View>
     );
@@ -177,15 +190,15 @@ const mapDispatchToProps = function(dispatch, ownProps) {
 
 var styles = StyleSheet.create({
   heroImage: {
-    width: 205,
-    height: 205,
+    width: 105,
+    height: 80,
+    marginTop: 12,
     alignSelf: 'center',
-    marginTop: -15,
-    marginBottom: -15,
   },
   mainHeader: {
     marginLeft: 30,
     marginRight: 30,
+    marginTop: 7,
     fontSize: 18,
     marginBottom: 7,
     textAlign: 'center',
@@ -202,7 +215,7 @@ var styles = StyleSheet.create({
     marginLeft: 30,
     fontSize: 16,
     marginRight: 30,
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BetaLock)

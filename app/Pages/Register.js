@@ -10,6 +10,7 @@ import GetSecrets from '../Globals/GetSecrets.js';
 import { connect } from 'react-redux';
 import actions from '../State/Actions/Actions';
 import User from '../Globals/User';
+import FButton from '../Components/FButton.js';
 import * as firebase from 'firebase';
 import {
   StyleSheet,
@@ -41,7 +42,7 @@ class Register extends Component {
       this.users.child(userData.uid).set({email: email, secrets: {}, securityEnabled: false, profileName: defaultName });
       this.usersIndex.child(filteredEmail).set(true);
       this.props.actions.toggleAnimation();
-      this.userFunctions.login(email, this.props.password, true);
+      this.userFunctions.login(email, this.props.password);
     }).catch((error) => {
       this.userFunctions.errorHandler(error);
     })
@@ -70,6 +71,17 @@ class Register extends Component {
   switchToLogin() {
     this.props.actions.removeError();
     this.props.navigator.push({name: 'SignIn'});
+  }
+
+  fbSuccessCB(authData, props) {
+    AsyncStorage.setItem('smUserData', JSON.stringify(authData));
+    Utility.setLocalAuth(true);
+    props.actions.removeError();
+    if (props.message) {
+      props.navigator.pop();
+    } else {
+      props.navigator.push({name: 'SelectCategory', refresh: true})
+    }
   }
 
   componentWillMount() {
@@ -128,6 +140,11 @@ class Register extends Component {
             :
             null
           }
+          <FButton
+            successCB={this.fbSuccessCB}
+            db={this.props.db}
+            navigator={this.props.navigator}
+            width={{width: 260, marginLeft: 35}}/>
           {
             this.props.route.cookieData ?
             null
@@ -146,7 +163,7 @@ class Register extends Component {
 var styles = StyleSheet.create({
   container: StylingGlobals.container,
   form: {
-    marginTop: 50
+    marginTop: 15
   },
   row: {
     flex: 1,

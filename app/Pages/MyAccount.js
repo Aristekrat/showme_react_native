@@ -84,8 +84,6 @@ class MyAccount extends React.Component {
   }
 
   componentWillMount() {
-    Utility.checkAllAuth();
-
     if (!Utility.authStatus) {
       this.props.navigator.push({name: 'SignIn', message: 'Sorry, you need to Sign In first'});
     }
@@ -100,9 +98,7 @@ class MyAccount extends React.Component {
         }
       });
     }
-  }
 
-  componentDidMount() {
     this.setTimeout (
       () => {
         Utility.firebaseApp.auth().onAuthStateChanged((user) => {
@@ -112,6 +108,10 @@ class MyAccount extends React.Component {
         });
       }, 0
     )
+  }
+
+  componentDidMount() {
+    
   }
 
   render(){

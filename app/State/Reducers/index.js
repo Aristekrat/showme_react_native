@@ -6,7 +6,6 @@ import animationReducer from './AnimationReducer';
 import errorReducer from './ErrorReducer';
 import formInputReducer from './FormInputReducer';
 import phoneNumberReducer from './PhoneNumberReducer';
-import introReducer from './IntroReducer';
 import isConnectedReducer from './IsConnectedReducer';
 import modalTextReducer from './ModalTextReducer';
 import secretKeyReducer from './SecretKeyReducer';
@@ -35,7 +34,6 @@ const reducers = combineReducers({
   password: passwordReducer,
   secretCode: secretCodeReducer,
   secretKey: secretKeyReducer,
-  selectCategoryIntro: introReducer,
   modalText: modalTextReducer,
   userId: userIdReducer,
   mySecretsType: mySecretsTypeReducer,

@@ -17,7 +17,6 @@ function User(firebase, db, usersTable, navigator) {
 User.prototype.anonAuth = function () {
   this.firebase.auth().signInAnonymously().then((authData) => {
     this.usersTable.child(authData.uid).set({email: "", secrets: {}, securityEnabled: false, profileName: "Anonymous" });
-    console.log("JUST ANON AUTHD");
     AsyncStorage.setItem('smAnonFlag', JSON.stringify(authData.uid));
     this.postLoginProcessing(authData.uid, authData.provider);
   }).catch((error) => {
@@ -31,7 +30,6 @@ User.prototype.postLoginProcessing = function(uid, provider = "anonymous") {
     userRecord.uid = uid;
     userRecord.provider = provider;
     AsyncStorage.setItem('smUserData', JSON.stringify(userRecord));
-    actions.updateUserId(uid);
   });
   AsyncStorage.removeItem('smSecrets');
   AsyncStorage.removeItem('smUpdatedSecrets');
@@ -40,7 +38,7 @@ User.prototype.postLoginProcessing = function(uid, provider = "anonymous") {
   GetSecrets.listenForUpdatesToSecrets(uid);
 };
 
-User.prototype.login = function (username, password, registrationFlag = false, referred = false) {
+User.prototype.login = function (username, password, referred = false) {
     let email = username.trim();
     actions.toggleAnimation();
     actions.removeError();
@@ -51,8 +49,6 @@ User.prototype.login = function (username, password, registrationFlag = false, r
       if (referred) {
         Utility.resetState(true, true, true);
         this.navigator.pop();
-      } else if (registrationFlag) {
-        this.navigator.push({name: 'RegistrationInterim'}); // Needs to be commented out
       } else {
         Utility.resetState(true, true);
         this.navigator.push({name: 'SelectCategory', refresh: true});

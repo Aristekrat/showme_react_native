@@ -98,6 +98,10 @@ class CreateYourOwn extends React.Component {
 
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error, this.props.text);
+
+    if (this.props.submitSuccess) {
+      this.props.actions.submitSuccess(false);
+    }
   }
 
   componentDidMount() {
@@ -165,10 +169,9 @@ class CreateYourOwn extends React.Component {
             </Switch>
           </View>
           { this.props.public ? // category picker for public secrets or nothing
-            <View>
-              <Text style={styles.label}>Which category?</Text>
+            <View style={styles.antiRow}>
+              <Text style={styles.whichCategory}>Which category?</Text>
               <CategoryPicker ref="catPicker" />
-              <Text style={[styles.publicExplanatory, {marginBottom: 15}]}>No one will know you wrote this secret</Text>
             </View>
             :
             null
@@ -202,6 +205,11 @@ class CreateYourOwn extends React.Component {
              <Text style={styles.buttonText}>Create Your Secret</Text>
           </TouchableHighlight>
           }
+          { this.props.public ? // category picker for public secrets or nothing
+            <Text style={[styles.publicExplanatory, {marginBottom: 15}]}>No one will know you wrote this secret</Text>
+            :
+            null
+          }
           <ActivityIndicator animationControl={this.props.animating} extraStyling={{height:0}}/>
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
@@ -216,7 +224,13 @@ var styles = StyleSheet.create({
     padding: 20,
   },
   row: {
-    marginBottom: 20
+    marginBottom: 15
+  },
+  antiRow: {
+    marginTop: -10,
+  },
+  whichCategory: {
+    fontSize: 14,
   },
   textInput: {
     backgroundColor: '#fff',
@@ -230,8 +244,8 @@ var styles = StyleSheet.create({
     fontSize: 16,
   },
   publicExplanatory: {
-    fontSize: 12,
-    marginBottom: 4,
+    fontSize: 13,
+    marginLeft: 2,
   },
   button: {
     backgroundColor: StylingGlobals.colors.mainColor,

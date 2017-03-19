@@ -11,6 +11,8 @@ import { connect } from 'react-redux';
 import actions from '../State/Actions/Actions';
 import User from '../Globals/User';
 import FButton from '../Components/FButton.js';
+import ReactMixin from 'react-mixin';
+import ReactTimer from 'react-timer-mixin';
 
 import {
   StyleSheet,
@@ -34,18 +36,23 @@ class SignIn extends Component {
 
   submitUser() {
     if (this.props.email !== '' && this.props.password !== '') {
-      this.userFunctions.login(this.props.email, this.props.password, false, this.props.route.message);
+      this.userFunctions.login(this.props.email, this.props.password, this.props.route.message);
     } else {
       this.props.actions.setError('Please enter an email and password');
     }
   }
 
   fbSuccessCB(authData, props) {
+    console.log(authData, props);
     AsyncStorage.setItem('smUserData', JSON.stringify(authData));
-    Utility.setLocalAuth();
+    Utility.setLocalAuth(true);
     props.actions.removeError();
     if (props.message) {
-      props.navigator.pop();
+      this.setTimeout (
+        () => {
+          props.navigator.pop();
+        }, 100
+      )
     } else {
       props.navigator.push({name: 'SelectCategory', refresh: true})
     }
@@ -141,10 +148,12 @@ class SignIn extends Component {
   }
 }
 
+ReactMixin(SignIn.prototype, ReactTimer);
+
 var styles = StyleSheet.create({
   container: StylingGlobals.container,
   form: {
-    marginTop: 50
+    marginTop: 15
   },
   row: {
     flex: 1,
@@ -186,7 +195,7 @@ var styles = StyleSheet.create({
     width: 410,
   },
   forgotPasswordBlock: {
-    marginTop: 15,
+    marginTop: 0,
     width: 410,
   },
   fbContainer: {

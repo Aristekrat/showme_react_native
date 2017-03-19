@@ -11,9 +11,9 @@ import {
 class ArrowLink extends React.Component {
   render() {
     return (
-      <TouchableHighlight 
-          style={styles.skipButton} 
-          underlayColor={StylingGlobals.colors.accentPressDown} 
+      <TouchableHighlight
+          style={[styles.skipButton, this.props.extraStyling]} 
+          underlayColor={StylingGlobals.colors.accentPressDown}
           onPress={this.props.skipTo} >
         <View style={styles.skipContainer}>
           <Text style={styles.skipText}>{this.props.children}</Text>
