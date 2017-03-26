@@ -89,7 +89,7 @@ class Register extends Component {
       this.props.actions.updateFormInput(this.props.route.cookieData);
     }
 
-    Utility.resetState(this.props.animating, this.props.error);
+    Utility.resetState(this.props.animating, this.props.error, this.props.email);
   }
 
   render() {
@@ -100,8 +100,9 @@ class Register extends Component {
           <View style={styles.row}>
             <Text style={styles.label}>Email</Text>
             <TextInput
-              style={styles.textInput}
+              style={StylingGlobals.textInput}
                 ref="email"
+                placeholder="Email"
                 autoFocus={true}
                 keyboardType={'email-address'}
                 value={this.props.email}
@@ -112,8 +113,9 @@ class Register extends Component {
           <View style={styles.row}>
             <Text style={styles.label}>Password</Text>
             <TextInput
-              style={styles.textInput}
+              style={StylingGlobals.textInput}
               ref="password"
+              placeholder="Password"
               onChangeText={(password) => this.props.actions.updatePassword(password) }
               secureTextEntry={true}
               selectionColor={StylingGlobals.colors.navColor} />
@@ -144,7 +146,7 @@ class Register extends Component {
             successCB={this.fbSuccessCB}
             db={this.props.db}
             navigator={this.props.navigator}
-            width={{width: 260, marginLeft: 35}}/>
+            width={{marginTop: 5, marginBottom: -5}}/>
           {
             this.props.route.cookieData ?
             null
@@ -166,16 +168,18 @@ var styles = StyleSheet.create({
     marginTop: 15
   },
   row: {
+    /*
     flex: 1,
     flexDirection: 'row',
     marginTop: 7
+    */
   },
   label: {
     fontSize: 12,
     textAlign: 'left',
-    margin: 10,
-    marginTop: 22,
-    width: 55,
+    marginLeft: 30,
+    marginBottom: 3,
+    marginTop: 12,
   },
   textInput: {
     height: 55,
@@ -184,15 +188,16 @@ var styles = StyleSheet.create({
     marginBottom: 8,
     borderColor: StylingGlobals.colors.textInputBorder,
     borderWidth: 1,
-    width: 260,
     backgroundColor: '#fff'
   },
   button: {
-  	padding: 10,
+    padding: 10,
   	backgroundColor: StylingGlobals.colors.mainColor,
-    marginTop: 14,
-    width: 260,
-    marginLeft: 75,
+    marginLeft: 30,
+    marginRight: 30,
+    marginTop: 18,
+    //width: 260,
+    //marginLeft: 75,
     height: 55,
   },
   buttonText: {
@@ -216,8 +221,8 @@ var styles = StyleSheet.create({
     width: 415,
   },
   switchBlock: {
-    marginTop: 5,
-    width: 415,
+    marginTop: 0,
+    //width: 415,
   }
 });
 

@@ -75,10 +75,6 @@ class SelectCategory extends React.PureComponent {
         AsyncStorage.setItem('smContacts', JSON.stringify(contacts));
       }
     });
-
-    AsyncStorage.getItem('smUserData').then((secrets_data_string) => {
-      console.log(JSON.parse(secrets_data_string));
-    });
   }
 
   render(){

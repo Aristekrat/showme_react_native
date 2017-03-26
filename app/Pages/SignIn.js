@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 import actions from '../State/Actions/Actions';
 import User from '../Globals/User';
 import FButton from '../Components/FButton.js';
+import BigButton from '../Components/BigButton.js';
 import ReactMixin from 'react-mixin';
 import ReactTimer from 'react-timer-mixin';
 
@@ -80,7 +81,7 @@ class SignIn extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View style={StylingGlobals.container}>
         <ActivityIndicator animationControl={this.props.animating}/>
         <ScrollView style={styles.form}>
           {
@@ -94,11 +95,12 @@ class SignIn extends Component {
           <View style={styles.row}>
             <Text style={styles.label}>Email</Text>
             <TextInput
-              style={styles.textInput}
+              style={StylingGlobals.textInput}
                 ref="email"
                 autoFocus={true}
                 keyboardType={'email-address'}
                 value={this.props.email}
+                placeholder="Email"
                 onEndEditing={ (text) => {this.refs.password.focus()}}
                 onChangeText={ (email) => this.props.actions.updateFormInput(email) }
                 selectionColor={StylingGlobals.colors.mainColor} />
@@ -106,8 +108,9 @@ class SignIn extends Component {
           <View style={styles.row}>
             <Text style={styles.label}>Password</Text>
             <TextInput
-              style={styles.textInput}
+              style={StylingGlobals.textInput}
               ref="password"
+              placeholder="Password"
               onChangeText={ (password) => this.props.actions.updatePassword(password) }
               secureTextEntry={true}
               selectionColor={StylingGlobals.colors.navColor} />
@@ -122,7 +125,7 @@ class SignIn extends Component {
             successCB={this.fbSuccessCB}
             db={this.props.db}
             navigator={this.props.navigator}
-            width={{width: 260, marginLeft: 35}}/>
+            width={{marginTop: 5, marginBottom: -5}}/>
           {
             this.props.displaySkip ?
             <View style={styles.forgotPasswordBlock}>
@@ -153,19 +156,23 @@ ReactMixin(SignIn.prototype, ReactTimer);
 var styles = StyleSheet.create({
   container: StylingGlobals.container,
   form: {
-    marginTop: 15
+    marginTop: 5
   },
   row: {
+    /*
     flex: 1,
     flexDirection: 'row',
     marginTop: 7
+    */
   },
   label: {
     fontSize: 12,
     textAlign: 'left',
-    margin: 10,
-    marginTop: 22,
-    width: 55,
+    marginLeft: 30,
+    marginBottom: 3,
+    marginTop: 12,
+    //marginTop: 22,
+    //width: 55,
   },
   textInput: {
     height: 55,
@@ -174,15 +181,17 @@ var styles = StyleSheet.create({
     marginBottom: 8,
     borderColor: StylingGlobals.colors.textInputBorder,
     borderWidth: 1,
-    width: 260,
+    //width: 260,
     backgroundColor: '#fff'
   },
   button: {
   	padding: 10,
   	backgroundColor: StylingGlobals.colors.mainColor,
-    marginTop: 14,
-    width: 260,
-    marginLeft: 75,
+    marginLeft: 30,
+    marginRight: 30,
+    marginTop: 18,
+    //width: 260,
+    //marginLeft: 75,
     height: 55,
   },
   buttonText: {
@@ -192,21 +201,11 @@ var styles = StyleSheet.create({
     fontSize: 16,
   },
   switchBlock: {
-    width: 410,
+    //width: 410,
   },
   forgotPasswordBlock: {
     marginTop: 0,
-    width: 410,
-  },
-  fbContainer: {
-    marginTop: 25,
-    marginBottom: 0,
-    width: 250,
-    marginLeft: 90,
-  },
-  fbutton: {
-    height: 45,
-    width: 250,
+    //width: 410,
   },
   errorContainer: {
     marginLeft: 30,

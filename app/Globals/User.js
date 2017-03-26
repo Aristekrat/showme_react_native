@@ -61,7 +61,7 @@ User.prototype.login = function (username, password, referred = false) {
 User.prototype.forgotPassword = function (username) {
   let auth = this.firebase.auth();
   auth.sendPasswordResetEmail(username).then(() => {
-    actions.setError('Password reset successfully. Please check your email.');
+    actions.setError('Please check your email to reset your password.');
   }, (error) => {
     switch (error.code) {
       case "auth/user-not-found":
@@ -83,6 +83,9 @@ User.prototype.errorHandler = function (error) {
       break;
     case 'auth/user-not-found':
       actions.setError('We did not find your email address. Do you need to register?');
+      break;
+    case 'auth/email-already-in-use':
+      actions.setError('Your email has already been registered. Please login');
       break;
     case 'auth/wrong-password':
       actions.setError('Incorrect password');

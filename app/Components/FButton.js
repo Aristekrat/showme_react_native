@@ -46,8 +46,6 @@ class FButton extends React.Component {
                           this.props.successCB(authData, this.props);
                           Utility.setLocalAuth(true);
                         }).catch((error) => {
-                          console.log("HERE");
-                          console.log(error);
                           this.props.actions.setError("Sorry, there was an error. Either try email registration or skip for now.");
                         });
                       }
@@ -71,7 +69,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   fbutton: {
-    width: 295,
+    width: 315,
     flex: 1,
     height: 55,
   },

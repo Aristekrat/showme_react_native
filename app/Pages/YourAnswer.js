@@ -51,7 +51,6 @@ class YourAnswer extends React.Component {
         let secretID = this.currentSecret.key;
         let updatedAnswer = {};
         updatedAnswer[userStatus] = this.props.answer;
-        console.log(userStatus, this.props.userId, updatedAnswer);
         this.answers.child(secretID).update(updatedAnswer, this.updateUsersTable(userStatus, this.props.userId));
       } else {
         this.props.actions.setError("Sorry, the app has experienced an error");

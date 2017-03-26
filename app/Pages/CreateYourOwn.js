@@ -178,7 +178,7 @@ class CreateYourOwn extends React.Component {
           }
           { // Success notification block or submit block
             this.props.submitSuccess ?
-            <View>
+            <View style={styles.successBlock}>
               <Text style={styles.positiveNotification}>Success!</Text>
               <TouchableHighlight
                   style={styles.button}
@@ -205,7 +205,7 @@ class CreateYourOwn extends React.Component {
              <Text style={styles.buttonText}>Create Your Secret</Text>
           </TouchableHighlight>
           }
-          { this.props.public ? // category picker for public secrets or nothing
+          { this.props.public && !this.props.submitSuccess ? // category picker for public secrets or nothing
             <Text style={[styles.publicExplanatory, {marginBottom: 15}]}>No one will know you wrote this secret</Text>
             :
             null
@@ -282,7 +282,10 @@ var styles = StyleSheet.create({
   linkStyling: {
     color: StylingGlobals.colors.pressDown,
     textAlign: 'center',
-  }
+  },
+  successBlock: {
+    marginBottom: 15,
+  },
 });
 
 const mapStateToProps = (state) => {

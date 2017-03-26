@@ -108,7 +108,8 @@ class ShareSecret extends React.Component {
                 } }/>
               <Text style={styles.label}>If you let ShowMe access contacts we can find it for you</Text>
               <BigButton do={() => {
-                  var filteredString = this.state.ph.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(' ').join('');
+                  let filteredString = this.props.phoneNumber.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(' ').join('');
+                  //var filteredString = this.state.ph
                   if (isNaN(parseInt(filteredString))) {
                     this.props.actions.setError("Please enter a number");
                   } else if (filteredString.length < 9) {
@@ -123,15 +124,15 @@ class ShareSecret extends React.Component {
             </View>
             :
             <View>
-              <Text style={StylingGlobals.header}>Choose who you want to send to...</Text>
+              <Text style={styles.header}>Choose who you want to send to...</Text>
               <UserContacts contacts={this.props.route.contacts}/>
-              <Text style={styles.label}>You will have a chance to review before you send</Text>
               <BigButton do={() => {
                   this.props.actions.toggleAnimation();
                   SendSecret.saveArgs(this.props.phoneNumber, this.props.firstName, this.props.userId, this.props.secretKey, this.props);
                 }}>
                 Continue
               </BigButton>
+              <Text style={styles.label}>You will have a chance to review before you send</Text>
             </View>
           }
           </View>
@@ -150,6 +151,12 @@ class ShareSecret extends React.Component {
 ReactMixin(ShareSecret.prototype, ReactTimer);
 
 var styles = StyleSheet.create({
+  header: {
+    marginLeft: 30,
+    marginTop: 10,
+    fontSize: 16,
+    marginBottom: 5,
+  },
   prompt: {
     width: 300,
     marginLeft: 30,
@@ -169,6 +176,8 @@ var styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   label: {
+    marginTop: 0,
+    marginBottom: 5,
     marginLeft: 30,
     fontSize: 12,
   },
