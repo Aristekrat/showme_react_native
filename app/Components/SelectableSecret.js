@@ -71,7 +71,7 @@ var styles = StyleSheet.create({
       fontSize: 15,
       color: '#444',
       paddingTop: 5,
-      flex: 4,
+      flex: 5,
     },
     secretArrow: {
       marginTop: 8,

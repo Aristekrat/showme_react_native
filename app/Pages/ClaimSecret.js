@@ -26,7 +26,7 @@ class ClaimSecret extends React.Component {
   constructor(props) {
     super(props);
     this.verificationCodes = this.props.db.child('indexes').child('verificationCodes');
-    this.verifiedIndex = this.props.db.child('indexes').child('verified');
+    // this.verifiedIndex = this.props.db.child('indexes').child('verified');
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
   }
@@ -76,7 +76,7 @@ class ClaimSecret extends React.Component {
           this.users.child(this.props.userId).child('secrets').child(codeKey).set({answerState: grandchildSnapshot.val().answerState, sentState: 'RR'});
         });
         this.verificationCodes.child(codeKey).remove();
-        this.verifiedIndex.child(this.props.userId).set(true);
+        // this.verifiedIndex.child(this.props.userId).set(true);
       } else {
         this.setErrorState("Sorry, we couldn't find that code");
       }
@@ -105,9 +105,21 @@ class ClaimSecret extends React.Component {
 
   componentDidMount() {
     GetSecrets.checkIfRemoteSecretsReceived(GetSecrets.writeRemoteSecretsToAsyncStore);
+
+    this.props.db.child('indexes').child('verificationCodes').orderByValue().equalTo('ClumsyHook').once('value', (snapshot) => {
+      let result = snapshot.val();
+      if (result) {
+        let psKey = Object.keys(result)[0];
+        this.privateSecrets.child(psKey).once('value', (grandchildSnapshot) => {
+          if (grandchildSnapshot.val()) {
+
+          }
+        })
+      }
+    });
   }
 
-  render(){
+  render() {
     return (
       <View style={StylingGlobals.container}>
         <ScrollView>

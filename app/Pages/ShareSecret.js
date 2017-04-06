@@ -36,6 +36,7 @@ class ShareSecret extends React.Component {
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
     this.answers = this.props.db.child('answers');
+    this.phIndex = this.props.db.child('indexes').child('phoneNumbers');
   }
 
   componentWillMount() {
@@ -48,7 +49,10 @@ class ShareSecret extends React.Component {
     AsyncStorage.getItem('smUserData').then((user_data_string) => {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
-        SendSecret.lookUpSenderPH(user_data.uid);
+        if (!this.props.userId) {
+          this.props.updateUserId(user_data.uid);
+        }
+        //SendSecret.lookUpSenderPH(user_data.uid);
         if (this.props.route.publicSecret) {
           if (!user_data.profileName) {
             user_data.profileName = "Anonymous";
@@ -128,7 +132,8 @@ class ShareSecret extends React.Component {
               <UserContacts contacts={this.props.route.contacts}/>
               <BigButton do={() => {
                   this.props.actions.toggleAnimation();
-                  SendSecret.saveArgs(this.props.phoneNumber, this.props.firstName, this.props.userId, this.props.secretKey, this.props);
+                  SendSecret.saveArgs(this.props.phoneNumber, this.props.name, this.props.userId, this.props.secretKey, this.props);
+                  // this.props.navigator.push({name: 'SecretCode', receiverName: this.props.name, userId: this.props.userId, cookieData: this.props.route.cookieData, key: this.props.secretKey, receiverPH: this.props.phoneNumber});
                 }}>
                 Continue
               </BigButton>
@@ -200,7 +205,7 @@ const mapStateToProps = (state) => {
     contactsPermission: state.contactsPermission,
     phoneNumber: state.phoneNumber,
     secretKey: state.secretKey,
-    firstName: state.firstName,
+    name: state.name,
     userId: state.userId,
   };
 }

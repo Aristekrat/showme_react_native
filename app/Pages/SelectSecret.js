@@ -92,10 +92,12 @@ class SelectSecret extends React.Component {
         }
       });
     }
-    
+
   }
 
   componentDidMount() {
+    console.log(this.props.userId);
+
     InteractionManager.runAfterInteractions(() => {
       this.setState({isReady: true});
     });
@@ -131,6 +133,11 @@ class SelectSecret extends React.Component {
         <ScrollView>
         <ActivityIndicator animationControl={this.props.animating}/>
         {this.props.error ? <Text style={styles.warning}>{this.props.error}</Text> : null }
+        {this.state.isReady && this.props.route.category === "Fall in Love" ?
+          <View>
+            <Text style={styles.fallInLove}>These questions were designed by scientists to help friends or lovers establish a deeper connection. They go up in intensity, from 1 to 37.</Text>
+          </View>
+          : null }
         {!this.state.isReady ? <ActivityIndicator animationControl={true}/> :
         <ListView
           dataSource= {
@@ -172,6 +179,15 @@ var styles = StyleSheet.create({
   secretContainer: {
     height: 50,
     marginBottom: 50,
+  },
+  fallInLove: {
+    marginTop: 5,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 3,
+    borderBottomColor: '#FDDCDC',
+    borderBottomWidth: 1,
+    fontSize: 13,
   },
   warning: {
     textAlign: 'center',

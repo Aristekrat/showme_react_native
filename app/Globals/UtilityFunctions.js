@@ -47,11 +47,13 @@ var Utility = {
     this.provider = provider;
   },
 
+  /*
 	getVerificationStatus: function(uid) {
 		this.ref.child('indexes').child('verified').child(uid).once('value', (snapshot)=> {
 			this.verified = snapshot.val();
 		});
 	},
+  */
 
 	escapeEmail: function(email) {
 		return (email || '').replace('.', ',');

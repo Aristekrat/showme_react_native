@@ -10,7 +10,7 @@ import {
 
 var PickerItemIOS = PickerIOS.Item;
 
-const CATEGORIES = ["Love", "Sex", "Social", "Funny", "Embarassing", "Past"]
+const CATEGORIES = ["Love", "Sex", "Social", "Funny", "Random"]
 
 class CategoryPicker extends React.Component {
   constructor(props) {

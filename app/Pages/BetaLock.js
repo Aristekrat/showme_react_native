@@ -28,8 +28,10 @@ class BetaLock extends React.Component {
   constructor(props) {
     super(props);
     this.verificationCodes = this.props.db.child('indexes').child('verificationCodes');
-    this.pureInvitation = this.props.db.child('indexes').child('pureInvitation');
-    this.verifiedIndex = this.props.db.child('indexes').child('verified');
+    //this.pureInvitation = this.props.db.child('indexes').child('pureInvitation');
+    // this.verifiedIndex = this.props.db.child('indexes').child('verified');
+    this.phoneNumberIndex = this.props.db.child('indexes').child('phoneNumberIndex');
+    this.invitees = this.props.db.child('indexes').child('invitees');
     this.privateSecrets = this.props.db.child('privateSecrets');
     this.users = this.props.db.child('users');
     this.userFunctions = new User(Utility.firebaseApp, this.props.db, this.users, this.props.navigator);
@@ -54,13 +56,23 @@ class BetaLock extends React.Component {
     }
   }
 
+  addToPhoneIndex(code, userId) {
+    console.log(code, userId);
+    this.invitees.child(code).once('value', (snapshot) => {
+      let PH = snapshot.val();
+      this.phoneNumberIndex.child(PH).set(userId);
+      this.invitees.child(code).remove();
+    })
+  }
+
+
   verifyCode() {
     if (!this.props.code) {
       this.props.actions.setError("Please enter a secret code.");
     } else {
       this.props.actions.toggleAnimation();
-      let whitespaceStripped = this.props.code.replace(/\s/g,'');
-      this.verificationCodes.orderByValue().equalTo(whitespaceStripped).once('value', (snapshot) => {
+      this.whitespaceStripped = this.props.code.replace(/\s/g,'');
+      this.verificationCodes.orderByValue().equalTo(this.whitespaceStripped).once('value', (snapshot) => {
         let valReturned = snapshot.val();
         if (valReturned) {
           this.userFunctions.anonAuth();
@@ -71,7 +83,7 @@ class BetaLock extends React.Component {
               this.waitOnAuth(0, codeKey, privateSecret);
             } else {
               this.verificationCodes.child(codeKey).remove();
-              this.pureInvitation.child(whitespaceStripped).remove();
+              //this.pureInvitation.child(this.whitespaceStripped).remove();
               this.props.actions.toggleAnimation();
               this.props.navigator.push({name: 'SelectCategory', modalText: 'You have the power to invite new users.', modalTitle: 'Welcome', modalSecondaryText: "Select a premade secret or make your own to get started."});
             }
@@ -111,8 +123,10 @@ class BetaLock extends React.Component {
             this.props.navigator.push({name: 'MySecrets', secret: ps, modalText: 'You have the power to invite new users.', modalTitle: 'Welcome', modalSecondaryText: "You can also answer your friend's secret question here."});
             this.setTimeout (
               () => {
+                // this.users.child(this.props.userId).child('friends').set({})
                 this.users.child(this.props.userId).child('secrets').child(codeKey).set({answerState: grandchildSnapshot.val().answerState, sentState: 'RR'});
-                this.verifiedIndex.child(this.props.userId).set(true);
+                // this.verifiedIndex.child(this.props.userId).set(true);
+                this.addToPhoneIndex(this.whitespaceStripped, this.props.userId);
                 GetSecrets.pushLocalSecret(ps);
               }, 1000
             )

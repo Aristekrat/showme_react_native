@@ -34,8 +34,8 @@ const Actions = {
   updateSecretKey: function (value) {
     this.dispatch({type: 'secretKey', key: value});
   },
-  updateFirstName: function (value) {
-    this.dispatch({type: 'firstName', text: value});
+  updateName: function (value) {
+    this.dispatch({type: 'name', text: value});
   },
   updateUserId: function (value) {
     this.dispatch({type: 'userId', uid: value});

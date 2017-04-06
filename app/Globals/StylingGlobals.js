@@ -21,7 +21,7 @@ var globalStyling = {
     	backgroundColor: '#fff8f8',
   },
 	rightArrow: {
-	    marginLeft: 20,
+	    marginLeft: 10,
 	    width: 35,
 	    height: 35,
 	    opacity: 0.5,

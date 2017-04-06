@@ -27,7 +27,7 @@ const reducers = combineReducers({
   error: errorReducer,
   emailAddress: formInputReducer,
   formInput: formInputReducer,
-  firstName: nameReducer,
+  name: nameReducer,
   isAnimating: animationReducer,
   isConnected: isConnectedReducer,
   phoneNumber: phoneNumberReducer,

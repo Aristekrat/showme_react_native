@@ -2,7 +2,7 @@
 
 function nameReducer(state = "", action) {
 	switch(action.type) {
-		case "firstName":
+		case "name":
 			return action.text
 	}
 

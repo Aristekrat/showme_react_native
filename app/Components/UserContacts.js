@@ -63,6 +63,19 @@ class UserContacts extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.props.actions.updatePhoneNumber(this.state.contacts[0].phoneNumbers[0].number);
+
+    if (this.state.contacts[0].givenName && this.state.contacts[0].familyName) {
+      let name = this.state.contacts[0].givenName + " " + this.state.contacts[0].familyName;
+      this.props.actions.updateName(name);
+    } else if (this.state.contacts[0].givenName) {
+      this.props.actions.updateName(this.state.contacts[0].givenName);
+    } else if (this.state.contacts[0].familyName) {
+      this.props.actions.updateName(this.state.contacts[0].familyName);
+    }
+  }
+
   render () {
     return (
       <View style={styles.userContacts}>
@@ -72,7 +85,14 @@ class UserContacts extends React.Component {
             (contactIndex) => {
               this.setState({contact: contactIndex});
               this.props.actions.updatePhoneNumber(this.state.contacts[contactIndex].phoneNumbers[0].number);
-              this.props.actions.updateFirstName(this.state.contacts[contactIndex].givenName);
+              if (this.state.contacts[contactIndex].givenName && this.state.contacts[contactIndex].familyName) {
+                let name = this.state.contacts[contactIndex].givenName + " " + this.state.contacts[contactIndex].familyName;
+                this.props.actions.updateName(name);
+              } else if (this.state.contacts[contactIndex].givenName) {
+                this.props.actions.updateName(this.state.contacts[contactIndex].givenName);
+              } else if (this.state.contacts[contactIndex].familyName) {
+                this.props.actions.updateName(this.state.contacts[contactIndex].familyName);
+              }
             }
           }>
           {this.state.contacts.map((contact, index) => (

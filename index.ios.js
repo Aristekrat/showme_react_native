@@ -102,7 +102,7 @@ class ShowMe extends React.Component {
       if (user_data_string) {
         let user_data = JSON.parse(user_data_string);
         actions.updateUserId(user_data.uid);
-        Utility.getVerificationStatus(user_data.uid);
+        //Utility.getVerificationStatus(user_data.uid);
         if (user_data.provider) {
           Utility.setProvider(user_data.provider);
         }
@@ -220,7 +220,7 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "CreateYourOwn"}}
+        initialRoute={{name: "SelectCategory"}}
         />
       </Provider>
     );

@@ -29,7 +29,9 @@ class SecretCode extends React.Component {
       isReady: false,
     }
     this.verificationIndex = this.props.db.child('indexes').child('verificationCodes');
-    this.secretCodesIndex = this.props.db.child('indexes').child('pureInvitation');
+    //this.secretCodesIndex = this.props.db.child('indexes').child('pureInvitation');
+    this.inviteeIndex = this.props.db.child('indexes').child('invitees');
+    this.users = this.props.db.child('users');
   }
 
   generate() {
@@ -51,10 +53,10 @@ class SecretCode extends React.Component {
     let psKey = this.props.route.key;
     if (this.props.code && this.props.code.length >= 9) {
       this.props.actions.setAnimation(true);
-      this.secretCodesIndex.once('value', (snapshot) => {
+      this.verificationIndex.once('value', (snapshot) => {
         if (!snapshot.hasChild(this.props.code)) {
           this.verificationIndex.child(psKey).set(this.props.code);
-          this.secretCodesIndex.child(this.props.code).set(true);
+          //this.secretCodesIndex.child(this.props.code).set(true);
           SendSecret.router(this.props.code);
         } else {
           this.props.actions.setError("Please enter a different code");
@@ -64,6 +66,13 @@ class SecretCode extends React.Component {
     } else {
       this.props.actions.setError("Please enter a valid secret code");
     }
+  }
+
+  savePhoneNumber() {
+    let receiverName = this.props.route.receiverName ? this.props.route.receiverName : "Anonymous";
+    let PH = this.props.route.receiverPH.replace(/[^0-9 ]/g, "").split(' ').join('');
+    this.inviteeIndex.child(this.props.code).set(PH);
+    this.users.child(this.props.route.userId).child('friends').child(PH).set(receiverName);
   }
 
   componentWillMount() {
@@ -93,7 +102,10 @@ class SecretCode extends React.Component {
             onChangeText={(text) => {this.props.actions.updateSecretCode(text); this.checkLength(text)} }
             value={this.props.code} />
           <Text style={styles.paragraph}>We will use this code to securely identify your friend</Text>
-          <BigButton do={() => this.createCode()}>
+          <BigButton do={() => {
+            this.savePhoneNumber();
+            this.createCode();
+          }}>
             Submit
           </BigButton>
           </View>

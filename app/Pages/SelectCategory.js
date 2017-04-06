@@ -38,9 +38,9 @@ class SelectCategory extends React.PureComponent {
     }, {
       'title': 'Funny'
     }, {
-      'title': 'Embarassing'
+      'title': 'Random'
     }, {
-      'title': 'Past'
+      'title': 'Fall in Love'
     }];
   }
 
@@ -97,15 +97,15 @@ class SelectCategory extends React.PureComponent {
             elsewhere={() =>  this.selectCategory(this.categories[1].title) } />
           <Category
             categoryName={this.categories[2].title}
-            imgSource={require("../img/caticon-sex.png")} // 'femenine1'
+            imgSource={require("../img/caticon-sex-2.png")} // 'femenine1'
             elsewhere={() =>  this.selectCategory(this.categories[2].title) } />
           <Category
             categoryName={this.categories[3].title}
-            imgSource={require("../img/caticon-social.png")} // group12
+            imgSource={require("../img/caticon-social-2.png")} // group12
             elsewhere={() =>  this.selectCategory(this.categories[3].title) } />
           <Category
             categoryName={this.categories[4].title}
-            imgSource={require("../img/caticon-funny.png")} // laughing
+            imgSource={require("../img/caticon-funny-2.png")} // laughing
             elsewhere={() =>  this.selectCategory(this.categories[4].title) } />
           <Category
             categoryName={this.categories[5].title}
