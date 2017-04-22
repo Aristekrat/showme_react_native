@@ -57,11 +57,12 @@ class BetaLock extends React.Component {
   }
 
   addToPhoneIndex(code, userId) {
-    console.log(code, userId);
     this.invitees.child(code).once('value', (snapshot) => {
       let PH = snapshot.val();
-      this.phoneNumberIndex.child(PH).set(userId);
-      this.invitees.child(code).remove();
+      if (PH && userId) {
+        this.phoneNumberIndex.child(PH).set(userId);
+        this.invitees.child(code).remove();
+      }
     })
   }
 

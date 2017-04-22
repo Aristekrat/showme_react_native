@@ -34,13 +34,13 @@ class SelectCategory extends React.PureComponent {
     }, {
       'title': 'Sex'
     }, {
+      'title': 'Fall in Love'
+    }, {
       'title': 'Social'
     }, {
       'title': 'Funny'
     }, {
       'title': 'Random'
-    }, {
-      'title': 'Fall in Love'
     }];
   }
 
@@ -101,19 +101,19 @@ class SelectCategory extends React.PureComponent {
             elsewhere={() =>  this.selectCategory(this.categories[2].title) } />
           <Category
             categoryName={this.categories[3].title}
-            imgSource={require("../img/caticon-social-2.png")} // group12
+            imgSource={require("../img/caticon-cupid.png")} // cupid
             elsewhere={() =>  this.selectCategory(this.categories[3].title) } />
           <Category
             categoryName={this.categories[4].title}
-            imgSource={require("../img/caticon-funny-2.png")} // laughing
+            imgSource={require("../img/caticon-social-2.png")} // group12
             elsewhere={() =>  this.selectCategory(this.categories[4].title) } />
           <Category
             categoryName={this.categories[5].title}
-            imgSource={require("../img/caticon-embarassing.png")} // wound4
+            imgSource={require("../img/caticon-funny-2.png")} // laughing
             elsewhere={() =>  this.selectCategory(this.categories[5].title) } />
           <Category
             categoryName={this.categories[6].title}
-            imgSource={require("../img/caticon-past.png")} // music-player17
+            imgSource={require("../img/caticon-embarassing.png")} // wound4
             elsewhere={() =>  this.selectCategory(this.categories[6].title) } />
         </ScrollView>
         <SModal modalTitle={this.props.route.modalTitle} modalText={this.props.route.modalText} secondaryText={this.props.route.modalSecondaryText} ref="smodal" />
@@ -127,6 +127,8 @@ class SelectCategory extends React.PureComponent {
     );
   }
 }
+
+// Past imgSource={require("../img/caticon-past.png")} // music-player17
 
 var styles = StyleSheet.create({
   error: {

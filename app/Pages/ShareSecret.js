@@ -104,7 +104,7 @@ class ShareSecret extends React.Component {
           <View>
           { this.props.route.contacts === "PermissionDenied" || !this.props.contactsPermission ?
             <View>
-              <Text style={styles.prompt}>Enter your friends Phone Number</Text>
+              <Text style={styles.prompt}>Enter your friends phone number</Text>
               <TextInput style={styles.textInput}
                 autoFocus={true}
                 onChangeText={(phoneNumber) => {
@@ -113,7 +113,6 @@ class ShareSecret extends React.Component {
               <Text style={styles.label}>If you let ShowMe access contacts we can find it for you</Text>
               <BigButton do={() => {
                   let filteredString = this.props.phoneNumber.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(' ').join('');
-                  //var filteredString = this.state.ph
                   if (isNaN(parseInt(filteredString))) {
                     this.props.actions.setError("Please enter a number");
                   } else if (filteredString.length < 9) {
@@ -133,7 +132,6 @@ class ShareSecret extends React.Component {
               <BigButton do={() => {
                   this.props.actions.toggleAnimation();
                   SendSecret.saveArgs(this.props.phoneNumber, this.props.name, this.props.userId, this.props.secretKey, this.props);
-                  // this.props.navigator.push({name: 'SecretCode', receiverName: this.props.name, userId: this.props.userId, cookieData: this.props.route.cookieData, key: this.props.secretKey, receiverPH: this.props.phoneNumber});
                 }}>
                 Continue
               </BigButton>

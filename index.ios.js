@@ -220,7 +220,7 @@ class ShowMe extends React.Component {
               routeMapper={Title}
               style={styles.navBar} />
         }
-        initialRoute={{name: "SelectCategory"}}
+        initialRoute={{name: "BetaLock"}}
         />
       </Provider>
     );
