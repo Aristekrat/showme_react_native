@@ -55,7 +55,7 @@ class BetaExplanation extends React.Component {
             Please enter your email
           </Text>
           <Text style={styles.header}>
-            Youll receive an invitation when were ready to accept more users
+            You'll receive an invitation when we're ready to accept more users
           </Text>
           <TextInput
             style={StylingGlobals.textInput}
@@ -73,17 +73,20 @@ class BetaExplanation extends React.Component {
             this.props.error ? <Text style={styles.error}>{this.props.error}</Text> : null
           }
           <ActivityIndicator animationControl={this.props.animating} />
-          <ArrowLink extraStyling={{marginTop: -10}} skipTo={() => this.setState({moreExplanation: !this.state.moreExplanation}) }>Why does ShowMe require an invitation?</ArrowLink>
-          {
-            this.state.moreExplanation ?
-            <Text style={styles.moreExplanation}>ShowMe is brand new and currently in Beta. We want to keep our userbase limited while we test new features.</Text> :
-            null
-          }
         </ScrollView>
       </View>
     );
   }
 }
+
+/*
+<ArrowLink extraStyling={{marginTop: -10}} skipTo={() => this.setState({moreExplanation: !this.state.moreExplanation}) }>Why does ShowMe require an invitation?</ArrowLink>
+{
+  this.state.moreExplanation ?
+  <Text style={styles.moreExplanation}>ShowMe is brand new. We want to keep our userbase limited .</Text> :
+  null
+}
+*/
 
 const mapStateToProps = (state) => {
   return {
