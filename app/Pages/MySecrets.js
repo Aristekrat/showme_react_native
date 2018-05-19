@@ -106,58 +106,6 @@ class MySecrets extends React.Component {
         if (this.props.route.secret) {
           allSecrets.push(this.props.route.secret);
         }
-        let addendum = [{
-            question: "Q31: What's something you like about me but have been afraid to say until now?",
-            askerID: 'Scs0SboLXpP2wys2dZ3HG8SDuGg1',
-            askerName: 'You',
-            responderID: 'udP5p9VF2IQ3UEslbMjX9bna9at2',
-            responderName: 'JKP',
-            key: '-KhVwUb48Bv5gzANhjpI',
-            state: { answerState: 'BR', sentState: 'SO' },
-            answer: {responderAnswer: "You have the sweetest laugh I've ever heard. I used to think up funny things to say to you all day just so I could hear you laugh again",
-                      askerAnswer: "You have the sweetest laugh I've ever heard. I used to think up funny things to say to you all day just so I could hear you laugh again"},
-            answerNotification: false
-        }, {
-            question: 'Who do you have a crush on?',
-            askerID: 'Scs0SboLXpP2wys2dZ3HG8SDuGg1',
-            askerName: 'Kristen',
-            responderID: 'udP5p9VF2IQ3UEslbMjX9bna9at2',
-            responderName: 'Kristen',
-            key: '-KhVwUb48Bv5gzANhFpI',
-            state: { answerState: 'BR', sentState: 'SO' },
-            answer: {responderAnswer: "Jake! God he's so cute", askerAnswer: "Jake! God he's so cute"},
-            answerNotification: false
-        }, {
-            question: "Do you know anyone that's cheating on their gf / bf?",
-            askerID: 'Scs0SboLXpP2wys2dZ3HG8SDuGg1',
-            askerName: 'Jake',
-            responderID: 'udP5p9VF2IQ3UEslbMjX9bna9at2',
-            responderName: 'Jake',
-            key: '-KBVwUb48Bv5gzANhjpJ',
-            state: { answerState: 'BR', sentState: 'SO' },
-            answer: {responderAnswer: "Yeah, Mike is cheating on Jenna. I caught him with another girl at a party last weekend", askerAnswer: "Yeah, Mike is cheating on Jenna. I caught him with another girl at a party last weekend"},
-            answerNotification: false
-        }];
-        allSecrets = allSecrets.concat(addendum);
-        /*
-        author={item.askerName ? item.askerName : "Anonymous"}
-        question={item.question}
-        key={item.key}
-        answer={item.answer ? 'A: ' + otherAnswer : null}
-        answerNotification={item.answerNotification ? "They've answered! To see it, write your own answer now." : null}
-        updateSecret={() =>  this.setUpdateSecretFunc(this.props.displaying, item)}
-        updated={this.props.updatedSecrets[item.key]}
-
-        { question: 'Here\'s a secret, oh boy!',
-          askerID: 'Scs0SboLXpP2wys2dZ3HG8SDuGg1',
-          askerName: 'You',
-          responderID: 'udP5p9VF2IQ3UEslbMjX9bna9at2',
-          responderName: 'Kristen',
-          key: '-KhVwUb48Bv5gzANhjpI',
-          state: { answerState: 'BR', sentState: 'SO' },
-          answer: "I've always loved you and I always will",
-          answerNotification: false }
-        */
         this.initialDisplay(allSecrets);
         this.mySecrets = allSecrets;
         if (this.props.updatedSecrets) {
@@ -223,7 +171,7 @@ class MySecrets extends React.Component {
     let secretsList = this.listSecrets(currentSecrets);
     switch(this.props.displaying) {
       case "SO":
-        helperText = null;
+        helperText = <Text style={styles.helperText}>Tap to report a fake answer</Text>;
         break;
       case "QS":
       case "RR":

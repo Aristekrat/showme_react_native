@@ -84,7 +84,7 @@ class YourAnswer extends React.Component {
     }
     this.notify("Success! We'll notify you when you both answer");
   }
-
+  /*
   componentWillMount() {
     Utility.resetState(this.props.animating, this.props.error, this.props.answer);
 
@@ -105,6 +105,7 @@ class YourAnswer extends React.Component {
       });
     }
   }
+  */
 
   render() {
     return (
@@ -125,6 +126,7 @@ class YourAnswer extends React.Component {
             <Text style={styles.buttonText}>Update</Text>
           </TouchableHighlight>
           { this.props.error ? <Text style={styles.notificationText}>{this.props.error}</Text> : null}
+          { this.props.answer ? <Text style={styles.warning}>Please do not write a fake or joke answer. Your friend will be mad at you if you do, and could report you</Text> : null}
         </ScrollView>
         <TabBar navigator={this.props.navigator} route={this.props.route} />
       </View>
@@ -155,6 +157,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 5,
     fontSize: 16,
+  },
+  warning: {
+    marginTop: 5,
+    fontSize: 13,
   },
   button: {
     backgroundColor: StylingGlobals.colors.mainColor,
